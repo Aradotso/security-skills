@@ -21,6 +21,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | Skill | skills.sh | Source | Date |
 |-------|-----------|--------|------|
 | [anthropic-cybersecurity-skills](skills/anthropic-cybersecurity-skills/) | [install](https://skills.sh/aradotso/security-skills/anthropic-cybersecurity-skills) | [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills) | 2026-05-16 |
+| [openclaw-security-hardening](skills/openclaw-security-hardening/) | [install](https://skills.sh/aradotso/security-skills/openclaw-security-hardening) | [slowmist/openclaw-security-practice-guide](https://github.com/slowmist/openclaw-security-practice-guide) | 2026-05-16 |
 <!-- SKILL_INDEX -->
 
 ---
