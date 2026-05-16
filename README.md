@@ -28,6 +28,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [security-awareness-malware-identification](skills/security-awareness-malware-identification/) | [install](https://skills.sh/aradotso/security-skills/security-awareness-malware-identification) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 | [security-awareness-malware-detection](skills/security-awareness-malware-detection/) | [install](https://skills.sh/aradotso/security-skills/security-awareness-malware-detection) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 | [avast-premium-security-analysis](skills/avast-premium-security-analysis/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-analysis) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
+| [malware-warning-avast-keygen](skills/malware-warning-avast-keygen/) | [install](https://skills.sh/aradotso/security-skills/malware-warning-avast-keygen) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 <!-- SKILL_INDEX -->
 
 ---
