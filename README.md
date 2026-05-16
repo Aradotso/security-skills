@@ -25,6 +25,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentest-ai-agents](skills/pentest-ai-agents/) | [install](https://skills.sh/aradotso/security-skills/pentest-ai-agents) | [0xSteph/pentest-ai-agents](https://github.com/0xSteph/pentest-ai-agents) | 2026-05-16 |
 | [vibe-security-skill](skills/vibe-security-skill/) | [install](https://skills.sh/aradotso/security-skills/vibe-security-skill) | [raroque/vibe-security-skill](https://github.com/raroque/vibe-security-skill) | 2026-05-16 |
 | [slowmist-agent-security-framework](skills/slowmist-agent-security-framework/) | [install](https://skills.sh/aradotso/security-skills/slowmist-agent-security-framework) | [slowmist/slowmist-agent-security](https://github.com/slowmist/slowmist-agent-security) | 2026-05-16 |
+| [security-awareness-malware-identification](skills/security-awareness-malware-identification/) | [install](https://skills.sh/aradotso/security-skills/security-awareness-malware-identification) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 <!-- SKILL_INDEX -->
 
 ---
