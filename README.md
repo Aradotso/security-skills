@@ -35,6 +35,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [palisade-security-nexus-bitdefender](skills/palisade-security-nexus-bitdefender/) | [install](https://skills.sh/aradotso/security-skills/palisade-security-nexus-bitdefender) | [tonylinden54/palisade-security-nexus](https://github.com/tonylinden54/palisade-security-nexus) | 2026-05-16 |
 | [malware-distribution-detection](skills/malware-distribution-detection/) | [install](https://skills.sh/aradotso/security-skills/malware-distribution-detection) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 | [malware-warning-avast-piracy](skills/malware-warning-avast-piracy/) | [install](https://skills.sh/aradotso/security-skills/malware-warning-avast-piracy) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
+| [security-warning-malicious-repository](skills/security-warning-malicious-repository/) | [install](https://skills.sh/aradotso/security-skills/security-warning-malicious-repository) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 <!-- SKILL_INDEX -->
 
 ---
