@@ -38,6 +38,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [security-warning-malicious-repository](skills/security-warning-malicious-repository/) | [install](https://skills.sh/aradotso/security-skills/security-warning-malicious-repository) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 | [avast-security-awareness](skills/avast-security-awareness/) | [install](https://skills.sh/aradotso/security-skills/avast-security-awareness) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 | [security-awareness-malicious-repository-detection](skills/security-awareness-malicious-repository-detection/) | [install](https://skills.sh/aradotso/security-skills/security-awareness-malicious-repository-detection) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
+| [report-malicious-repository](skills/report-malicious-repository/) | [install](https://skills.sh/aradotso/security-skills/report-malicious-repository) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-16 |
 <!-- SKILL_INDEX -->
 
 ---
