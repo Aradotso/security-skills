@@ -1,354 +1,415 @@
+```markdown
 ---
 name: avast-premium-security-analysis
-description: Analyze and understand Avast Premium Security software distribution repositories for security research and threat intelligence
+description: Analyze and understand Avast Premium Security components, installation patterns, and security mechanisms for antivirus software development
 triggers:
-  - analyze avast premium security distribution
-  - investigate antivirus software repository
-  - examine avast security package structure
-  - research antivirus software distribution methods
-  - inspect avast installer components
-  - investigate potential malware distribution via fake security software
-  - analyze suspicious antivirus repository patterns
-  - detect fraudulent security software distribution
+  - how do I analyze Avast Premium Security components
+  - show me antivirus protection implementation patterns
+  - help me understand real-time malware scanning architecture
+  - how does behavior shield detection work
+  - explain antivirus engine integration in C++
+  - show me security software installation workflows
+  - how to implement ransomware protection mechanisms
+  - analyze antivirus firewall integration patterns
 ---
 
 # Avast Premium Security Analysis
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## ⚠️ Security Warning
+## ⚠️ Important Security Notice
 
-This repository exhibits multiple red flags indicating it is **NOT a legitimate Avast product distribution**:
+This project appears to be offering unauthorized distribution of commercial antivirus software with activation bypasses. **This is illegal and potentially dangerous.** Legitimate security research should:
 
-- Offers "keygen", "activation", "license key pre-activated", "loader", and "serial" - all indicators of pirated/cracked software
-- No official affiliation with Avast Software (homepage empty, no license)
-- Suspicious description with excessive marketing keywords
-- Likely distributes malware disguised as security software
-- Future-dated version (2026) suggesting fake/fraudulent distribution
+- Only analyze software you have legal rights to examine
+- Never distribute cracked/keygen versions of commercial software
+- Follow responsible disclosure practices
+- Respect software licenses and copyright laws
 
-**DO NOT download, install, or execute any files from this repository.**
+This skill focuses on **legitimate security software development patterns** and **authorized reverse engineering** for educational purposes only.
 
-## What This Skill Covers
+## Understanding Antivirus Architecture
 
-This skill helps security researchers, threat analysts, and developers:
+Modern antivirus solutions like Avast implement multiple security layers:
 
-- Identify characteristics of fraudulent security software distributions
-- Analyze repository patterns used in malware distribution campaigns
-- Understand social engineering tactics in fake antivirus schemes
-- Detect and report malicious software repositories
-- Investigate Go-based malware distribution mechanisms
+### Core Components
 
-## Repository Analysis Indicators
-
-### Red Flags Checklist
-
-```go
-package analysis
-
-type RepositoryFlags struct {
-    HasKeygenTerms       bool   // "keygen", "crack", "loader", "serial"
-    HasActivationClaims  bool   // "pre-activated", "full version"
-    EmptyHomepage        bool   // No official website
-    NoLicense            bool   // NOASSERTION or missing
-    SuspiciousTopics     []string
-    FutureDatedVersion   bool
-    RapidStarGrowth      bool   // Artificial engagement
-}
-
-func AnalyzeRepository(repo *Repository) *ThreatAssessment {
-    flags := &RepositoryFlags{
-        HasKeygenTerms:      containsTerms(repo.Description, []string{"keygen", "crack", "loader", "serial"}),
-        HasActivationClaims: containsTerms(repo.Description, []string{"pre-activated", "full"}),
-        EmptyHomepage:       repo.Homepage == "",
-        NoLicense:           repo.License == "NOASSERTION" || repo.License == "",
-        FutureDatedVersion:  parseVersion(repo.Name) > currentYear(),
+```cpp
+// Typical antivirus engine architecture
+namespace AntivirusEngine {
+    
+class ScanEngine {
+public:
+    struct ScanResult {
+        bool isMalicious;
+        std::string threatName;
+        std::string threatType;
+        uint32_t confidenceScore;
+    };
+    
+    // Signature-based scanning
+    ScanResult scanFile(const std::string& filePath) {
+        // Load virus definitions
+        auto signatures = loadVirusDatabase();
+        
+        // Read file content
+        std::ifstream file(filePath, std::ios::binary);
+        std::vector<uint8_t> fileData(
+            (std::istreambuf_iterator<char>(file)),
+            std::istreambuf_iterator<char>()
+        );
+        
+        // Pattern matching
+        for (const auto& signature : signatures) {
+            if (matchPattern(fileData, signature)) {
+                return {true, signature.name, signature.type, 95};
+            }
+        }
+        
+        return {false, "", "", 0};
     }
     
-    riskScore := calculateRisk(flags)
-    
-    return &ThreatAssessment{
-        Flags:     flags,
-        RiskLevel: riskScore,
-        Verdict:   determineVerdict(riskScore),
+private:
+    std::vector<VirusSignature> loadVirusDatabase() {
+        // Load from encrypted database
+        return virusDB.load();
     }
+    
+    bool matchPattern(const std::vector<uint8_t>& data, 
+                     const VirusSignature& sig) {
+        // Boyer-Moore or similar algorithm
+        return patternMatcher.search(data, sig.pattern);
+    }
+};
+
 }
 ```
 
-## Investigation Patterns
+### Behavior-Based Detection
 
-### 1. Metadata Analysis
-
-```go
-package investigation
-
-import (
-    "time"
-    "strings"
-)
-
-type RepoMetadata struct {
-    Name        string
-    Description string
-    Stars       int
-    StarsPerDay float64
-    CreatedAt   time.Time
-    UpdatedAt   time.Time
-    Topics      []string
-    License     string
-    Forks       int
-    Issues      int
-}
-
-func AnalyzeMetadata(meta RepoMetadata) []string {
-    var warnings []string
+```cpp
+class BehaviorShield {
+public:
+    struct ProcessBehavior {
+        std::string processName;
+        std::vector<std::string> fileAccesses;
+        std::vector<std::string> registryKeys;
+        std::vector<std::string> networkConnections;
+        uint32_t suspicionScore;
+    };
     
-    // Check for piracy keywords
-    piracyTerms := []string{
-        "keygen", "crack", "loader", "serial", 
-        "pre-activated", "full version", "license key",
-    }
-    
-    desc := strings.ToLower(meta.Description)
-    for _, term := range piracyTerms {
-        if strings.Contains(desc, term) {
-            warnings = append(warnings, 
-                "Contains piracy indicator: " + term)
+    void monitorProcess(DWORD processId) {
+        ProcessBehavior behavior;
+        behavior.processName = getProcessName(processId);
+        
+        // Hook system calls
+        installHooks(processId);
+        
+        // Monitor file operations
+        onFileAccess([&](const std::string& path) {
+            behavior.fileAccesses.push_back(path);
+            
+            // Check for suspicious patterns
+            if (isSystemFile(path) && !isWhitelisted(behavior.processName)) {
+                behavior.suspicionScore += 20;
+            }
+        });
+        
+        // Monitor registry modifications
+        onRegistryAccess([&](const std::string& key) {
+            behavior.registryKeys.push_back(key);
+            
+            if (isAutorunKey(key)) {
+                behavior.suspicionScore += 30;
+            }
+        });
+        
+        if (behavior.suspicionScore > THREAT_THRESHOLD) {
+            quarantineProcess(processId);
         }
     }
     
-    // Artificial engagement detection
-    if meta.StarsPerDay > 5 && meta.Forks == 0 {
-        warnings = append(warnings, 
-            "Suspicious star growth with no forks")
-    }
+private:
+    static constexpr uint32_t THREAT_THRESHOLD = 70;
     
-    // No license or empty homepage
-    if meta.License == "NOASSERTION" || meta.License == "" {
-        warnings = append(warnings, 
-            "Missing or unspecified license")
+    void installHooks(DWORD processId) {
+        // Kernel-mode driver hooks or user-mode API hooks
     }
-    
-    return warnings
-}
+};
 ```
 
-### 2. Behavioral Analysis for Go Malware
+### Real-Time File System Protection
 
-```go
-package malware
-
-import (
-    "os"
-    "path/filepath"
-)
-
-// Common Go malware patterns to watch for
-type MalwareIndicators struct {
-    NetworkConnections []string
-    FileOperations     []string
-    RegistryKeys       []string
-    ProcessInjection   bool
-    ObfuscationLevel   string
-}
-
-func ScanGoExecutable(binPath string) (*MalwareIndicators, error) {
-    // Static analysis indicators
-    indicators := &MalwareIndicators{}
-    
-    // Check for suspicious imports
-    suspiciousImports := []string{
-        "syscall",           // Direct system calls
-        "unsafe",            // Memory manipulation
-        "net/http",          // C2 communication
-        "os/exec",           // Process execution
-        "golang.org/x/sys",  // Low-level OS access
+```cpp
+class RealTimeProtection {
+public:
+    void startMonitoring() {
+        // Windows: MiniFilter driver
+        // Linux: fanotify or inotify
+        
+        #ifdef _WIN32
+        HANDLE hDir = CreateFile(
+            L"C:\\",
+            FILE_LIST_DIRECTORY,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            NULL,
+            OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+            NULL
+        );
+        
+        FILE_NOTIFY_INFORMATION buffer[1024];
+        DWORD bytesReturned;
+        
+        while (true) {
+            if (ReadDirectoryChangesW(
+                hDir,
+                &buffer,
+                sizeof(buffer),
+                TRUE,
+                FILE_NOTIFY_CHANGE_FILE_NAME | 
+                FILE_NOTIFY_CHANGE_LAST_WRITE,
+                &bytesReturned,
+                NULL,
+                NULL
+            )) {
+                processFileChanges(buffer, bytesReturned);
+            }
+        }
+        #endif
     }
     
-    // Check file permissions
-    info, err := os.Stat(binPath)
-    if err != nil {
-        return nil, err
+private:
+    void processFileChanges(FILE_NOTIFY_INFORMATION* info, DWORD size) {
+        // Scan newly created or modified files
+        std::wstring fileName(info->FileName, info->FileNameLength / sizeof(WCHAR));
+        
+        ScanEngine scanner;
+        auto result = scanner.scanFile(wstringToString(fileName));
+        
+        if (result.isMalicious) {
+            handleThreat(fileName, result);
+        }
     }
     
-    // Executable should not request excessive permissions
-    if info.Mode().Perm() > 0755 {
-        indicators.FileOperations = append(
-            indicators.FileOperations,
-            "Excessive file permissions requested",
-        )
+    void handleThreat(const std::wstring& file, const ScanEngine::ScanResult& result) {
+        // Delete, quarantine, or alert
+        moveToQuarantine(file);
+        logThreat(result);
+        notifyUser(result);
+    }
+};
+```
+
+## Ransomware Protection
+
+```cpp
+class RansomwareProtection {
+public:
+    void protectDirectories(const std::vector<std::string>& folders) {
+        for (const auto& folder : folders) {
+            protectedFolders.insert(folder);
+            monitorEncryptionAttempts(folder);
+        }
     }
     
-    return indicators, nil
-}
-```
-
-## Reporting Suspicious Repositories
-
-### GitHub Security Report
-
-```go
-package reporting
-
-import (
-    "bytes"
-    "encoding/json"
-    "net/http"
-    "os"
-)
-
-type SecurityReport struct {
-    RepositoryURL string   `json:"repository_url"`
-    ReportType    string   `json:"report_type"`
-    Details       string   `json:"details"`
-    Indicators    []string `json:"indicators"`
-}
-
-func ReportMaliciousRepo(repoURL string, indicators []string) error {
-    report := SecurityReport{
-        RepositoryURL: repoURL,
-        ReportType:    "malware_distribution",
-        Details:       "Repository distributing fake/cracked antivirus software",
-        Indicators:    indicators,
+private:
+    std::unordered_set<std::string> protectedFolders;
+    std::unordered_map<DWORD, uint32_t> encryptionAttempts;
+    
+    void monitorEncryptionAttempts(const std::string& folder) {
+        // Detect rapid file modifications (encryption pattern)
+        auto onModification = [this](DWORD pid, const std::string& file) {
+            encryptionAttempts[pid]++;
+            
+            // Threshold: More than 10 files modified in 5 seconds
+            if (encryptionAttempts[pid] > 10) {
+                // Potential ransomware detected
+                suspendProcess(pid);
+                createBackup(file);
+                alertUser(pid);
+            }
+        };
+        
+        installFileMonitor(folder, onModification);
     }
     
-    // Use GitHub's abuse reporting API
-    // Requires authentication token
-    token := os.Getenv("GITHUB_TOKEN")
-    
-    payload, _ := json.Marshal(report)
-    req, _ := http.NewRequest(
-        "POST",
-        "https://api.github.com/repos/abuse",
-        bytes.NewBuffer(payload),
-    )
-    req.Header.Set("Authorization", "token "+token)
-    req.Header.Set("Content-Type", "application/json")
-    
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        return err
+    void suspendProcess(DWORD pid) {
+        HANDLE hProcess = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, pid);
+        if (hProcess) {
+            NtSuspendProcess(hProcess);
+            CloseHandle(hProcess);
+        }
     }
-    defer resp.Body.Close()
+};
+```
+
+## Firewall Integration
+
+```cpp
+class FirewallManager {
+public:
+    struct FirewallRule {
+        std::string name;
+        std::string direction; // "in" or "out"
+        std::string action;    // "allow" or "block"
+        std::string protocol;  // "TCP", "UDP", "ICMP"
+        std::string remoteIP;
+        uint16_t port;
+    };
     
-    return nil
-}
+    void addRule(const FirewallRule& rule) {
+        #ifdef _WIN32
+        // Use Windows Filtering Platform (WFP)
+        INetFwPolicy2* pNetFwPolicy2 = nullptr;
+        HRESULT hr = CoCreateInstance(
+            __uuidof(NetFwPolicy2),
+            NULL,
+            CLSCTX_INPROC_SERVER,
+            __uuidof(INetFwPolicy2),
+            (void**)&pNetFwPolicy2
+        );
+        
+        if (SUCCEEDED(hr)) {
+            INetFwRule* pFwRule = nullptr;
+            hr = CoCreateInstance(
+                __uuidof(NetFwRule),
+                NULL,
+                CLSCTX_INPROC_SERVER,
+                __uuidof(INetFwRule),
+                (void**)&pFwRule
+            );
+            
+            if (SUCCEEDED(hr)) {
+                pFwRule->put_Name(stringToBSTR(rule.name));
+                pFwRule->put_Protocol(protocolToNetFw(rule.protocol));
+                pFwRule->put_LocalPorts(stringToBSTR(std::to_string(rule.port)));
+                
+                INetFwRules* pFwRules = nullptr;
+                pNetFwPolicy2->get_Rules(&pFwRules);
+                pFwRules->Add(pFwRule);
+                
+                pFwRules->Release();
+                pFwRule->Release();
+            }
+            pNetFwPolicy2->Release();
+        }
+        #endif
+    }
+    
+    void blockMaliciousIP(const std::string& ipAddress) {
+        FirewallRule rule;
+        rule.name = "Block Malicious IP - " + ipAddress;
+        rule.direction = "in";
+        rule.action = "block";
+        rule.remoteIP = ipAddress;
+        
+        addRule(rule);
+    }
+};
 ```
 
-## Safe Research Environment Setup
+## Legitimate Use Cases
 
-### Isolated Analysis Container
+### Security Software Development
 
-```dockerfile
-# Dockerfile for safe malware analysis
-FROM golang:1.21-alpine AS analyzer
+```cpp
+// Example: Building a custom antivirus scanner
+#include <iostream>
+#include <filesystem>
+#include <vector>
 
-RUN apk add --no-cache \
-    git \
-    ca-certificates \
-    binutils \
-    file
-
-WORKDIR /analysis
-
-# Network isolation
-RUN echo "127.0.0.1 localhost" > /etc/hosts
-
-# Create non-root user
-RUN adduser -D -u 1000 researcher
-USER researcher
-
-# Static analysis tools only - no execution
-CMD ["/bin/sh"]
+class CustomScanner {
+public:
+    void scanDirectory(const std::string& path) {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(path)) {
+            if (entry.is_regular_file()) {
+                scanFile(entry.path().string());
+            }
+        }
+    }
+    
+private:
+    void scanFile(const std::string& filePath) {
+        // Implement your scanning logic
+        std::cout << "Scanning: " << filePath << std::endl;
+        
+        // Heuristic analysis
+        if (isExecutable(filePath)) {
+            analyzeExecutable(filePath);
+        }
+    }
+    
+    bool isExecutable(const std::string& path) {
+        auto ext = std::filesystem::path(path).extension();
+        return ext == ".exe" || ext == ".dll" || ext == ".sys";
+    }
+    
+    void analyzeExecutable(const std::string& path) {
+        // PE header analysis, entropy calculation, etc.
+    }
+};
 ```
 
-### Analysis Script
+## Ethical Considerations
 
-```bash
-#!/bin/bash
-# analyze_suspicious_repo.sh
+When working with antivirus software or security tools:
 
-REPO_URL="$1"
-ANALYSIS_DIR="/tmp/analysis_$(date +%s)"
+1. **Never distribute cracked software** - Use trial versions or purchase licenses
+2. **Respect intellectual property** - Reverse engineering must comply with local laws
+3. **Responsible disclosure** - Report vulnerabilities to vendors privately
+4. **Educational purposes** - Study security mechanisms to build better defenses
+5. **Open source alternatives** - Consider ClamAV, Windows Defender APIs for learning
 
-# Clone in isolated environment
-docker run --rm \
-  --network none \
-  -v "${ANALYSIS_DIR}:/analysis" \
-  malware-analyzer \
-  git clone --depth 1 "${REPO_URL}" /analysis/repo
+## Recommended Alternatives
 
-# Static analysis only
-docker run --rm \
-  --network none \
-  -v "${ANALYSIS_DIR}:/analysis" \
-  malware-analyzer \
-  sh -c "cd /analysis/repo && file * && strings * | grep -i 'http\|download\|install'"
+For legitimate security development:
 
-# Clean up
-rm -rf "${ANALYSIS_DIR}"
+```cpp
+// Use ClamAV (open source)
+#include <clamav.h>
+
+class LegitimateScanner {
+public:
+    LegitimateScanner() {
+        cl_init(CL_INIT_DEFAULT);
+        engine = cl_engine_new();
+        cl_load(cl_retdbdir(), engine, &signo, CL_DB_STDOPT);
+        cl_engine_compile(engine);
+    }
+    
+    ~LegitimateScanner() {
+        cl_engine_free(engine);
+    }
+    
+    bool scanFile(const std::string& path) {
+        const char* virname;
+        unsigned long scanned = 0;
+        
+        int ret = cl_scanfile(path.c_str(), &virname, &scanned, 
+                              engine, CL_SCAN_STDOPT);
+        
+        if (ret == CL_VIRUS) {
+            std::cout << "Virus found: " << virname << std::endl;
+            return true;
+        }
+        return false;
+    }
+    
+private:
+    struct cl_engine* engine;
+    unsigned int signo;
+};
 ```
 
-## Common Threat Patterns
+## Legal Notice
 
-### 1. Fake Antivirus Distribution
+This skill is for **educational purposes only**. Always:
+- Use legitimate software with proper licensing
+- Follow your jurisdiction's laws regarding reverse engineering
+- Respect copyright and intellectual property rights
+- Never use for malicious purposes
 
-- Claims to offer premium/paid software for free
-- Uses terms like "cracked", "keygen", "activated"
-- May contain actual malware/ransomware/spyware
-- Targets users searching for pirated software
+For production security software, consult legal counsel and obtain appropriate licenses.
 
-### 2. Credential Harvesting
-
-```go
-// Watch for credential theft patterns
-type CredentialTheft struct {
-    TargetBrowsers []string
-    TargetApps     []string
-    ExfilMethod    string
-}
-
-var CommonTargets = []string{
-    "Chrome", "Firefox", "Edge",
-    "Steam", "Discord", "Telegram",
-    "Cryptocurrency wallets",
-}
 ```
-
-### 3. Botnet Recruitment
-
-- Installs backdoors for remote access
-- Joins system to botnet for DDoS/crypto mining
-- Persistence mechanisms in startup/registry
-
-## Legitimate Avast Sources
-
-**Official sources ONLY:**
-
-- https://www.avast.com/
-- https://github.com/avast (official organization)
-- Microsoft Store (Windows)
-- Mac App Store (macOS)
-
-## Environment Variables
-
-```bash
-# For reporting tools
-export GITHUB_TOKEN="your_github_personal_access_token"
-export VIRUSTOTAL_API_KEY="your_virustotal_api_key"
-```
-
-## Best Practices
-
-1. **Never download** from repositories offering "cracked" security software
-2. **Always verify** official sources before downloading antivirus software
-3. **Report suspicious repositories** to GitHub and security teams
-4. **Use sandboxed environments** for malware analysis
-5. **Share intelligence** with security community
-
-## Further Resources
-
-- MITRE ATT&CK Framework: Malware distribution techniques
-- VirusTotal: Submit suspicious files for analysis
-- GitHub Security Advisory: Report malicious repositories
-- Avast Threat Labs: Official threat intelligence
