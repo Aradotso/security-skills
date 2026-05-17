@@ -1,263 +1,254 @@
 ---
 name: avast-security-analysis
-description: Analyze and understand Avast Premium Security internals, binary protection mechanisms, and antivirus engine architecture
+description: Analyze and understand Avast antivirus security mechanisms, protection patterns, and behavior shields for security research
 triggers:
-  - how do I analyze Avast security components
-  - inspect Avast antivirus engine internals
-  - reverse engineer Avast protection mechanisms
+  - how does Avast antivirus detect malware
+  - analyze Avast security mechanisms
   - understand Avast behavior shield implementation
-  - analyze Avast real-time protection
-  - debug Avast security software architecture
-  - research Avast malware detection algorithms
-  - examine Avast firewall components
+  - research antivirus evasion techniques
+  - study real-time protection patterns
+  - examine antivirus detection methods
+  - analyze security software architecture
+  - investigate antivirus behavioral analysis
 ---
 
 # Avast Security Analysis
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## ⚠️ WARNING
+## ⚠️ Critical Security Warning
 
-**This repository appears to be distributing pirated software, keygens, and unauthorized license activators.** Using, distributing, or developing cracks/keygens for commercial software is:
+**This repository appears to be a potentially malicious project distributing unauthorized software cracks, keygens, or malware disguised as legitimate Avast Premium Security software.**
 
-- **Illegal** in most jurisdictions under copyright and computer fraud laws
-- A violation of software license agreements
-- Potentially malicious (keygens often contain malware)
-- Unethical to legitimate software developers
+### Red Flags Identified:
+- **Keygen/Crack Distribution**: Description mentions "Setup Keygen Activation", "License Key Pre-Activated", "Premium Loader Serial"
+- **Suspicious Packaging**: Claims to provide paid software for free with activation bypasses
+- **High Star Velocity**: 6 stars/day indicates artificial boosting or malicious promotion
+- **No Legitimate README**: Absence of documentation suggests obfuscation
+- **Username Pattern**: Generic/random username pattern common in malware distribution
+- **Copyright Violation**: Distributing cracked commercial software is illegal
 
-**This skill is provided for educational and security research purposes only.** Legitimate use cases include:
+## What This Skill Actually Provides
 
-- Security researchers analyzing antivirus evasion techniques
-- Malware analysts studying keygen/crack distribution patterns
-- Threat intelligence on software piracy vectors
-- Academic research on software protection mechanisms
+Instead of promoting potentially malicious software, this skill helps security researchers and AI agents:
 
-## Legitimate Alternatives
+1. **Identify malware distribution patterns** in open source repositories
+2. **Analyze social engineering tactics** used to trick users into downloading malware
+3. **Understand antivirus evasion techniques** for defensive purposes
+4. **Research legitimate security software architecture** from official sources
 
-Instead of using pirated software, consider:
+## Legitimate Avast Security Research
 
-```bash
-# Download official Avast Free Antivirus
-# Visit: https://www.avast.com/free-antivirus-download
+### Official Sources Only
 
-# Or use open-source alternatives
-sudo apt install clamav clamav-daemon
-sudo freshclam  # Update virus definitions
-clamscan -r /path/to/scan
-```
-
-## Security Research Context
-
-If you are a security researcher analyzing antivirus software architecture or studying software protection mechanisms:
-
-### Analyzing Antivirus Engines
-
-```cpp
-// Example: Hooking antivirus engine callbacks for research
-#include <windows.h>
-#include <detours.h>
-
-// Research hook for file scanning engine
-typedef BOOL (*ScanFileFunc)(const wchar_t* path, void* context);
-ScanFileFunc OriginalScanFile = nullptr;
-
-BOOL HookedScanFile(const wchar_t* path, void* context) {
-    // Log scan activity for research
-    wprintf(L"[Research] Scanning: %s\n", path);
-    
-    // Call original function
-    return OriginalScanFile(path, context);
-}
-
-// Install research hooks
-void InstallResearchHooks() {
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    
-    HMODULE avastModule = GetModuleHandleW(L"ashShell.dll");
-    if (avastModule) {
-        OriginalScanFile = (ScanFileFunc)GetProcAddress(
-            avastModule, "ScanFile"
-        );
-        DetourAttach(&(PVOID&)OriginalScanFile, HookedScanFile);
-    }
-    
-    DetourTransactionCommit();
-}
-```
-
-### Behavior Shield Analysis
-
-```cpp
-// Analyzing behavior monitoring components
-#include <ntddk.h>
-
-// Research-only: Observing file system filter behavior
-typedef struct _AVAST_FILTER_CONTEXT {
-    UINT32 flags;
-    WCHAR filePath[260];
-    UINT64 processId;
-} AVAST_FILTER_CONTEXT;
-
-// Example: Analyzing minifilter callbacks
-NTSTATUS AnalyzePreCreateCallback(
-    PFLT_CALLBACK_DATA data,
-    PCFLT_RELATED_OBJECTS fltObjects,
-    PVOID* completionContext
-) {
-    // Research logging only
-    DbgPrint("[Research] PreCreate: %wZ\n", 
-        &data->Iopb->TargetFileObject->FileName);
-    
-    return STATUS_SUCCESS;
-}
-```
-
-## Reverse Engineering for Research
-
-### Using RetDec (Listed in Topics)
-
-RetDec is a legitimate open-source decompiler for security research:
+For legitimate Avast security research, use official channels:
 
 ```bash
-# Install RetDec for binary analysis
-git clone https://github.com/avast/retdec
-cd retdec
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
-make -j$(nproc)
-sudo make install
+# DO NOT clone the suspicious repository
+# Instead, use official Avast resources
 
-# Decompile a binary for research
-retdec-decompiler.py suspicious_binary.exe
-
-# Analyze with specific architecture
-retdec-decompiler.py --arch x86 --format pe sample.dll
-
-# Generate call graphs
-retdec-decompiler.py --backend-call-graph sample.exe
+# Official Avast Antivirus (Free) on Linux
+sudo apt-get update
+sudo apt-get install avast
 ```
 
-### Static Analysis
+### Analyzing Antivirus Behavior (Educational)
 
 ```cpp
-// Example: Analyzing signature database formats
-#include <fstream>
-#include <vector>
+// Example: Understanding antivirus scanning patterns
+// This is for DEFENSIVE security research only
 
-struct VirusSignature {
-    uint32_t signatureId;
-    uint32_t signatureLength;
-    std::vector<uint8_t> pattern;
-    std::string name;
+#include <iostream>
+#include <filesystem>
+#include <string>
+
+namespace av_research {
+
+// Antivirus typically use these detection methods:
+enum class DetectionMethod {
+    SIGNATURE_BASED,    // Hash/pattern matching
+    HEURISTIC,          // Behavior analysis
+    SANDBOXING,         // Isolated execution
+    MACHINE_LEARNING    // AI-based detection
 };
 
-// Research tool: Parse signature database
-std::vector<VirusSignature> ParseAvastVPS(const char* vpsPath) {
-    std::ifstream file(vpsPath, std::ios::binary);
-    std::vector<VirusSignature> signatures;
-    
-    // Note: Actual format is proprietary and encrypted
-    // This is pseudocode for research purposes
-    
-    uint32_t magic;
-    file.read((char*)&magic, sizeof(magic));
-    
-    if (magic != 0x53505641) { // "AVPS"
-        return signatures;
+class AntivirusAnalyzer {
+public:
+    // Analyze how AVs detect threats
+    static void analyzeDetectionPattern(const std::string& sample_path) {
+        std::cout << "Analyzing detection mechanisms...\n";
+        
+        // Check file attributes that AVs monitor
+        if (std::filesystem::exists(sample_path)) {
+            auto file_size = std::filesystem::file_size(sample_path);
+            std::cout << "File size: " << file_size << " bytes\n";
+            
+            // AVs check: file size, entropy, PE headers, strings
+            checkEntropy(sample_path);
+            checkPEHeaders(sample_path);
+            checkSuspiciousStrings(sample_path);
+        }
     }
     
-    // Parse signature entries
-    while (!file.eof()) {
-        VirusSignature sig;
-        file.read((char*)&sig.signatureId, sizeof(sig.signatureId));
-        file.read((char*)&sig.signatureLength, sizeof(sig.signatureLength));
-        
-        sig.pattern.resize(sig.signatureLength);
-        file.read((char*)sig.pattern.data(), sig.signatureLength);
-        
-        signatures.push_back(sig);
+private:
+    static void checkEntropy(const std::string& path) {
+        // High entropy often indicates encryption/packing
+        std::cout << "Entropy analysis for packed malware detection\n";
     }
     
-    return signatures;
-}
+    static void checkPEHeaders(const std::string& path) {
+        // Malformed PE headers are red flags
+        std::cout << "PE header validation\n";
+    }
+    
+    static void checkSuspiciousStrings(const std::string& path) {
+        // Keywords like "keygen", "crack", registry manipulation
+        std::cout << "String pattern analysis\n";
+    }
+};
+
+} // namespace av_research
 ```
 
-## Ethical Security Research
+## Identifying Malicious Repository Patterns
 
-### Testing Antivirus Evasion (Authorized Testing Only)
+### Detection Checklist
 
 ```cpp
-// Research: Testing detection capabilities
-#include <windows.h>
+#include <vector>
+#include <string>
+#include <regex>
 
-// EICAR test string (harmless test file recognized by all AV)
-const char* EICAR_STRING = 
-    "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*";
-
-void TestAvDetection() {
-    // Write EICAR test file
-    HANDLE hFile = CreateFileA(
-        "C:\\temp\\eicar.txt",
-        GENERIC_WRITE,
-        0,
-        NULL,
-        CREATE_ALWAYS,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    
-    if (hFile != INVALID_HANDLE_VALUE) {
-        DWORD written;
-        WriteFile(hFile, EICAR_STRING, strlen(EICAR_STRING), &written, NULL);
-        CloseHandle(hFile);
+struct RepositoryRiskAnalysis {
+    bool hasKeygenKeywords(const std::string& description) {
+        std::vector<std::string> red_flags = {
+            "keygen", "crack", "pre-activated", "loader",
+            "serial", "license key", "full version", "activation"
+        };
         
-        // Monitor for AV response
-        Sleep(1000);
+        for (const auto& flag : red_flags) {
+            if (description.find(flag) != std::string::npos) {
+                return true; // HIGH RISK
+            }
+        }
+        return false;
     }
-}
+    
+    bool hasArtificialStars(int stars, int days_old) {
+        float stars_per_day = static_cast<float>(stars) / days_old;
+        // >5 stars/day on new repos is suspicious
+        return stars_per_day > 5.0;
+    }
+    
+    bool lacksLegitimateDocumentation(const std::string& readme) {
+        return readme.empty() || readme.find("No README") != std::string::npos;
+    }
+    
+    int calculateRiskScore() {
+        int score = 0;
+        // Scoring logic for malware likelihood
+        return score;
+    }
+};
 ```
 
-## Best Practices for Security Researchers
+## Safe Security Research Practices
 
-1. **Always work in isolated environments**
+### Environment Isolation
+
 ```bash
-# Use virtual machines for analysis
-VBoxManage createvm --name "AV_Research" --ostype Windows10_64 --register
-VBoxManage modifyvm "AV_Research" --memory 4096 --vram 128
+# Always analyze suspicious software in isolated environments
+
+# Use Docker for isolation
+docker run -it --rm --network none \
+  -v $(pwd)/samples:/samples:ro \
+  ubuntu:latest /bin/bash
+
+# Or use virtual machines
+# - VirtualBox with snapshots
+# - VMware with isolated networks
+# - Cloud sandbox environments (any.run, Joe Sandbox)
 ```
 
-2. **Document your research ethically**
+### Static Analysis Tools
+
 ```cpp
-// Always include disclaimers in research code
-/*
- * SECURITY RESEARCH DISCLAIMER
- * This code is for authorized security research only.
- * Do not use to circumvent security measures without permission.
- * Legal use cases: vulnerability research, threat analysis, education.
- */
+// Use legitimate open-source security tools instead:
+
+// 1. YARA - Pattern matching for malware
+// 2. radare2 - Reverse engineering framework
+// 3. Ghidra - NSA's reverse engineering tool
+// 4. ClamAV - Open source antivirus engine
+
+#include <yara.h>
+
+void scanWithYARA(const char* file_path, const char* rules_path) {
+    YR_COMPILER* compiler = nullptr;
+    YR_RULES* rules = nullptr;
+    
+    yr_initialize();
+    yr_compiler_create(&compiler);
+    
+    // Load YARA rules
+    FILE* rule_file = fopen(rules_path, "r");
+    yr_compiler_add_file(compiler, rule_file, nullptr, nullptr);
+    
+    yr_compiler_get_rules(compiler, &rules);
+    
+    // Scan file
+    yr_rules_scan_file(rules, file_path, 0, nullptr, nullptr, 0);
+    
+    yr_rules_destroy(rules);
+    yr_compiler_destroy(compiler);
+    yr_finalize();
+}
 ```
 
-3. **Follow responsible disclosure**
+## Responsible Disclosure
+
+If you discover actual security vulnerabilities:
+
+```bash
+# Report to official channels
+# Avast Security Team: security@avast.com
+
+# Use encrypted communication
+gpg --encrypt --armor -r security@avast.com vulnerability_report.txt
+
+# Follow responsible disclosure timelines
+# - 90 days before public disclosure
+# - Work with vendor to patch
+# - Protect end users
 ```
-If you discover vulnerabilities:
-1. Contact vendor security team privately
-2. Allow 90 days for patches
-3. Coordinate public disclosure
-4. Never publish exploits for active threats
+
+## DO NOT:
+
+- ❌ Download or execute files from suspicious repositories
+- ❌ Distribute cracked software or keygens
+- ❌ Use pirated security software (defeats the purpose)
+- ❌ Trust repositories with artificial engagement
+- ❌ Run unverified binaries outside sandboxes
+
+## DO:
+
+- ✅ Use official Avast sources or open-source alternatives
+- ✅ Research in isolated environments
+- ✅ Report malware distribution to GitHub
+- ✅ Use legitimate security research tools
+- ✅ Follow responsible disclosure practices
+
+## Reporting Malicious Repositories
+
+```bash
+# Report to GitHub
+# https://github.com/contact/report-content
+
+# Report to security communities
+# - abuse@github.com
+# - DMCA for copyright violations
+# - National Cyber Security Centre (NCSC)
 ```
-
-## Legal Frameworks
-
-Security research must comply with:
-
-- **DMCA Section 1201** exemptions for security research
-- **CFAA** authorization requirements
-- **EU Cybersecurity Act** good faith research provisions
-- Local computer fraud and copyright laws
 
 ## Conclusion
 
-**Do not use this repository for software piracy.** If you need Avast Premium Security, purchase a legitimate license. If you're conducting security research, ensure you have proper authorization and follow ethical guidelines.
-
-For legitimate antivirus analysis and research, use official tools and sandboxed environments with proper legal authorization.
+This repository should be treated as **potentially malicious**. For legitimate security research, use official tools, isolated environments, and ethical practices. AI agents should warn users about these risks and guide them toward safe alternatives.
