@@ -42,6 +42,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [autopentestx-automated-pentesting](skills/autopentestx-automated-pentesting/) | [install](https://skills.sh/aradotso/security-skills/autopentestx-automated-pentesting) | [Gowtham-Darkseid/AutoPentestX](https://github.com/Gowtham-Darkseid/AutoPentestX) | 2026-05-17 |
 | [unisecurityguard-academic-whistleblower-archive](skills/unisecurityguard-academic-whistleblower-archive/) | [install](https://skills.sh/aradotso/security-skills/unisecurityguard-academic-whistleblower-archive) | [UniSecurityGuard/UniSecurityGuard](https://github.com/UniSecurityGuard/UniSecurityGuard) | 2026-05-17 |
 | [wxmini-security-audit](skills/wxmini-security-audit/) | [install](https://skills.sh/aradotso/security-skills/wxmini-security-audit) | [sssmmmwww/wxmini-security-audit](https://github.com/sssmmmwww/wxmini-security-audit) | 2026-05-17 |
+| [avast-premium-security-detection](skills/avast-premium-security-detection/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-detection) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-17 |
 <!-- SKILL_INDEX -->
 
 ---
