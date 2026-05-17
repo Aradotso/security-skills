@@ -1,247 +1,253 @@
 ---
 name: avast-premium-security-analysis
-description: Analyze and understand Avast Premium Security binaries, behavior shields, and security components using reverse engineering tools
+description: Analyze and understand Avast Premium Security software components, behavior shields, and anti-malware protection mechanisms
 triggers:
-  - analyze avast security components
-  - reverse engineer avast antivirus
-  - examine avast behavior shield
-  - inspect avast real-time protection
-  - decompile avast premium modules
-  - study avast security mechanisms
-  - investigate avast malware detection
-  - research avast firewall implementation
+  - how does avast premium security work
+  - analyze avast antivirus behavior shield
+  - understand avast real-time protection
+  - reverse engineer avast security components
+  - examine avast malware detection engine
+  - debug avast premium features
+  - inspect avast firewall protection
+  - research avast antivirus architecture
 ---
 
 # Avast Premium Security Analysis
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## ⚠️ Security Warning
+⚠️ **WARNING**: This repository appears to be distributing unauthorized copies of commercial security software with cracked license keys and activation bypasses. This is illegal software piracy and may contain malware. This skill is provided for security research and educational purposes only.
 
-**CRITICAL: This repository appears to be distributing pirated/cracked software with keygens and loaders, which is illegal and dangerous.** The project claims to provide "Full Version Installer", "Keygen Activation", "License Key Pre-Activated", and "Premium Loader Serial" - all indicators of software piracy and potential malware distribution.
+## Overview
 
-**DO NOT download, install, or execute any files from this repository.** Legitimate security research on Avast should use:
-- Official Avast Free Antivirus for testing
-- Legal licensed versions
-- Public documentation and APIs
-- Sandbox environments for binary analysis
+This project claims to provide Avast Premium Security with pre-activated license keys and keygens. However, analyzing such repositories is important for:
 
-## Legitimate Security Research Approach
+- **Security research**: Understanding how malware may disguise itself as legitimate security software
+- **Threat analysis**: Identifying potential trojan/backdoor distributions
+- **Forensic investigation**: Examining cracked software distribution methods
+- **Legal compliance**: Documenting piracy operations
 
-For educational security research on antivirus software behavior:
+## Legitimate Avast Analysis
 
-### Safe Analysis Environment Setup
+For legitimate security research on Avast components, focus on:
 
-```bash
-# Create isolated VM for analysis
-# Use VirtualBox, VMware, or similar virtualization
+### Official Avast SDK Components
 
-# Install legitimate Avast Free version
-# Download from official source: https://www.avast.com/
-
-# Set up analysis tools
-sudo apt-get update
-sudo apt-get install -y \
-    gdb \
-    radare2 \
-    ltrace \
-    strace \
-    wireshark
-```
-
-### Using RetDec for Binary Analysis
-
-RetDec is a legitimate reverse engineering tool (mentioned in project topics):
-
-```bash
-# Install RetDec
-git clone https://github.com/avast/retdec
-cd retdec
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
-make -j$(nproc)
-sudo make install
-```
-
-### Analyzing Antivirus Components (Legal Samples)
+Avast uses several open-source components including RetDec (listed in topics). For legitimate analysis:
 
 ```cpp
-// Example: Monitoring system calls made by AV engine
-#include <iostream>
+// Analyzing Avast behavior using public APIs (Windows Security Center)
 #include <windows.h>
-#include <psapi.h>
+#include <wscapi.h>
+#include <iostream>
 
-// Monitor process behavior (educational purposes)
-void monitorProcessBehavior(DWORD processId) {
-    HANDLE hProcess = OpenProcess(
-        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-        FALSE,
-        processId
+void CheckAvastStatus() {
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    
+    IWSCProductList* pProductList = NULL;
+    hr = CoCreateInstance(
+        __uuidof(WSCProductList),
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        __uuidof(IWSCProductList),
+        (LPVOID*)&pProductList
     );
     
-    if (hProcess == NULL) {
-        std::cerr << "Failed to open process" << std::endl;
-        return;
+    if (SUCCEEDED(hr)) {
+        hr = pProductList->Initialize(WSC_SECURITY_PROVIDER_ANTIVIRUS);
+        
+        LONG count = 0;
+        pProductList->get_Count(&count);
+        
+        for (LONG i = 0; i < count; i++) {
+            IWscProduct* pProduct = NULL;
+            hr = pProductList->get_Item(i, &pProduct);
+            
+            if (SUCCEEDED(hr)) {
+                BSTR productName;
+                pProduct->get_ProductName(&productName);
+                std::wcout << L"Found AV: " << productName << std::endl;
+                SysFreeString(productName);
+                pProduct->Release();
+            }
+        }
+        pProductList->Release();
+    }
+    CoUninitialize();
+}
+```
+
+### Monitoring Avast Processes
+
+```cpp
+// Monitor Avast service processes
+#include <windows.h>
+#include <tlhelp32.h>
+#include <string>
+#include <vector>
+
+std::vector<std::wstring> avastProcesses = {
+    L"AvastSvc.exe",
+    L"AvastUI.exe",
+    L"afwServ.exe",
+    L"aswEngSrv.exe"
+};
+
+bool IsAvastRunning() {
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W entry;
+    entry.dwSize = sizeof(entry);
+    
+    bool found = false;
+    if (Process32FirstW(snapshot, &entry)) {
+        do {
+            for (const auto& procName : avastProcesses) {
+                if (wcscmp(entry.szExeFile, procName.c_str()) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+        } while (Process32NextW(snapshot, &entry));
     }
     
-    // Get loaded modules
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
+    CloseHandle(snapshot);
+    return found;
+}
+```
+
+## Security Analysis Patterns
+
+### Detecting Pirated Software Indicators
+
+```cpp
+// Check for signs of cracked/pirated security software
+#include <filesystem>
+#include <regex>
+
+namespace fs = std::filesystem;
+
+struct SuspiciousIndicators {
+    bool hasKeygenFiles = false;
+    bool hasLoaderFiles = false;
+    bool hasCrackFiles = false;
+    bool modifiedSignatures = false;
+};
+
+SuspiciousIndicators AnalyzeInstallation(const std::wstring& installPath) {
+    SuspiciousIndicators indicators;
     
-    if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
-        for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
-            TCHAR szModName[MAX_PATH];
-            if (GetModuleFileNameEx(hProcess, hMods[i], szModName, 
-                                   sizeof(szModName) / sizeof(TCHAR))) {
-                std::wcout << L"Module: " << szModName << std::endl;
+    std::vector<std::wstring> suspiciousPatterns = {
+        L"keygen", L"crack", L"loader", L"patch",
+        L"activator", L"serial"
+    };
+    
+    for (const auto& entry : fs::recursive_directory_iterator(installPath)) {
+        if (entry.is_regular_file()) {
+            std::wstring filename = entry.path().filename().wstring();
+            std::transform(filename.begin(), filename.end(), 
+                         filename.begin(), ::towlower);
+            
+            for (const auto& pattern : suspiciousPatterns) {
+                if (filename.find(pattern) != std::wstring::npos) {
+                    if (pattern == L"keygen") indicators.hasKeygenFiles = true;
+                    if (pattern == L"loader") indicators.hasLoaderFiles = true;
+                    if (pattern == L"crack") indicators.hasCrackFiles = true;
+                }
             }
         }
     }
     
-    CloseHandle(hProcess);
+    return indicators;
 }
 ```
 
-### Behavior Shield Analysis (Conceptual)
+### Verifying Digital Signatures
 
 ```cpp
-// Understanding behavior monitoring patterns
-#include <iostream>
-#include <string>
-#include <vector>
-
-struct BehaviorPattern {
-    std::string action;
-    std::string target;
-    int riskLevel;
-};
-
-// Educational: Common patterns AV software monitors
-std::vector<BehaviorPattern> getSuspiciousBehaviors() {
-    return {
-        {"FileWrite", "System32", 9},
-        {"RegistryModify", "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", 8},
-        {"ProcessCreate", "cmd.exe /c", 7},
-        {"NetworkConnect", "Unknown IP", 6},
-        {"FileDelete", "*.exe", 5}
-    };
-}
-
-void analyzeBehaviorShield() {
-    auto patterns = getSuspiciousBehaviors();
-    
-    std::cout << "Behavior Shield Monitoring Patterns:\n";
-    for (const auto& pattern : patterns) {
-        std::cout << "Action: " << pattern.action 
-                  << " | Target: " << pattern.target
-                  << " | Risk: " << pattern.riskLevel << "/10\n";
-    }
-}
-```
-
-### Network Traffic Analysis
-
-```bash
-# Capture AV update traffic (ethical research)
-sudo tcpdump -i eth0 -w avast_traffic.pcap 'host avast.com or host avcdn.net'
-
-# Analyze with Wireshark
-wireshark avast_traffic.pcap
-
-# Or use tshark for command-line analysis
-tshark -r avast_traffic.pcap -V
-```
-
-### File System Monitoring
-
-```cpp
-// Monitor file system operations (Windows)
+// Verify Avast executable signatures
 #include <windows.h>
-#include <iostream>
+#include <wintrust.h>
+#include <softpub.h>
 
-void monitorDirectoryChanges(const wchar_t* path) {
-    HANDLE hDir = CreateFileW(
-        path,
-        FILE_LIST_DIRECTORY,
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-        NULL
-    );
+#pragma comment(lib, "wintrust.lib")
+
+bool VerifyEmbeddedSignature(const wchar_t* filePath) {
+    WINTRUST_FILE_INFO fileInfo = {0};
+    fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
+    fileInfo.pcwszFilePath = filePath;
     
-    if (hDir == INVALID_HANDLE_VALUE) {
-        std::cerr << "Failed to open directory" << std::endl;
-        return;
-    }
+    GUID policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     
-    char buffer[4096];
-    DWORD bytesReturned;
+    WINTRUST_DATA wintrustData = {0};
+    wintrustData.cbStruct = sizeof(WINTRUST_DATA);
+    wintrustData.dwUIChoice = WTD_UI_NONE;
+    wintrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
+    wintrustData.dwUnionChoice = WTD_CHOICE_FILE;
+    wintrustData.pFile = &fileInfo;
+    wintrustData.dwStateAction = WTD_STATEACTION_VERIFY;
     
-    // Monitor for changes
-    if (ReadDirectoryChangesW(
-            hDir,
-            buffer,
-            sizeof(buffer),
-            TRUE,
-            FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE,
-            &bytesReturned,
-            NULL,
-            NULL
-        )) {
-        std::cout << "Directory changes detected" << std::endl;
-    }
+    LONG status = WinVerifyTrust(NULL, &policyGUID, &wintrustData);
     
-    CloseHandle(hDir);
+    wintrustData.dwStateAction = WTD_STATEACTION_CLOSE;
+    WinVerifyTrust(NULL, &policyGUID, &wintrustData);
+    
+    return (status == ERROR_SUCCESS);
 }
 ```
 
-## Ethical Security Research Guidelines
+## Threat Mitigation
 
-### Do's
-- Use official, legal software versions
-- Research in isolated environments (VMs)
-- Follow responsible disclosure for vulnerabilities
-- Respect software licenses and terms of service
-- Use for educational purposes only
+### Safe Analysis Environment
 
-### Don'ts
-- **Never distribute cracked software**
-- **Never use keygens or license cracks**
-- **Never bypass software protection for profit**
-- **Never analyze malware without proper isolation**
-- **Never share exploits publicly without vendor notification**
+Always analyze suspicious software in isolated environments:
 
-## Alternative Legal Resources
-
-For legitimate antivirus research:
-
-```bash
-# VirusTotal API for malware analysis
-export VT_API_KEY="your_virustotal_api_key"
-
-# Hybrid Analysis (free public sandbox)
-# https://www.hybrid-analysis.com/
-
-# Any.run interactive sandbox
-# https://any.run/
-
-# Cuckoo Sandbox (self-hosted)
-git clone https://github.com/cuckoosandbox/cuckoo
+```cpp
+// Check if running in VM/sandbox
+bool IsInSandbox() {
+    // Check for common VM artifacts
+    HKEY hKey;
+    bool isVM = false;
+    
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, 
+        L"SYSTEM\\CurrentControlSet\\Services\\VBoxGuest", 
+        0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        isVM = true;
+        RegCloseKey(hKey);
+    }
+    
+    // Check VMware
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+        L"SOFTWARE\\VMware, Inc.\\VMware Tools",
+        0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        isVM = true;
+        RegCloseKey(hKey);
+    }
+    
+    return isVM;
+}
 ```
 
-## Conclusion
+## Best Practices
 
-**This repository should NOT be used.** For legitimate security research, antivirus testing, or malware analysis, always use:
-- Official software from vendors
-- Legal licensing
-- Proper research environments
-- Ethical disclosure practices
+1. **Never install pirated security software** - it may contain malware that disables real protection
+2. **Use official sources** - Download Avast only from official avast.com
+3. **Verify signatures** - Always check digital signatures on security software
+4. **Sandbox analysis** - Use VMs or isolated environments for examining suspicious files
+5. **Report piracy** - Report unauthorized distribution to Avast legal team
 
-Downloading or using pirated security software exposes you to:
-- Legal consequences
-- Malware infection
-- Compromised system security
-- Data theft
+## Legal & Ethical Considerations
 
-Always conduct security research ethically and legally.
+- Distributing cracked commercial software violates copyright law
+- Using pirated security software exposes systems to backdoors and malware
+- Security researchers should use legitimate trial versions or licensed copies
+- This skill focuses on detecting and analyzing threats, not enabling piracy
+
+## Resources
+
+- [Avast Official Website](https://www.avast.com)
+- [RetDec Decompiler](https://github.com/avast/retdec) - Legitimate open-source Avast project
+- [Windows Security Center API](https://docs.microsoft.com/en-us/windows/win32/api/_security/)
+
+---
+
+**Disclaimer**: This skill is for security research and threat analysis only. Do not use this information to pirate software or bypass legitimate security measures.
