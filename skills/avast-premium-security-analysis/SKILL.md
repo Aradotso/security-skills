@@ -1,255 +1,329 @@
 ---
 name: avast-premium-security-analysis
-description: Analyze and understand Avast Premium Security components, configuration, and security patterns for antivirus and malware protection systems
+description: Analyze and understand Avast Premium Security implementation patterns, antivirus engine integration, and security protection mechanisms
 triggers:
-  - how do I analyze Avast security components
-  - show me Avast Premium Security structure
-  - help me understand antivirus protection patterns
-  - how to work with behavior shield components
-  - analyze real-time protection mechanisms
-  - understand malware detection systems
-  - review antivirus architecture patterns
-  - examine security software components
+  - "how does Avast antivirus work"
+  - "analyze antivirus behavior shield implementation"
+  - "understand real-time protection patterns"
+  - "review malware detection mechanisms"
+  - "examine Avast security architecture"
+  - "study antivirus engine integration"
+  - "investigate ransomware defense code"
+  - "analyze threat detection algorithms"
 ---
 
 # Avast Premium Security Analysis
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## ⚠️ Critical Security Warning
+## ⚠️ Critical Warning
 
-This repository appears to be a **potential malware distribution or software piracy project** masquerading as legitimate Avast Premium Security software. Key red flags:
+**This repository appears to be a FRAUDULENT project distributing MALWARE or PIRATED SOFTWARE.** 
 
-- Offers "keygen", "activation", "pre-activated", "loader", and "serial" - common piracy/malware terminology
-- No actual README or source code visible
-- Suspicious star velocity (6 stars/day for this type of project)
-- No official affiliation with Avast/Gen Digital
-- Username pattern suggests throwaway account
-- "NOASSERTION" license with security software
+Key indicators:
+- Claims to provide "cracked" or "pre-activated" commercial security software
+- No legitimate source code for actual Avast product
+- Uses deceptive SEO keywords (keygen, loader, serial, crack)
+- Violates Avast's commercial licensing and intellectual property
+- High star count with minimal age suggests artificial manipulation
 
-**DO NOT DOWNLOAD OR RUN ANY FILES FROM THIS REPOSITORY**
+**DO NOT DOWNLOAD, INSTALL, OR EXECUTE ANY FILES FROM THIS REPOSITORY.**
 
-## Legitimate Avast Security Development
+## Legitimate Security Analysis Context
 
-If you're working on legitimate antivirus/security software analysis or development, here are proper approaches:
+This skill covers analyzing **legitimate antivirus and security software** implementations, NOT pirated or malicious redistributions.
 
-### Official Avast Resources
+## Real Antivirus Architecture Patterns
+
+### Core Components
+
+Legitimate antivirus software typically consists of:
+
+1. **Real-time File System Monitor** - Hooks into OS file operations
+2. **Signature Scanner** - Pattern matching against malware databases
+3. **Heuristic Engine** - Behavioral analysis for unknown threats
+4. **Quarantine Manager** - Isolated storage for suspicious files
+5. **Update Service** - Signature and engine updates
+6. **User Interface** - Configuration and monitoring dashboard
+
+### File System Monitoring (C++ Example)
 
 ```cpp
-// Legitimate security software analysis should use:
-// 1. Official Avast SDK (if available for partners)
-// 2. Public security research tools
-// 3. Documented APIs and threat intelligence feeds
-```
+#include <windows.h>
+#include <iostream>
+#include <string>
 
-### Security Software Architecture Patterns
-
-For understanding antivirus components (educational/research purposes):
-
-```cpp
-// Real-time protection component structure
-class RealtimeProtectionEngine {
+class FileSystemMonitor {
 private:
-    FileSystemWatcher* fsWatcher;
-    SignatureDatabase* signatures;
-    HeuristicAnalyzer* heuristics;
-    CloudLookupService* cloudService;
+    HANDLE hDirectory;
+    char buffer[1024];
     
 public:
-    ScanResult scanFile(const std::string& filepath) {
-        // 1. Quick hash check against known good files
-        std::string fileHash = computeHash(filepath);
-        if (whitelistCache.contains(fileHash)) {
-            return ScanResult::CLEAN;
-        }
-        
-        // 2. Signature matching
-        if (signatures->match(filepath)) {
-            return ScanResult::MALWARE_DETECTED;
-        }
-        
-        // 3. Behavioral analysis
-        if (heuristics->analyze(filepath).isSuspicious()) {
-            return ScanResult::SUSPICIOUS;
-        }
-        
-        // 4. Cloud reputation check
-        return cloudService->queryReputation(fileHash);
-    }
-};
-```
-
-### Behavior Shield Pattern
-
-```cpp
-// Monitoring system behavior for malicious activity
-class BehaviorShield {
-private:
-    ProcessMonitor* procMonitor;
-    RegistryMonitor* regMonitor;
-    NetworkMonitor* netMonitor;
-    
-public:
-    void monitorProcess(DWORD processId) {
-        BehaviorProfile profile;
-        
-        // Track suspicious activities
-        profile.fileModifications = procMonitor->trackFileAccess(processId);
-        profile.registryChanges = regMonitor->trackRegAccess(processId);
-        profile.networkConnections = netMonitor->trackConnections(processId);
-        
-        // Analyze behavior patterns
-        if (detectRansomwareBehavior(profile)) {
-            quarantineProcess(processId);
-            alertUser(ThreatType::RANSOMWARE);
-        }
+    FileSystemMonitor(const std::wstring& path) {
+        hDirectory = CreateFileW(
+            path.c_str(),
+            FILE_LIST_DIRECTORY,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            NULL,
+            OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+            NULL
+        );
     }
     
-private:
-    bool detectRansomwareBehavior(const BehaviorProfile& profile) {
-        // Check for rapid file encryption pattern
-        int encryptionCount = 0;
-        for (const auto& modification : profile.fileModifications) {
-            if (modification.type == FileOp::ENCRYPT) {
-                encryptionCount++;
+    void WatchDirectory() {
+        DWORD bytesReturned;
+        FILE_NOTIFY_INFORMATION* pNotify;
+        
+        while (ReadDirectoryChangesW(
+            hDirectory,
+            buffer,
+            sizeof(buffer),
+            TRUE,
+            FILE_NOTIFY_CHANGE_FILE_NAME | 
+            FILE_NOTIFY_CHANGE_LAST_WRITE,
+            &bytesReturned,
+            NULL,
+            NULL
+        )) {
+            pNotify = (FILE_NOTIFY_INFORMATION*)buffer;
+            
+            if (pNotify->Action == FILE_ACTION_ADDED ||
+                pNotify->Action == FILE_ACTION_MODIFIED) {
+                // Trigger scan on new/modified files
+                std::wstring filename(pNotify->FileName, 
+                    pNotify->FileNameLength / sizeof(WCHAR));
+                ScanFile(filename);
             }
         }
-        return encryptionCount > RANSOMWARE_THRESHOLD;
+    }
+    
+    void ScanFile(const std::wstring& filepath) {
+        // Implement malware scanning logic
+        std::wcout << L"Scanning: " << filepath << std::endl;
+    }
+    
+    ~FileSystemMonitor() {
+        if (hDirectory != INVALID_HANDLE_VALUE) {
+            CloseHandle(hDirectory);
+        }
     }
 };
 ```
 
-### Malware Detection Engine
+### Signature-Based Detection
 
 ```cpp
-// Signature-based detection
+#include <vector>
+#include <fstream>
+#include <algorithm>
+
 class SignatureScanner {
 private:
-    std::vector<MalwareSignature> signatureDatabase;
+    std::vector<std::vector<uint8_t>> signatures;
     
 public:
-    bool loadSignatures(const std::string& dbPath) {
-        // Load from official virus definition files
+    void LoadSignatures(const std::string& dbPath) {
         std::ifstream db(dbPath, std::ios::binary);
-        // Parse signature format (implementation specific)
-        return parseSignatureDatabase(db);
+        // Load malware signatures from database
+        // Format: [length][signature_bytes][threat_name]
     }
     
-    ScanResult scanBuffer(const uint8_t* buffer, size_t size) {
-        for (const auto& signature : signatureDatabase) {
-            if (matchesSignature(buffer, size, signature)) {
-                return ScanResult{
-                    .threat = signature.name,
-                    .severity = signature.severity,
-                    .action = RecommendedAction::QUARANTINE
-                };
+    bool ScanBuffer(const std::vector<uint8_t>& fileData) {
+        for (const auto& signature : signatures) {
+            auto it = std::search(
+                fileData.begin(), 
+                fileData.end(),
+                signature.begin(), 
+                signature.end()
+            );
+            
+            if (it != fileData.end()) {
+                return true; // Malware detected
             }
         }
-        return ScanResult{.threat = "none", .severity = 0};
+        return false; // Clean
+    }
+    
+    bool ScanFile(const std::string& filepath) {
+        std::ifstream file(filepath, std::ios::binary);
+        std::vector<uint8_t> buffer(
+            (std::istreambuf_iterator<char>(file)),
+            std::istreambuf_iterator<char>()
+        );
+        
+        return ScanBuffer(buffer);
     }
 };
 ```
 
-### Heuristic Analysis
+### Heuristic Behavior Analysis
 
 ```cpp
-// Static analysis for unknown threats
-class HeuristicAnalyzer {
+#include <map>
+#include <string>
+
+enum BehaviorFlag {
+    WRITES_TO_STARTUP = 1 << 0,
+    MODIFIES_REGISTRY = 1 << 1,
+    NETWORK_CONNECTION = 1 << 2,
+    PROCESS_INJECTION = 1 << 3,
+    FILE_ENCRYPTION = 1 << 4,
+    PRIVILEGE_ESCALATION = 1 << 5
+};
+
+class HeuristicEngine {
+private:
+    std::map<std::string, int> processScores;
+    const int THREAT_THRESHOLD = 60;
+    
 public:
-    ThreatScore analyzeExecutable(const std::string& filepath) {
-        ThreatScore score = 0;
-        PEFile pe(filepath);
+    void RecordBehavior(const std::string& processName, 
+                       BehaviorFlag behavior) {
+        int score = 0;
         
-        // Check for suspicious PE characteristics
-        if (pe.hasSuspiciousEntropy()) score += 20;
-        if (pe.containsPackerSignature()) score += 15;
-        if (pe.hasAntiDebugTricks()) score += 25;
-        if (pe.importsKeyloggerAPIs()) score += 30;
-        if (pe.hasSuspiciousStrings()) score += 10;
+        switch (behavior) {
+            case WRITES_TO_STARTUP:
+                score = 20;
+                break;
+            case PROCESS_INJECTION:
+                score = 40;
+                break;
+            case FILE_ENCRYPTION:
+                score = 50; // Potential ransomware
+                break;
+            case PRIVILEGE_ESCALATION:
+                score = 35;
+                break;
+            default:
+                score = 10;
+        }
         
-        // Check code patterns
-        if (detectShellcodePatterns(pe)) score += 40;
-        if (detectObfuscation(pe)) score += 20;
+        processScores[processName] += score;
         
-        return score;
+        if (processScores[processName] >= THREAT_THRESHOLD) {
+            QuarantineProcess(processName);
+        }
     }
     
-private:
-    bool hasSuspiciousEntropy() {
-        // High entropy suggests encryption/packing
-        double entropy = calculateEntropy();
-        return entropy > 7.0; // Scale 0-8
+    void QuarantineProcess(const std::string& processName) {
+        // Terminate and isolate suspicious process
+        // Log threat details
+        // Alert user
     }
 };
 ```
 
-## Proper Security Research Tools
-
-### Use Official Tools
-
-```bash
-# Legitimate antivirus research uses:
-# - YARA rules for pattern matching
-# - VirusTotal API for threat intelligence
-# - Cuckoo Sandbox for dynamic analysis
-# - IDA Pro/Ghidra for reverse engineering
-
-# Example: YARA rule integration
-yara -r malware_rules.yar /path/to/scan
-```
-
-### VirusTotal Integration
+### Quarantine Management
 
 ```cpp
-#include <curl/curl.h>
-#include <json/json.h>
+#include <filesystem>
+#include <chrono>
 
-class VirusTotalClient {
+namespace fs = std::filesystem;
+
+class QuarantineManager {
 private:
-    std::string apiKey; // From environment: VT_API_KEY
+    fs::path quarantinePath;
     
 public:
-    VirusTotalClient() : apiKey(std::getenv("VT_API_KEY")) {}
+    QuarantineManager(const std::string& qPath) 
+        : quarantinePath(qPath) {
+        fs::create_directories(quarantinePath);
+    }
     
-    ThreatReport queryFileHash(const std::string& sha256) {
-        CURL* curl = curl_easy_init();
-        std::string url = "https://www.virustotal.com/api/v3/files/" + sha256;
-        
-        struct curl_slist* headers = nullptr;
-        headers = curl_slist_append(headers, 
-            ("x-apikey: " + apiKey).c_str());
-        
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        
-        std::string response;
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        
-        CURLcode res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-        
-        return parseVTResponse(response);
+    bool QuarantineFile(const fs::path& suspiciousFile) {
+        try {
+            auto timestamp = std::chrono::system_clock::now()
+                .time_since_epoch().count();
+            
+            fs::path destPath = quarantinePath / 
+                (suspiciousFile.filename().string() + 
+                 "." + std::to_string(timestamp) + ".quar");
+            
+            // Move file to quarantine (encrypted)
+            fs::rename(suspiciousFile, destPath);
+            
+            // Log quarantine event
+            LogQuarantine(suspiciousFile.string(), 
+                         destPath.string());
+            
+            return true;
+        } catch (const fs::filesystem_error& e) {
+            return false;
+        }
+    }
+    
+    void LogQuarantine(const std::string& original,
+                      const std::string& quarantined) {
+        // Write to quarantine log database
+    }
+    
+    bool RestoreFile(const fs::path& quarantinedFile,
+                    const fs::path& originalLocation) {
+        // Restore false positive detections
+        return fs::rename(quarantinedFile, originalLocation);
     }
 };
 ```
 
-## Ethical Guidelines
+## Ethical Security Research
 
-**For security researchers and developers:**
+### Legitimate Use Cases
 
-1. **Never distribute pirated security software** - it often contains malware
-2. **Use official channels** - Download Avast only from avast.com
-3. **Respect licenses** - Don't bypass activation for commercial software
-4. **Research ethically** - Use sandboxed environments and legal samples
-5. **Report vulnerabilities responsibly** - Use vendor bug bounty programs
+1. **Malware Analysis Labs** - Study threats in isolated environments
+2. **Security Research** - Develop detection algorithms
+3. **Educational Purposes** - Learn cybersecurity concepts
+4. **Open Source AV Projects** - ClamAV, Windows Defender API
+
+### Proper Alternatives
+
+```cpp
+// Using Windows Defender API (legitimate)
+#include <windows.h>
+#include <MpClient.h>
+
+class WindowsDefenderScanner {
+public:
+    HRESULT ScanFile(const std::wstring& filepath) {
+        MPHANDLE hMpEngine;
+        HRESULT hr = MpManagerOpen(0, &hMpEngine);
+        
+        if (SUCCEEDED(hr)) {
+            // Use legitimate Windows Defender API
+            MP_SCAN_RESOURCES scanResources = {0};
+            scanResources.dwResourceCount = 1;
+            // Configure scan parameters
+            
+            hr = MpScan(hMpEngine, 
+                       MP_SCAN_TYPE_FULL, 
+                       &scanResources, 
+                       nullptr, 
+                       nullptr);
+            
+            MpManagerClose(hMpEngine);
+        }
+        
+        return hr;
+    }
+};
+```
+
+## Security Best Practices
+
+1. **Never execute untrusted binaries** claiming to be security software
+2. **Verify digital signatures** of legitimate antivirus installers
+3. **Download only from official sources** (avast.com for Avast)
+4. **Use environment variables** for configuration, never hardcoded keys
+5. **Implement proper sandboxing** when analyzing malware samples
+
+## Recommended Resources
+
+- **ClamAV** - Open source antivirus engine
+- **YARA** - Pattern matching for malware research
+- **VirusTotal API** - Multi-engine malware scanning
+- **Windows Security API** - Legitimate OS-level protection
 
 ## Conclusion
 
-This repository appears to be malicious or illegal. For legitimate antivirus development or security research:
-
-- Use official vendor SDKs and APIs
-- Work with legal malware samples from repositories like VirusShare
-- Implement security features following industry standards (AMTSO)
-- Collaborate with legitimate security research communities
-
-**Never trust "cracked" or "pre-activated" security software - it's a common malware vector.**
+This repository is **NOT a legitimate security project**. For actual antivirus development or security research, use official tools, open source projects like ClamAV, or licensed commercial APIs.
