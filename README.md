@@ -46,6 +46,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentest-agents-bug-bounty-framework](skills/pentest-agents-bug-bounty-framework/) | [install](https://skills.sh/aradotso/security-skills/pentest-agents-bug-bounty-framework) | [H-mmer/pentest-agents](https://github.com/H-mmer/pentest-agents) | 2026-05-17 |
 | [avast-security-analysis](skills/avast-security-analysis/) | [install](https://skills.sh/aradotso/security-skills/avast-security-analysis) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-17 |
 | [openosint-ai-osint-framework](skills/openosint-ai-osint-framework/) | [install](https://skills.sh/aradotso/security-skills/openosint-ai-osint-framework) | [OpenOSINT/OpenOSINT](https://github.com/OpenOSINT/OpenOSINT) | 2026-05-17 |
+| [avast-premium-security-malware-analysis](skills/avast-premium-security-malware-analysis/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-analysis) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-17 |
 <!-- SKILL_INDEX -->
 
 ---
