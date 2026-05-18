@@ -52,6 +52,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [malware-analysis-dragonflyTomb-avast](skills/malware-analysis-dragonflyTomb-avast/) | [install](https://skills.sh/aradotso/security-skills/malware-analysis-dragonflyTomb-avast) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-18 |
 | [security-threat-awareness](skills/security-threat-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-threat-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 | [avast-premium-security-malware-detection](skills/avast-premium-security-malware-detection/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-detection) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
+| [security-risk-awareness](skills/security-risk-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-risk-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 <!-- SKILL_INDEX -->
 
 ---
