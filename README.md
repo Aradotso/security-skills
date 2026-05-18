@@ -51,6 +51,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [openclaw-security-watchdog](skills/openclaw-security-watchdog/) | [install](https://skills.sh/aradotso/security-skills/openclaw-security-watchdog) | [CTCT-CT2/openclaw-security-watchdog](https://github.com/CTCT-CT2/openclaw-security-watchdog) | 2026-05-18 |
 | [malware-analysis-dragonflyTomb-avast](skills/malware-analysis-dragonflyTomb-avast/) | [install](https://skills.sh/aradotso/security-skills/malware-analysis-dragonflyTomb-avast) | [DragonflyTomb/Avast-Premium-Security-2026](https://github.com/DragonflyTomb/Avast-Premium-Security-2026) | 2026-05-18 |
 | [security-threat-awareness](skills/security-threat-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-threat-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
+| [avast-premium-security-malware-detection](skills/avast-premium-security-malware-detection/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-detection) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 <!-- SKILL_INDEX -->
 
 ---
