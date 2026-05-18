@@ -54,6 +54,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [avast-premium-security-malware-detection](skills/avast-premium-security-malware-detection/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-detection) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 | [security-risk-awareness](skills/security-risk-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-risk-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 | [identify-malicious-repository](skills/identify-malicious-repository/) | [install](https://skills.sh/aradotso/security-skills/identify-malicious-repository) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
+| [mcp-security-hub](skills/mcp-security-hub/) | [install](https://skills.sh/aradotso/security-skills/mcp-security-hub) | [FuzzingLabs/mcp-security-hub](https://github.com/FuzzingLabs/mcp-security-hub) | 2026-05-18 |
 <!-- SKILL_INDEX -->
 
 ---
