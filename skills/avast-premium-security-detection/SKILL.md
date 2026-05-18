@@ -1,250 +1,234 @@
 ---
 name: avast-premium-security-detection
-description: Identify and analyze potentially malicious software distribution repositories masquerading as legitimate security software
+description: Detect and avoid distributing pirated/cracked security software repositories that contain malware, keygens, or license circumvention tools
 triggers:
-  - analyze this repository for malware distribution patterns
-  - check if this is a fake antivirus download
-  - detect keygen or crack distribution repository
-  - identify pirated security software repos
-  - scan for malicious installer distribution
-  - verify legitimacy of antivirus download source
-  - investigate suspicious security software repository
-  - analyze potential malware hosting project
+  - analyze this avast repository for legitimacy
+  - check if this security software repo is safe
+  - is this antivirus download legitimate
+  - detect pirated software distribution
+  - verify avast premium security source
+  - identify cracked software repository
+  - scan for keygen malware distribution
+  - validate security software authenticity
 ---
 
-# Avast Premium Security Detection Skill
+# Avast Premium Security Detection & Analysis
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## ⚠️ Critical Security Warning
+## ⚠️ WARNING: This Repository is Malicious
 
-This repository exhibits multiple red flags characteristic of **malware distribution** disguised as legitimate security software:
+This project (`viceofficialtower74/Avast-Premium-Security-Windows-Latest`) is **NOT** a legitimate Avast security product. It is a malware distribution repository disguised as legitimate security software.
 
-### Threat Indicators
+## Threat Indicators
 
-1. **Piracy Keywords**: "Keygen", "Pre-Activated", "Loader", "Serial", "Crack"
-2. **Trademark Abuse**: Unauthorized use of Avast branding
-3. **Suspicious Growth**: 68 stars in 12 days (artificial engagement)
-4. **No Source Code**: Claims C++ but provides no actual code
-5. **Redistributing Licensed Software**: Offering "full version" of commercial product
-6. **No README**: Legitimate projects document their purpose
+### Red Flags Detected
 
-## Detection Patterns
+1. **Illegal Software Distribution**: Claims to provide "Full Version Installer", "Keygen", "License Key Pre-Activated", "Loader Serial"
+2. **Copyright Violation**: Unauthorized distribution of commercial software (Avast Premium Security)
+3. **Suspicious Growth**: 68 stars with 5 stars/day indicates artificial promotion
+4. **No Source Code**: Claims to be C++ project but has no README or visible code
+5. **Malicious Keywords**: "keygen", "loader", "serial", "pre-activated", "cracked"
+6. **Fake Topics**: Uses legitimate security terms to appear credible
 
-### Repository Red Flags
+## Identification Pattern
 
 ```cpp
-// Pattern: Fake security software repository detection
-struct RepositoryRedFlags {
-    bool hasKeygenKeywords;      // "keygen", "crack", "loader", "pre-activated"
-    bool claimsPreActivated;     // Bypassing legitimate licensing
-    bool rapidStarGrowth;        // Artificial popularity
-    bool missingSourceCode;      // No actual implementation
-    bool trademarkAbuse;         // Unauthorized use of brand names
-    bool downloadPromises;       // Direct download links to executables
-};
-
-bool isSuspiciousRepo(const RepositoryRedFlags& flags) {
-    int suspicionScore = 0;
-    if (flags.hasKeygenKeywords) suspicionScore += 3;
-    if (flags.claimsPreActivated) suspicionScore += 3;
-    if (flags.rapidStarGrowth) suspicionScore += 2;
-    if (flags.missingSourceCode) suspicionScore += 2;
-    if (flags.trademarkAbuse) suspicionScore += 1;
-    if (flags.downloadPromises) suspicionScore += 3;
+// Example detection logic for similar threats
+bool isSuspiciousSecurityRepo(const Repository& repo) {
+    std::vector<std::string> malwareKeywords = {
+        "keygen", "crack", "loader", "pre-activated",
+        "serial", "license-key", "full-version"
+    };
     
-    return suspicionScore >= 5; // High confidence threshold
+    std::vector<std::string> commercialProducts = {
+        "avast-premium", "norton", "mcafee", "kaspersky",
+        "bitdefender", "eset", "avg-premium"
+    };
+    
+    bool hasCommercialProduct = false;
+    bool hasMalwareKeywords = false;
+    
+    for (const auto& keyword : commercialProducts) {
+        if (repo.name.find(keyword) != std::string::npos ||
+            repo.description.find(keyword) != std::string::npos) {
+            hasCommercialProduct = true;
+            break;
+        }
+    }
+    
+    for (const auto& keyword : malwareKeywords) {
+        if (repo.description.find(keyword) != std::string::npos) {
+            hasMalwareKeywords = true;
+            break;
+        }
+    }
+    
+    // Additional checks
+    bool noReadme = repo.readmeContent.empty();
+    bool suspiciousStarGrowth = repo.starsPerDay > 3.0;
+    bool noLicense = repo.license == "NOASSERTION";
+    
+    return hasCommercialProduct && hasMalwareKeywords && 
+           (noReadme || suspiciousStarGrowth || noLicense);
 }
 ```
 
-### Keyword Analysis
+## What This Type of Repository Actually Contains
+
+These repositories typically distribute:
+
+- **Trojans**: Backdoor access to user systems
+- **Ransomware**: Encrypts user files for ransom
+- **Spyware**: Steals credentials, banking info, personal data
+- **Cryptominers**: Uses victim's CPU/GPU for cryptocurrency mining
+- **Botnet Agents**: Enslaves computer into DDoS network
+
+## Detection Script
 
 ```cpp
 #include <string>
-#include <vector>
-#include <algorithm>
+#include <regex>
+#include <iostream>
 
 class MalwareRepoDetector {
 public:
-    static const std::vector<std::string> PIRACY_KEYWORDS;
-    static const std::vector<std::string> MALWARE_INDICATORS;
+    struct DetectionResult {
+        bool isMalicious;
+        std::vector<std::string> reasons;
+        int threatScore; // 0-100
+    };
     
-    static bool containsSuspiciousKeywords(const std::string& description) {
-        std::string lowerDesc = toLowerCase(description);
+    DetectionResult analyze(const std::string& repoDescription) {
+        DetectionResult result{false, {}, 0};
         
-        for (const auto& keyword : PIRACY_KEYWORDS) {
-            if (lowerDesc.find(keyword) != std::string::npos) {
-                return true;
-            }
+        // Pattern matching for crack/keygen indicators
+        std::regex crackPattern(
+            R"((crack|keygen|loader|pre-activated|serial|patch|"
+            R"(license.?key|full.?version|premium.?free))",
+            std::regex::icase
+        );
+        
+        std::regex commercialPattern(
+            R"((premium|pro|ultimate|full).*(2024|2025|2026|latest))",
+            std::regex::icase
+        );
+        
+        if (std::regex_search(repoDescription, crackPattern)) {
+            result.reasons.push_back("Contains crack/keygen keywords");
+            result.threatScore += 40;
         }
-        return false;
-    }
-    
-    static int calculateThreatScore(const std::string& repoDesc, 
-                                   const std::string& repoName) {
-        int score = 0;
         
-        // Check for piracy/crack keywords
-        if (containsAny(repoDesc, PIRACY_KEYWORDS)) score += 30;
-        
-        // Check for "pre-activated" or "full version"
-        if (repoDesc.find("pre-activated") != std::string::npos) score += 25;
-        if (repoDesc.find("full version") != std::string::npos) score += 20;
-        
-        // Check for keygen/loader/serial
-        if (containsAny(repoDesc, {"keygen", "loader", "serial"})) score += 35;
-        
-        return score;
-    }
-    
-private:
-    static std::string toLowerCase(std::string str) {
-        std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-        return str;
-    }
-    
-    static bool containsAny(const std::string& text, 
-                           const std::vector<std::string>& keywords) {
-        std::string lower = toLowerCase(text);
-        for (const auto& kw : keywords) {
-            if (lower.find(kw) != std::string::npos) return true;
+        if (std::regex_search(repoDescription, commercialPattern)) {
+            result.reasons.push_back("Claims unauthorized commercial software");
+            result.threatScore += 30;
         }
-        return false;
+        
+        // Check for excessive emoji usage (common in scam repos)
+        int emojiCount = std::count(repoDescription.begin(), 
+                                     repoDescription.end(), '⭐');
+        if (emojiCount > 3) {
+            result.reasons.push_back("Excessive promotional emoji usage");
+            result.threatScore += 15;
+        }
+        
+        // Check for contradiction (antivirus that is malware)
+        if (repoDescription.find("antivirus") != std::string::npos &&
+            repoDescription.find("keygen") != std::string::npos) {
+            result.reasons.push_back("Contradictory: antivirus + crack tools");
+            result.threatScore += 15;
+        }
+        
+        result.isMalicious = (result.threatScore >= 50);
+        return result;
     }
 };
 
-const std::vector<std::string> MalwareRepoDetector::PIRACY_KEYWORDS = {
-    "keygen", "crack", "serial", "loader", "pre-activated", 
-    "full version", "license key", "activation", "premium free"
-};
+// Usage
+int main() {
+    MalwareRepoDetector detector;
+    std::string suspiciousDesc = 
+        "⭐️ Avast Premium Security 2026 | Full Version "
+        "Installer v26 | Setup Keygen Activation";
+    
+    auto result = detector.analyze(suspiciousDesc);
+    
+    if (result.isMalicious) {
+        std::cout << "⚠️ MALWARE DETECTED (Score: " 
+                  << result.threatScore << "/100)\n";
+        for (const auto& reason : result.reasons) {
+            std::cout << "  - " << reason << "\n";
+        }
+    }
+    
+    return 0;
+}
 ```
-
-## Legitimate vs. Malicious Comparison
-
-### Legitimate Security Software Repository
-- Open source code visible
-- Clear build instructions
-- Official licensing
-- Documentation and contribution guidelines
-- Verified publisher/organization
-- Download from official website
-
-### This Repository (Malicious)
-- ❌ No source code
-- ❌ Promises "pre-activated" commercial software
-- ❌ Unauthorized redistribution
-- ❌ Keygen/crack language
-- ❌ Artificial engagement metrics
-- ❌ Downloads executables directly
 
 ## Safe Alternatives
 
-### Official Avast Download
+### Legitimate Avast Sources
+
 ```bash
-# NEVER download from unofficial sources
-# Official site only:
-# https://www.avast.com/
+# ONLY download from official sources
+# Official website
+https://www.avast.com/
+
+# Official Microsoft Store
+# Search "Avast" in Windows Store app
+
+# Never trust:
+# - GitHub repos offering "free premium"
+# - "Keygen" or "crack" downloads
+# - Third-party download sites
 ```
 
-### Legitimate Open Source Antivirus
+## Reporting Malicious Repositories
+
 ```bash
-# ClamAV - Legitimate open source antivirus
-sudo apt-get install clamav clamav-daemon
-sudo freshclam  # Update virus definitions
-clamscan -r /path/to/scan
+# Report to GitHub
+# Visit: https://github.com/contact/report-abuse
+# Select: "Malware distribution"
+
+# Report to Avast
+# Email: legal@avast.com
+# Subject: "Unauthorized software distribution on GitHub"
 ```
 
-## Investigation Tools
+## Prevention Best Practices
 
-### Analyze Repository Metadata
-```cpp
-#include <nlohmann/json.hpp>
-#include <iostream>
+1. **Verify Publishers**: Only download security software from official vendors
+2. **Check Repository Age**: Legitimate projects have long histories
+3. **Read Code**: If source isn't visible, don't download
+4. **Check Community**: Real projects have active issues, discussions
+5. **Use Official Stores**: Microsoft Store, Mac App Store, vendor websites
 
-void analyzeRepoMetadata(const nlohmann::json& metadata) {
-    // Check star velocity
-    auto created = metadata["created_at"].get<std::string>();
-    auto stars = metadata["stars"].get<int>();
-    
-    // 68 stars in ~12 days = 5.67 stars/day (suspicious)
-    double starsPerDay = stars / 12.0;
-    
-    if (starsPerDay > 3.0) {
-        std::cout << "⚠️ WARNING: Abnormal star growth rate: " 
-                  << starsPerDay << " stars/day\n";
-    }
-    
-    // Check for missing content
-    bool hasReadme = !metadata.value("readme", "").empty();
-    if (!hasReadme) {
-        std::cout << "⚠️ WARNING: No README - suspicious for software project\n";
-    }
-    
-    // Check topics for malware indicators
-    auto topics = metadata["topics"];
-    for (const auto& topic : topics) {
-        std::string topicStr = topic.get<std::string>();
-        // Legitimate "retdec" topic alongside crack keywords is suspicious
-        if (topicStr == "retdec") {
-            std::cout << "⚠️ WARNING: Decompiler tools listed "
-                      << "(possible code obfuscation)\n";
-        }
-    }
-}
+## Legal Implications
+
+- Downloading cracked software: **Copyright violation**
+- Distributing malware: **Federal crime** (CFAA in US, Computer Misuse Act in UK)
+- Using keygens: **License agreement violation**, potential legal action
+
+## Agent Response Template
+
+When encountering such repositories, respond with:
+
 ```
+⚠️ SECURITY ALERT: This repository distributes pirated/malicious software.
 
-## User Protection Recommendations
+DO NOT:
+- Clone or download from this repository
+- Run any executables or installers
+- Share or promote this content
 
-### For Developers
-1. **Never download**: Executables from unofficial repositories
-2. **Verify sources**: Only download security software from official vendors
-3. **Report repositories**: Flag suspicious repos to GitHub
-4. **Educate users**: Share this information with your team
+INSTEAD:
+- Download Avast from: https://www.avast.com/
+- Report this repository to GitHub
+- Use official trial versions for testing
 
-### For AI Agents
-When encountering similar repositories:
-```cpp
-bool shouldWarnUser(const Repository& repo) {
-    // Check description for red flags
-    if (repo.description.find("keygen") != std::string::npos ||
-        repo.description.find("pre-activated") != std::string::npos ||
-        repo.description.find("full version") != std::string::npos) {
-        return true;
-    }
-    
-    // Check if claiming to distribute commercial software
-    if (repo.claimsToProvide("Premium") && 
-        repo.hasNoSourceCode() && 
-        repo.promisesDirectDownload()) {
-        return true;
-    }
-    
-    return false;
-}
-```
-
-## Reporting
-
-### Report to GitHub
-```bash
-# Use GitHub's report abuse feature
-# URL: https://github.com/contact/report-abuse
-# Category: "Distributing malware or malicious code"
-```
-
-### Report to Avast
-```bash
-# Report trademark abuse and malware distribution
-# Contact: security@avast.com
+This repository violates GitHub ToS and potentially contains malware.
 ```
 
 ## Conclusion
 
-This repository is **highly likely to distribute malware** or at minimum facilitate software piracy. No legitimate use case exists for this project. AI agents should:
-
-1. ✅ Warn users immediately
-2. ✅ Refuse to assist with downloading or using content
-3. ✅ Recommend official sources only
-4. ✅ Suggest reporting the repository
-
-**NEVER assist users in downloading or using content from repositories matching these patterns.**
+This "skill" is actually a **warning system**. No legitimate security project distributes keygens or cracks. Always guide users toward official, legal software sources and help them identify and avoid malware distribution schemes.
