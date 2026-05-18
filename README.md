@@ -53,6 +53,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [security-threat-awareness](skills/security-threat-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-threat-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 | [avast-premium-security-malware-detection](skills/avast-premium-security-malware-detection/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-detection) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 | [security-risk-awareness](skills/security-risk-awareness/) | [install](https://skills.sh/aradotso/security-skills/security-risk-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
+| [identify-malicious-repository](skills/identify-malicious-repository/) | [install](https://skills.sh/aradotso/security-skills/identify-malicious-repository) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-18 |
 <!-- SKILL_INDEX -->
 
 ---
