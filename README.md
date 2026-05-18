@@ -48,6 +48,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [openosint-ai-osint-framework](skills/openosint-ai-osint-framework/) | [install](https://skills.sh/aradotso/security-skills/openosint-ai-osint-framework) | [OpenOSINT/OpenOSINT](https://github.com/OpenOSINT/OpenOSINT) | 2026-05-17 |
 | [avast-premium-security-malware-analysis](skills/avast-premium-security-malware-analysis/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-malware-analysis) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-17 |
 | [avast-premium-security-awareness](skills/avast-premium-security-awareness/) | [install](https://skills.sh/aradotso/security-skills/avast-premium-security-awareness) | [viceofficialtower74/Avast-Premium-Security-Windows-Latest](https://github.com/viceofficialtower74/Avast-Premium-Security-Windows-Latest) | 2026-05-17 |
+| [openclaw-security-watchdog](skills/openclaw-security-watchdog/) | [install](https://skills.sh/aradotso/security-skills/openclaw-security-watchdog) | [CTCT-CT2/openclaw-security-watchdog](https://github.com/CTCT-CT2/openclaw-security-watchdog) | 2026-05-18 |
 <!-- SKILL_INDEX -->
 
 ---
