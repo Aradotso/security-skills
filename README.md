@@ -65,6 +65,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [malware-detection-and-removal](skills/malware-detection-and-removal/) | [install](https://skills.sh/aradotso/security-skills/malware-detection-and-removal) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
 | [security-awareness-malicious-repository-identification](skills/security-awareness-malicious-repository-identification/) | [install](https://skills.sh/aradotso/security-skills/security-awareness-malicious-repository-identification) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
 | [malware-detection-security-awareness](skills/malware-detection-security-awareness/) | [install](https://skills.sh/aradotso/security-skills/malware-detection-security-awareness) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
+| [malware-awareness-bitdefender-crack-fraud](skills/malware-awareness-bitdefender-crack-fraud/) | [install](https://skills.sh/aradotso/security-skills/malware-awareness-bitdefender-crack-fraud) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
 <!-- SKILL_INDEX -->
 
 ---
