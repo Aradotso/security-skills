@@ -69,6 +69,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [npm-security-best-practices](skills/npm-security-best-practices/) | [install](https://skills.sh/aradotso/security-skills/npm-security-best-practices) | [lirantal/npm-security-best-practices](https://github.com/lirantal/npm-security-best-practices) | 2026-05-20 |
 | [dragonjar-android-pentesting-skill](skills/dragonjar-android-pentesting-skill/) | [install](https://skills.sh/aradotso/security-skills/dragonjar-android-pentesting-skill) | [DragonJAR/Android-Pentesting-Skill](https://github.com/DragonJAR/Android-Pentesting-Skill) | 2026-05-20 |
 | [security-detections-mcp](skills/security-detections-mcp/) | [install](https://skills.sh/aradotso/security-skills/security-detections-mcp) | [MHaggis/Security-Detections-MCP](https://github.com/MHaggis/Security-Detections-MCP) | 2026-05-20 |
+| [malware-repository-warning](skills/malware-repository-warning/) | [install](https://skills.sh/aradotso/security-skills/malware-repository-warning) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 <!-- SKILL_INDEX -->
 
 ---
