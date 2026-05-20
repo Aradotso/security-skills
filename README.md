@@ -72,6 +72,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [malware-repository-warning](skills/malware-repository-warning/) | [install](https://skills.sh/aradotso/security-skills/malware-repository-warning) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 | [malware-analysis-warning](skills/malware-analysis-warning/) | [install](https://skills.sh/aradotso/security-skills/malware-analysis-warning) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 | [malware-detection-and-reporting](skills/malware-detection-and-reporting/) | [install](https://skills.sh/aradotso/security-skills/malware-detection-and-reporting) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
+| [malware-distribution-awareness](skills/malware-distribution-awareness/) | [install](https://skills.sh/aradotso/security-skills/malware-distribution-awareness) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 <!-- SKILL_INDEX -->
 
 ---
