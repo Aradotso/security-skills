@@ -67,6 +67,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [malware-detection-security-awareness](skills/malware-detection-security-awareness/) | [install](https://skills.sh/aradotso/security-skills/malware-detection-security-awareness) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
 | [malware-awareness-bitdefender-crack-fraud](skills/malware-awareness-bitdefender-crack-fraud/) | [install](https://skills.sh/aradotso/security-skills/malware-awareness-bitdefender-crack-fraud) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-19 |
 | [npm-security-best-practices](skills/npm-security-best-practices/) | [install](https://skills.sh/aradotso/security-skills/npm-security-best-practices) | [lirantal/npm-security-best-practices](https://github.com/lirantal/npm-security-best-practices) | 2026-05-20 |
+| [dragonjar-android-pentesting-skill](skills/dragonjar-android-pentesting-skill/) | [install](https://skills.sh/aradotso/security-skills/dragonjar-android-pentesting-skill) | [DragonJAR/Android-Pentesting-Skill](https://github.com/DragonJAR/Android-Pentesting-Skill) | 2026-05-20 |
 <!-- SKILL_INDEX -->
 
 ---
