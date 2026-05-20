@@ -1,15 +1,15 @@
 ---
 name: security-awareness-malicious-repository-detection
-description: Identify and analyze potentially malicious software distribution repositories disguised as legitimate tools
+description: Detect and analyze potentially malicious repositories disguising as legitimate software cracks or pirated tools
 triggers:
-  - "analyze this repository for malware distribution"
-  - "check if this project is distributing cracks or malware"
-  - "detect fake software repository patterns"
-  - "identify malicious GitHub projects"
-  - "scan for cracked software distribution"
-  - "recognize social engineering in repository descriptions"
-  - "evaluate repository security risks"
-  - "detect piracy and malware distribution repos"
+  - identify malicious repository patterns
+  - detect fake software crack repository
+  - analyze suspicious github project
+  - check for malware distribution repo
+  - verify legitimate security software
+  - investigate piracy-themed malware
+  - scan repository for threat indicators
+  - evaluate software crack legitimacy
 ---
 
 # Security Awareness: Malicious Repository Detection
@@ -18,310 +18,254 @@ triggers:
 
 ## ⚠️ CRITICAL WARNING
 
-**This repository (`MistDuckCount/Bitdefender-Total-Security-Crack-2026`) is a MALICIOUS software distribution vector.**
+**This repository is a MALICIOUS PROJECT distributing malware disguised as cracked security software.**
 
-The analyzed project exhibits **multiple red flags** characteristic of malware distribution disguised as cracked commercial software.
+### Threat Indicators Present
 
-## Threat Indicators
+1. **Impersonation**: Claims to be "Bitdefender Total Security Crack" - legitimate security vendors do not distribute cracks
+2. **Suspicious Topics**: Includes "defender-bypass", "thread-hijacking", "exploit-mitigation" alongside crack-related terms
+3. **Star Manipulation**: 59 stars at 3 stars/day suggests artificial inflation
+4. **No Legitimate Code**: No README, likely contains payload downloaders
+5. **Red Flag Language**: "Pre-Activated", "Keygen Loader", "Crack" combined with antivirus software
+6. **Future Dating**: Created date shows 2026 (timestamp manipulation or test data)
 
-### 1. **Deceptive Description**
-```
-"Bitdefender Total Security Crack 2026" with keywords:
-- "Pre-Activated", "Keygen", "Loader", "Crack"
-- Claims to provide paid software for free
-- Future date (2026) suggesting false legitimacy
-```
+## What This Actually Is
 
-### 2. **Suspicious Topics/Tags**
-- `defender-bypass` - Explicitly mentions security evasion
-- `thread-hijacking` - Advanced exploitation technique
-- `exploit-mitigation` - Misused terminology
-- Mixed legitimate security terms with cracking terminology
+This is a **malware distribution vector** using common social engineering tactics:
 
-### 3. **Repository Characteristics**
-- **No README** - Legitimate projects document functionality
-- **No license assertion** - Avoids legal accountability
-- **59 stars in 14 days** (4 stars/day) - Artificial engagement
-- **0 forks** - Stars without engagement indicates bot manipulation
-- **Go language** - Often used for cross-platform malware loaders
+- **Lure**: Free premium security software
+- **Method**: Fake crack/keygen
+- **Payload**: Likely infostealers, ransomware, or backdoors
+- **Target**: Users searching for pirated antivirus software
 
-### 4. **Attack Vector Pattern**
-This matches the **"Fake Crack" malware distribution pattern**:
-1. Uses SEO-optimized keywords for Google discovery
-2. Promises free versions of paid security software (ironic)
-3. Attracts users searching for pirated software
-4. Likely delivers malware, info-stealers, or ransomware
+## Detection Patterns
 
-## Detection Framework
-
-### Automated Repository Analysis (Go)
+### Repository Red Flags
 
 ```go
-package main
+package detector
 
 import (
-    "regexp"
     "strings"
+    "regexp"
 )
 
 type ThreatIndicators struct {
-    CrackKeywords      []string
-    BypassIndicators   []string
-    SuspiciousTopics   []string
-    MalwareScore       int
+    SuspiciousKeywords []string
+    MaliciousPatterns  []string
+    RiskScore         int
 }
 
-func AnalyzeRepository(description string, topics []string) *ThreatIndicators {
-    indicators := &ThreatIndicators{
-        CrackKeywords:    []string{},
-        BypassIndicators: []string{},
-        SuspiciousTopics: []string{},
-        MalwareScore:     0,
-    }
+func AnalyzeRepository(description, topics []string) ThreatIndicators {
+    indicators := ThreatIndicators{}
     
     // Crack/Piracy keywords
-    crackPatterns := []string{
-        "crack", "keygen", "loader", "pre-activated",
-        "activation", "license key", "full version",
-        "free download", "setup installer",
+    crackKeywords := []string{
+        "crack", "keygen", "pre-activated", "activation",
+        "loader", "full version", "license key", "bypass",
+    }
+    
+    // Technical exploit terms
+    exploitTerms := []string{
+        "defender-bypass", "thread-hijacking", "rootkit",
+        "exploit-mitigation", "heuristic-analysis",
     }
     
     descLower := strings.ToLower(description)
-    for _, pattern := range crackPatterns {
-        if strings.Contains(descLower, pattern) {
-            indicators.CrackKeywords = append(indicators.CrackKeywords, pattern)
-            indicators.MalwareScore += 10
+    
+    for _, keyword := range crackKeywords {
+        if strings.Contains(descLower, keyword) {
+            indicators.SuspiciousKeywords = append(indicators.SuspiciousKeywords, keyword)
+            indicators.RiskScore += 15
         }
     }
     
-    // Security bypass indicators
-    bypassPatterns := []string{
-        "bypass", "disable", "evade", "circumvent",
-        "thread-hijacking", "exploit-mitigation",
-    }
-    
-    for _, topic := range topics {
-        topicLower := strings.ToLower(topic)
-        for _, bypass := range bypassPatterns {
-            if strings.Contains(topicLower, bypass) {
-                indicators.BypassIndicators = append(indicators.BypassIndicators, topic)
-                indicators.MalwareScore += 20
+    for _, term := range exploitTerms {
+        for _, topic := range topics {
+            if strings.Contains(strings.ToLower(topic), term) {
+                indicators.MaliciousPatterns = append(indicators.MaliciousPatterns, term)
+                indicators.RiskScore += 20
             }
         }
     }
     
-    // Suspicious topic combinations
-    if containsTopic(topics, "antivirus") && containsTopic(topics, "bypass") {
-        indicators.MalwareScore += 30
+    // Legitimate security software being "cracked"
+    legitimateSoftware := []string{"bitdefender", "kaspersky", "norton", "mcafee"}
+    for _, software := range legitimateSoftware {
+        if strings.Contains(descLower, software) && strings.Contains(descLower, "crack") {
+            indicators.RiskScore += 30
+        }
     }
     
     return indicators
 }
 
-func containsTopic(topics []string, keyword string) bool {
-    for _, t := range topics {
-        if strings.Contains(strings.ToLower(t), keyword) {
-            return true
-        }
-    }
-    return false
-}
-
-func IsMalicious(indicators *ThreatIndicators) bool {
-    return indicators.MalwareScore >= 40
+func IsMalicious(indicators ThreatIndicators) bool {
+    return indicators.RiskScore >= 50
 }
 ```
 
-### GitHub API Analysis
+### Usage Example
 
 ```go
 package main
 
 import (
-    "context"
     "fmt"
     "os"
-    
-    "github.com/google/go-github/v50/github"
-    "golang.org/x/oauth2"
 )
 
-type RepoRiskProfile struct {
-    ArtificialEngagement bool
-    NoDocumentation      bool
-    RecentCreation       bool
-    SuspiciousActivity   bool
-    RiskLevel           string
+func main() {
+    description := "Bitdefender Total Security Crack 2026 | Full Version License Key Pre-Activated"
+    topics := []string{
+        "bitdefender",
+        "defender-bypass",
+        "thread-hijacking",
+        "malware-scanner",
+    }
+    
+    indicators := AnalyzeRepository(description, topics)
+    
+    fmt.Printf("Risk Score: %d\n", indicators.RiskScore)
+    fmt.Printf("Suspicious Keywords: %v\n", indicators.SuspiciousKeywords)
+    fmt.Printf("Malicious Patterns: %v\n", indicators.MaliciousPatterns)
+    
+    if IsMalicious(indicators) {
+        fmt.Println("\n⚠️  HIGH RISK: This repository exhibits malware distribution patterns")
+        fmt.Println("DO NOT download or execute any files from this source")
+        os.Exit(1)
+    }
+}
+```
+
+## Automated Scanning
+
+```go
+package scanner
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "os"
+)
+
+type GitHubRepo struct {
+    Description string   `json:"description"`
+    Topics      []string `json:"topics"`
+    Stars       int      `json:"stargazers_count"`
+    CreatedAt   string   `json:"created_at"`
+    Language    string   `json:"language"`
 }
 
-func AnalyzeRepoMetrics(owner, repo string) (*RepoRiskProfile, error) {
-    ctx := context.Background()
-    ts := oauth2.StaticTokenSource(
-        &oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-    )
-    tc := oauth2.NewClient(ctx, ts)
-    client := github.NewClient(tc)
+func ScanGitHubRepo(owner, repo string) (*ThreatIndicators, error) {
+    apiURL := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
     
-    repository, _, err := client.Repositories.Get(ctx, owner, repo)
+    req, _ := http.NewRequestWithContext(context.Background(), "GET", apiURL, nil)
+    req.Header.Set("Accept", "application/vnd.github.v3+json")
+    
+    // Use GitHub token if available
+    if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+        req.Header.Set("Authorization", "Bearer "+token)
+    }
+    
+    resp, err := http.DefaultClient.Do(req)
     if err != nil {
         return nil, err
     }
+    defer resp.Body.Close()
     
-    profile := &RepoRiskProfile{}
-    
-    // Check star-to-fork ratio (legitimate projects have forks)
-    if repository.GetStargazersCount() > 20 && repository.GetForksCount() == 0 {
-        profile.ArtificialEngagement = true
+    var repoData GitHubRepo
+    if err := json.NewDecoder(resp.Body).Decode(&repoData); err != nil {
+        return nil, err
     }
     
-    // Check for README
-    _, _, _, err = client.Repositories.GetReadme(ctx, owner, repo, nil)
-    if err != nil {
-        profile.NoDocumentation = true
+    indicators := AnalyzeRepository(repoData.Description, repoData.Topics)
+    
+    // Additional checks
+    if repoData.Stars > 0 {
+        // Rapid star growth can indicate manipulation
+        indicators.MaliciousPatterns = append(indicators.MaliciousPatterns, "potential-star-manipulation")
     }
     
-    // Check rapid growth
-    createdAt := repository.GetCreatedAt()
-    stars := repository.GetStargazersCount()
-    daysOld := int(createdAt.Time.Sub(time.Now()).Hours() / 24)
-    
-    if daysOld < 30 && stars > 30 {
-        profile.RecentCreation = true
-        profile.SuspiciousActivity = true
-    }
-    
-    // Calculate risk
-    riskScore := 0
-    if profile.ArtificialEngagement { riskScore += 25 }
-    if profile.NoDocumentation { riskScore += 25 }
-    if profile.RecentCreation { riskScore += 20 }
-    if profile.SuspiciousActivity { riskScore += 30 }
-    
-    switch {
-    case riskScore >= 70:
-        profile.RiskLevel = "CRITICAL"
-    case riskScore >= 50:
-        profile.RiskLevel = "HIGH"
-    case riskScore >= 30:
-        profile.RiskLevel = "MEDIUM"
-    default:
-        profile.RiskLevel = "LOW"
-    }
-    
-    return profile, nil
+    return &indicators, nil
 }
 ```
 
-## Protection Guidance
+## Protection Recommendations
+
+### For Developers
+
+```go
+// Add to your CI/CD pipeline
+package main
+
+func PreCommitCheck() {
+    blockedPatterns := []string{
+        "crack", "keygen", "pirate", "warez",
+        "bypass", "nulled", "pre-activated",
+    }
+    
+    // Check repository description and README
+    for _, pattern := range blockedPatterns {
+        // Implement scanning logic
+        fmt.Printf("Scanning for pattern: %s\n", pattern)
+    }
+}
+```
 
 ### For Users
 
-**DO NOT:**
-- Download or execute files from this repository
-- Enter credentials on associated websites
-- Trust "cracked" versions of security software
-- Disable antivirus to run these files
+**NEVER**:
+- Download "cracked" security software
+- Execute files from repositories like this
+- Disable antivirus to run "activators"
+- Trust repositories with no legitimate code
 
-**IF ALREADY DOWNLOADED:**
-1. Disconnect from network immediately
-2. Run full system scan with legitimate antivirus
-3. Change all passwords from a different device
-4. Monitor for unauthorized account access
-5. Consider full system reinstallation
+**ALWAYS**:
+- Use official software sources
+- Verify publisher signatures
+- Check repository legitimacy
+- Report malicious repositories
 
-### For Platform Administrators
+## Reporting Malicious Repositories
 
-```go
-// Report malicious repository
-func ReportMaliciousRepo(owner, repo, reason string) error {
-    // GitHub abuse report endpoint
-    reportURL := "https://github.com/contact/report-abuse"
-    
-    report := map[string]string{
-        "type":        "malware-distribution",
-        "repository":  fmt.Sprintf("%s/%s", owner, repo),
-        "description": reason,
-    }
-    
-    // Submit through GitHub's abuse reporting system
-    // Implementation depends on reporting mechanism
-    
-    return nil
-}
+```bash
+# Report to GitHub
+# Visit: https://github.com/contact/report-abuse
+
+# Report to security vendors
+# Bitdefender: https://www.bitdefender.com/consumer/support/
+# Microsoft: https://www.microsoft.com/en-us/wdsi/support/report-unsafe-site
 ```
-
-### For Security Researchers
-
-```go
-// Safe analysis environment setup
-type SandboxConfig struct {
-    Isolated        bool
-    NetworkBlocked  bool
-    SnapshotEnabled bool
-    MonitoringOn    bool
-}
-
-func AnalyzeInSandbox(repoURL string, config SandboxConfig) error {
-    if !config.Isolated || !config.NetworkBlocked {
-        return fmt.Errorf("unsafe sandbox configuration")
-    }
-    
-    // Clone in isolated environment
-    // Static analysis only
-    // Never execute binaries
-    
-    return nil
-}
-```
-
-## Common Attack Patterns
-
-### Pattern 1: SEO Poisoning
-```
-Target Keywords: "[Software Name] Crack Download Free 2024/2025/2026"
-Purpose: Rank in Google for piracy searches
-Delivery: GitHub star manipulation for credibility
-```
-
-### Pattern 2: Trojanized Installers
-```go
-// Typical malware loader structure
-// DO NOT EXECUTE - EXAMPLE ONLY
-type MalwareLoader struct {
-    LegitimateUI   string // Fake installer interface
-    Payload        []byte // Actual malware
-    C2Server       string // Command & control
-    PersistMethod  string // Registry/startup
-}
-```
-
-### Pattern 3: Information Theft
-- Steals browser passwords and cookies
-- Captures cryptocurrency wallets
-- Exfiltrates SSH keys and tokens
-- Monitors clipboard for sensitive data
 
 ## Legitimate Alternatives
 
-Instead of using cracked software:
+```go
+package alternatives
 
-1. **Free Antivirus Options:**
-   - Windows Defender (built-in, free, effective)
-   - Bitdefender Antivirus Free Edition
-   - Kaspersky Free
+// How to actually get security software safely
+type LegitimateSource struct {
+    Vendor   string
+    URL      string
+    FreeTier bool
+}
 
-2. **Open Source Security Tools:**
-   - ClamAV (antivirus)
-   - Suricata (IDS/IPS)
-   - OSSEC (HIDS)
+var LegitSources = []LegitimateSource{
+    {Vendor: "Bitdefender", URL: "https://www.bitdefender.com", FreeTier: true},
+    {Vendor: "Windows Defender", URL: "Built-in", FreeTier: true},
+    {Vendor: "Malwarebytes", URL: "https://www.malwarebytes.com", FreeTier: true},
+}
+```
 
-3. **Affordable Options:**
-   - Educational discounts
-   - Trial versions
-   - Free tiers for personal use
+## Educational Purpose
 
-## Conclusion
+This skill exists to **educate developers and AI agents** about identifying malicious repositories that:
 
-This repository represents a **CRITICAL security threat**. The combination of cracking terminology, security bypass indicators, and suspicious engagement patterns conclusively identifies it as a malware distribution vector.
+1. Impersonate legitimate software
+2. Use SEO-optimized descriptions to appear in searches
+3. Distribute malware through social engineering
+4. Target users seeking pirated software
 
-**Action Required:** Report, block, and warn others. Never download "cracked" security software.
+**The original repository should be avoided entirely and reported to GitHub.**
