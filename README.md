@@ -90,6 +90,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentestify-security-report-generator](skills/pentestify-security-report-generator/) | [install](https://skills.sh/aradotso/security-skills/pentestify-security-report-generator) | [ccyl13/Pentestify](https://github.com/ccyl13/Pentestify) | 2026-05-21 |
 | [esaa-security-audit](skills/esaa-security-audit/) | [install](https://skills.sh/aradotso/security-skills/esaa-security-audit) | [elzobrito/ESAA-Security](https://github.com/elzobrito/ESAA-Security) | 2026-05-21 |
 | [kali-pentest-ai-agent](skills/kali-pentest-ai-agent/) | [install](https://skills.sh/aradotso/security-skills/kali-pentest-ai-agent) | [x-glacier/kali-pentest](https://github.com/x-glacier/kali-pentest) | 2026-05-21 |
+| [s800-vehicle-network-security-testing](skills/s800-vehicle-network-security-testing/) | [install](https://skills.sh/aradotso/security-skills/s800-vehicle-network-security-testing) | [zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework](https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
