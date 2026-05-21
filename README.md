@@ -86,6 +86,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [sparkfinderoven-r01-security-compliance-skills](skills/sparkfinderoven-r01-security-compliance-skills/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-r01-security-compliance-skills) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 | [sparkfinderoven-claude-security-compliance-suite](skills/sparkfinderoven-claude-security-compliance-suite/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-claude-security-compliance-suite) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 | [awesome-claude-code-security-compliance-suite](skills/awesome-claude-code-security-compliance-suite/) | [install](https://skills.sh/aradotso/security-skills/awesome-claude-code-security-compliance-suite) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
+| [sparkfinderoven-security-compliance-suite](skills/sparkfinderoven-security-compliance-suite/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-security-compliance-suite) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
