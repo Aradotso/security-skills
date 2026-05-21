@@ -80,6 +80,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [skill-file-security](skills/skill-file-security/) | [install](https://skills.sh/aradotso/security-skills/skill-file-security) | [Netxeo/skill-file-security](https://github.com/Netxeo/skill-file-security) | 2026-05-21 |
 | [zen-ai-pentest-framework](skills/zen-ai-pentest-framework/) | [install](https://skills.sh/aradotso/security-skills/zen-ai-pentest-framework) | [SHAdd0WTAka/Zen-Ai-Pentest](https://github.com/SHAdd0WTAka/Zen-Ai-Pentest) | 2026-05-21 |
 | [securityclaw-autonomous-soc-agent](skills/securityclaw-autonomous-soc-agent/) | [install](https://skills.sh/aradotso/security-skills/securityclaw-autonomous-soc-agent) | [SecurityClaw/SecurityClaw](https://github.com/SecurityClaw/SecurityClaw) | 2026-05-21 |
+| [sparkfinderoven-security-compliance-skills](skills/sparkfinderoven-security-compliance-skills/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-security-compliance-skills) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
