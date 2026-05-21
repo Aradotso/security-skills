@@ -84,6 +84,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [edgesecurityaccess-wireguard-vpn](skills/edgesecurityaccess-wireguard-vpn/) | [install](https://skills.sh/aradotso/security-skills/edgesecurityaccess-wireguard-vpn) | [KochiyaSanaeNya/EdgeSecurityAccess](https://github.com/KochiyaSanaeNya/EdgeSecurityAccess) | 2026-05-21 |
 | [security-compliance-skills-suite-claude](skills/security-compliance-skills-suite-claude/) | [install](https://skills.sh/aradotso/security-skills/security-compliance-skills-suite-claude) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 | [sparkfinderoven-r01-security-compliance-skills](skills/sparkfinderoven-r01-security-compliance-skills/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-r01-security-compliance-skills) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
+| [sparkfinderoven-claude-security-compliance-suite](skills/sparkfinderoven-claude-security-compliance-suite/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-claude-security-compliance-suite) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
