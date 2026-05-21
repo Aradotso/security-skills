@@ -81,6 +81,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [zen-ai-pentest-framework](skills/zen-ai-pentest-framework/) | [install](https://skills.sh/aradotso/security-skills/zen-ai-pentest-framework) | [SHAdd0WTAka/Zen-Ai-Pentest](https://github.com/SHAdd0WTAka/Zen-Ai-Pentest) | 2026-05-21 |
 | [securityclaw-autonomous-soc-agent](skills/securityclaw-autonomous-soc-agent/) | [install](https://skills.sh/aradotso/security-skills/securityclaw-autonomous-soc-agent) | [SecurityClaw/SecurityClaw](https://github.com/SecurityClaw/SecurityClaw) | 2026-05-21 |
 | [sparkfinderoven-security-compliance-skills](skills/sparkfinderoven-security-compliance-skills/) | [install](https://skills.sh/aradotso/security-skills/sparkfinderoven-security-compliance-skills) | [sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security](https://github.com/sparkfinderoven/r01-hesreallyhim-awesome-claude-code-security) | 2026-05-21 |
+| [edgesecurityaccess-wireguard-vpn](skills/edgesecurityaccess-wireguard-vpn/) | [install](https://skills.sh/aradotso/security-skills/edgesecurityaccess-wireguard-vpn) | [KochiyaSanaeNya/EdgeSecurityAccess](https://github.com/KochiyaSanaeNya/EdgeSecurityAccess) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
