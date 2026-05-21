@@ -78,6 +78,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [bitdefender-malware-analysis](skills/bitdefender-malware-analysis/) | [install](https://skills.sh/aradotso/security-skills/bitdefender-malware-analysis) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 | [bitdefender-malware-investigation](skills/bitdefender-malware-investigation/) | [install](https://skills.sh/aradotso/security-skills/bitdefender-malware-investigation) | [MistDuckCount/Bitdefender-Total-Security-Crack-2026](https://github.com/MistDuckCount/Bitdefender-Total-Security-Crack-2026) | 2026-05-20 |
 | [skill-file-security](skills/skill-file-security/) | [install](https://skills.sh/aradotso/security-skills/skill-file-security) | [Netxeo/skill-file-security](https://github.com/Netxeo/skill-file-security) | 2026-05-21 |
+| [zen-ai-pentest-framework](skills/zen-ai-pentest-framework/) | [install](https://skills.sh/aradotso/security-skills/zen-ai-pentest-framework) | [SHAdd0WTAka/Zen-Ai-Pentest](https://github.com/SHAdd0WTAka/Zen-Ai-Pentest) | 2026-05-21 |
 <!-- SKILL_INDEX -->
 
 ---
