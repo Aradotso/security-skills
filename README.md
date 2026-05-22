@@ -91,6 +91,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [esaa-security-audit](skills/esaa-security-audit/) | [install](https://skills.sh/aradotso/security-skills/esaa-security-audit) | [elzobrito/ESAA-Security](https://github.com/elzobrito/ESAA-Security) | 2026-05-21 |
 | [kali-pentest-ai-agent](skills/kali-pentest-ai-agent/) | [install](https://skills.sh/aradotso/security-skills/kali-pentest-ai-agent) | [x-glacier/kali-pentest](https://github.com/x-glacier/kali-pentest) | 2026-05-21 |
 | [s800-vehicle-network-security-testing](skills/s800-vehicle-network-security-testing/) | [install](https://skills.sh/aradotso/security-skills/s800-vehicle-network-security-testing) | [zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework](https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework) | 2026-05-21 |
+| [foundry-security-spec](skills/foundry-security-spec/) | [install](https://skills.sh/aradotso/security-skills/foundry-security-spec) | [CiscoDevNet/foundry-security-spec](https://github.com/CiscoDevNet/foundry-security-spec) | 2026-05-22 |
 <!-- SKILL_INDEX -->
 
 ---
