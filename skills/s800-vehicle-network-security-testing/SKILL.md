@@ -1,15 +1,15 @@
 ---
 name: s800-vehicle-network-security-testing
-description: Vehicle network security testing framework for automotive CAN bus, LIN, and other vehicle communication protocols
+description: Vehicle network security testing framework for automotive CAN bus, LIN, and FlexRay protocol analysis and penetration testing
 triggers:
   - test vehicle network security
-  - analyze CAN bus vulnerabilities
-  - scan automotive network protocols
-  - perform vehicle penetration testing
-  - inject CAN messages for testing
-  - fuzzing automotive protocols
-  - vehicle security assessment framework
-  - S800 vehicle testing tool
+  - analyze CAN bus traffic
+  - perform automotive penetration testing
+  - use S800 framework for vehicle security
+  - scan automotive network vulnerabilities
+  - test ECU communication security
+  - fuzz vehicle protocols with S800
+  - conduct automotive security assessment
 ---
 
 # S800 Vehicle Network Security Testing Framework
@@ -18,238 +18,306 @@ triggers:
 
 ## Overview
 
-S800-Vehicle-Network-Security-Testing-Framework is a specialized testing framework designed for security assessment of vehicle networks including CAN (Controller Area Network), LIN (Local Interconnect Network), FlexRay, and other automotive communication protocols. The framework enables security researchers and automotive engineers to perform penetration testing, fuzzing, traffic analysis, and vulnerability assessment on vehicle network systems.
+S800 is a comprehensive vehicle network security testing framework designed for automotive penetration testing and security research. It provides tools for analyzing, intercepting, fuzzing, and exploiting vulnerabilities in vehicle communication protocols including CAN bus, LIN, FlexRay, and automotive Ethernet.
+
+The framework enables security researchers and automotive engineers to:
+- Monitor and decode vehicle network traffic
+- Perform protocol fuzzing and anomaly injection
+- Test ECU (Electronic Control Unit) security
+- Simulate attacks on vehicle networks
+- Validate security controls in automotive systems
+
+**Note:** This framework is for authorized security testing only. Unauthorized access to vehicle systems is illegal.
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.7 or higher
-- SocketCAN support (Linux recommended)
-- CAN interface hardware (USB-CAN adapter, CANtact, etc.)
-- Root/administrator privileges for raw socket access
+- Python 3.8+
+- Hardware interface (CAN adapter, OBD-II dongle, or compatible USB-to-CAN device)
+- Linux kernel with SocketCAN support (recommended) or Windows with appropriate drivers
 
-### Basic Installation
+### Setup
 
 ```bash
+# Clone the repository
 git clone https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework.git
 cd S800-Vehicle-Network-Security-Testing-Framework
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Or install in virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Setting Up CAN Interface
+### Hardware Configuration
 
+For SocketCAN on Linux:
 ```bash
-# Load CAN kernel modules
+# Load kernel modules
 sudo modprobe can
 sudo modprobe can_raw
 sudo modprobe vcan
 
-# Create virtual CAN interface for testing
+# Setup virtual CAN interface (for testing without hardware)
 sudo ip link add dev vcan0 type vcan
 sudo ip link set up vcan0
 
-# Or configure physical CAN interface
+# Setup physical CAN interface (adjust bitrate as needed)
 sudo ip link set can0 type can bitrate 500000
 sudo ip link set up can0
 ```
 
 ## Core Components
 
-### 1. CAN Bus Testing Module
+### 1. CAN Bus Scanner
 
-The CAN testing module provides capabilities for sniffing, injecting, and fuzzing CAN messages.
+Scan and enumerate CAN IDs on the vehicle network:
 
 ```python
-from s800_framework import CANTester
-import os
+from s800.scanner import CANScanner
+from s800.interface import CANInterface
 
-# Initialize CAN tester with interface
-tester = CANTester(interface='can0')
+# Initialize CAN interface
+interface = CANInterface(channel='can0', bustype='socketcan', bitrate=500000)
 
-# Sniff CAN traffic
-tester.start_sniffing(duration=30, save_to='capture.log')
+# Create scanner instance
+scanner = CANScanner(interface)
 
-# Analyze captured traffic
-analysis = tester.analyze_traffic('capture.log')
-print(f"Unique CAN IDs: {analysis['unique_ids']}")
-print(f"Message frequency: {analysis['frequency']}")
+# Perform passive scan (listen only)
+print("Starting passive CAN scan...")
+results = scanner.passive_scan(duration=60)  # Scan for 60 seconds
 
-# Inject specific CAN message
-tester.send_message(
-    can_id=0x123,
-    data=[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08],
-    extended=False
+# Display discovered CAN IDs
+for can_id, info in results.items():
+    print(f"ID: 0x{can_id:03X} - Count: {info['count']}, "
+          f"Data Length: {info['dlc']}, First seen: {info['timestamp']}")
+
+# Active scan with request injection
+active_results = scanner.active_scan(
+    id_range=(0x000, 0x7FF),
+    timeout=5
 )
 ```
 
-### 2. Fuzzing Engine
+### 2. Traffic Analyzer
 
-Perform intelligent fuzzing of CAN messages to discover vulnerabilities.
+Monitor and decode CAN bus messages:
 
 ```python
-from s800_framework import CANFuzzer
+from s800.analyzer import TrafficAnalyzer
+from s800.decoders import OBDDecoder, UDSDecoder
 
-fuzzer = CANFuzzer(interface='can0')
+# Initialize analyzer
+analyzer = TrafficAnalyzer(interface)
 
-# Define fuzzing parameters
-fuzzer.configure(
-    target_ids=[0x100, 0x200, 0x300],  # Target CAN IDs
-    fuzz_data=True,
-    fuzz_id=False,
-    delay_ms=10,
-    iterations=1000
+# Add protocol decoders
+analyzer.add_decoder(OBDDecoder())
+analyzer.add_decoder(UDSDecoder())
+
+# Start capturing with filters
+analyzer.start_capture(
+    can_ids=[0x7E0, 0x7E8, 0x7DF],  # OBD-II PIDs
+    callback=lambda msg: print(f"CAN ID: 0x{msg.arbitration_id:03X} Data: {msg.data.hex()}")
 )
 
-# Start fuzzing campaign
-results = fuzzer.run_fuzzing(
-    monitor_ids=[0x400, 0x500],  # Monitor for responses
-    timeout=300
-)
+# Capture for duration
+import time
+time.sleep(30)
+analyzer.stop_capture()
 
-# Analyze fuzzing results
-for anomaly in results['anomalies']:
-    print(f"Anomaly detected: ID {anomaly['can_id']}, Data: {anomaly['data']}")
+# Export captured data
+analyzer.export_pcap('capture.pcap')
+analyzer.export_csv('capture.csv')
+
+# Statistical analysis
+stats = analyzer.get_statistics()
+print(f"Total messages: {stats['total_messages']}")
+print(f"Unique IDs: {stats['unique_ids']}")
+print(f"Message rate: {stats['messages_per_second']:.2f} msg/s")
 ```
 
-### 3. Protocol Analyzer
+### 3. Protocol Fuzzer
 
-Deep inspection and decoding of automotive protocols.
+Fuzz vehicle protocols to discover vulnerabilities:
 
 ```python
-from s800_framework import ProtocolAnalyzer
+from s800.fuzzer import CANFuzzer
+from s800.generators import RandomGenerator, MutationGenerator
 
-analyzer = ProtocolAnalyzer()
+# Initialize fuzzer
+fuzzer = CANFuzzer(interface)
 
-# Load and parse UDS (Unified Diagnostic Services) messages
-analyzer.load_protocol('UDS')
-analyzer.parse_message(
-    data=b'\x10\x01',  # Start diagnostic session
-    protocol='UDS'
+# Random fuzzing strategy
+fuzzer.set_generator(RandomGenerator(
+    can_id_range=(0x000, 0x7FF),
+    data_length=8,
+    seed=42
+))
+
+# Start fuzzing with safety limits
+fuzzer.start(
+    duration=300,  # 5 minutes
+    rate=100,      # 100 messages per second
+    blacklist=[0x760, 0x761],  # Avoid critical safety IDs
+    monitor_response=True
 )
 
-# Decode OBD-II requests
-obd_decoder = analyzer.get_decoder('OBD2')
-result = obd_decoder.decode(
-    mode=0x01,
-    pid=0x0C,
-    data=b'\x0F\xA0'  # Engine RPM
+# Mutation-based fuzzing (based on captured traffic)
+baseline_traffic = analyzer.get_captured_messages()
+fuzzer.set_generator(MutationGenerator(
+    baseline=baseline_traffic,
+    mutation_rate=0.2
+))
+
+# Targeted fuzzing with callbacks
+def response_monitor(request, response, elapsed_time):
+    if response and response.arbitration_id not in expected_ids:
+        print(f"Anomaly detected: Unexpected response 0x{response.arbitration_id:03X}")
+        fuzzer.log_finding(request, response, "unexpected_response")
+
+fuzzer.start_targeted(
+    target_ids=[0x7E0, 0x7E8],
+    callback=response_monitor
 )
-print(f"Engine RPM: {result['rpm']}")
 ```
 
-### 4. Replay Attack Module
+### 4. UDS (Unified Diagnostic Services) Tester
 
-Capture and replay CAN messages for security testing.
+Test diagnostic services security:
 
 ```python
-from s800_framework import ReplayAttack
+from s800.uds import UDSClient, UDSService
+from s800.uds.security import SecurityAccess
 
-replay = ReplayAttack(interface='can0')
-
-# Capture baseline traffic
-print("Recording normal operation...")
-replay.capture(
-    duration=60,
-    output='baseline_traffic.pcap',
-    filter_ids=[0x100, 0x200, 0x300]
+# Connect to ECU via UDS
+uds_client = UDSClient(
+    interface,
+    request_id=0x7E0,
+    response_id=0x7E8,
+    timeout=2.0
 )
 
-# Replay captured traffic
-replay.replay(
-    pcap_file='baseline_traffic.pcap',
-    speed=1.0,  # Real-time speed
+# Start diagnostic session
+try:
+    uds_client.start_session(session_type=0x03)  # Extended diagnostic
+    print("Diagnostic session started")
+    
+    # Read DTC (Diagnostic Trouble Codes)
+    dtcs = uds_client.read_dtc_information()
+    print(f"Found {len(dtcs)} DTCs")
+    
+    # Read data by identifier
+    vin = uds_client.read_data_by_id(0xF190)  # VIN
+    print(f"VIN: {vin.decode('ascii')}")
+    
+    # Security access attempt
+    security = SecurityAccess(uds_client)
+    
+    # Request seed
+    seed = security.request_seed(level=0x01)
+    print(f"Seed received: {seed.hex()}")
+    
+    # Calculate key (implement your algorithm or use brute force)
+    key = security.calculate_key(seed, algorithm='default')
+    
+    # Send key
+    if security.send_key(key):
+        print("Security access granted!")
+        
+        # Perform privileged operations
+        uds_client.write_data_by_id(0x1234, b'\x00\x00\x00\x00')
+    else:
+        print("Security access denied")
+        
+except Exception as e:
+    print(f"UDS error: {e}")
+finally:
+    uds_client.stop_session()
+```
+
+### 5. Replay Attacks
+
+Capture and replay vehicle network traffic:
+
+```python
+from s800.replay import MessageRecorder, MessageReplayer
+
+# Record legitimate traffic
+recorder = MessageRecorder(interface)
+recorder.start_recording()
+
+print("Recording traffic... (perform vehicle operations now)")
+time.sleep(60)
+
+recorder.stop_recording()
+messages = recorder.get_messages()
+recorder.save('door_unlock_sequence.json')
+
+# Replay captured sequence
+replayer = MessageReplayer(interface)
+replayer.load('door_unlock_sequence.json')
+
+# Replay with exact timing
+replayer.replay(
+    preserve_timing=True,
     loop=False
 )
 
 # Replay with modifications
-replay.replay_modified(
-    pcap_file='baseline_traffic.pcap',
-    modifications={
-        0x123: {'data_byte': 2, 'new_value': 0xFF}
-    }
+replayer.replay_modified(
+    can_id_map={0x321: 0x322},  # Change target ID
+    data_transform=lambda data: bytes([b ^ 0xFF for b in data]),  # XOR data
+    speed_multiplier=2.0  # 2x faster
 )
 ```
 
-## Advanced Testing Scenarios
+### 6. Man-in-the-Middle (MITM)
 
-### ECU Identification and Enumeration
-
-```python
-from s800_framework import ECUScanner
-
-scanner = ECUScanner(interface='can0')
-
-# Scan for active ECUs using UDS
-ecus = scanner.scan_uds_range(
-    start_id=0x700,
-    end_id=0x7FF,
-    timeout=1.0
-)
-
-for ecu in ecus:
-    print(f"ECU found at ID: {ecu['id']}")
-    
-    # Read ECU information
-    info = scanner.read_ecu_info(ecu['id'])
-    print(f"  Manufacturer: {info.get('manufacturer')}")
-    print(f"  Part Number: {info.get('part_number')}")
-    print(f"  Software Version: {info.get('sw_version')}")
-```
-
-### Security Access Testing
+Intercept and modify messages in real-time:
 
 ```python
-from s800_framework import SecurityAccess
+from s800.mitm import CANProxy
 
-sec_access = SecurityAccess(interface='can0')
-
-# Attempt security access on ECU
-target_ecu = 0x750
-
-# Request seed
-seed = sec_access.request_seed(
-    ecu_id=target_ecu,
-    access_level=0x01
+# Setup proxy between two CAN interfaces
+proxy = CANProxy(
+    interface_a='can0',
+    interface_b='can1',
+    bustype='socketcan'
 )
 
-# Brute force or dictionary attack (for testing only)
-result = sec_access.brute_force_key(
-    ecu_id=target_ecu,
-    seed=seed,
-    key_length=4,
-    algorithm='xor',  # or 'custom'
-    max_attempts=1000
+# Define interception rules
+@proxy.on_message(can_id=0x123)
+def modify_speed_signal(message):
+    # Intercept and modify speed data
+    original_speed = int.from_bytes(message.data[0:2], 'big')
+    modified_speed = int(original_speed * 0.8)  # Report 80% of actual speed
+    message.data[0:2] = modified_speed.to_bytes(2, 'big')
+    print(f"Modified speed: {original_speed} -> {modified_speed}")
+    return message
+
+@proxy.on_message(can_id=0x321)
+def block_message(message):
+    # Block specific messages
+    print(f"Blocked message: 0x{message.arbitration_id:03X}")
+    return None  # Don't forward
+
+# Start MITM proxy
+proxy.start()
+
+# Inject additional messages
+proxy.inject_message(
+    can_id=0x456,
+    data=b'\x01\x02\x03\x04\x05\x06\x07\x08',
+    interface='can1'
 )
 
-if result['success']:
-    print(f"Security access granted with key: {result['key']}")
-```
-
-### Gateway Testing
-
-```python
-from s800_framework import GatewayTester
-
-gateway = GatewayTester(
-    external_interface='can0',
-    internal_interface='can1'
-)
-
-# Test gateway filtering
-gateway.test_filtering(
-    test_ids=range(0x000, 0x7FF),
-    direction='external_to_internal'
-)
-
-# Attempt to bypass gateway restrictions
-bypass_results = gateway.test_bypass(
-    blocked_id=0x300,
-    techniques=['fragmentation', 'timing', 'flood']
-)
-
-for technique, success in bypass_results.items():
-    print(f"{technique}: {'VULNERABLE' if success else 'PROTECTED'}")
+# Stop proxy
+time.sleep(300)
+proxy.stop()
 ```
 
 ## Configuration
@@ -259,202 +327,181 @@ for technique, success in bypass_results.items():
 Create `s800_config.yaml`:
 
 ```yaml
-interfaces:
-  primary: can0
-  secondary: can1
-  virtual: vcan0
-
-logging:
-  level: INFO
-  output: logs/s800_test.log
-  capture_dir: captures/
-
-can_settings:
+# Interface configuration
+interface:
+  default_type: socketcan
+  default_channel: can0
   bitrate: 500000
-  sample_point: 0.875
   fd_enabled: false
 
-fuzzing:
-  default_delay_ms: 10
-  max_iterations: 10000
-  save_anomalies: true
+# Logging configuration
+logging:
+  level: INFO
+  file: s800_logs.txt
+  capture_raw: true
+  max_size: 100MB
 
-security:
-  allow_destructive_tests: false
+# Safety limits
+safety:
+  enable_blacklist: true
+  blacklist_ids:
+    - 0x760  # Critical safety system
+    - 0x761
+  max_injection_rate: 1000  # messages per second
   require_confirmation: true
-  backup_before_write: true
+
+# Database configuration
+database:
+  type: sqlite
+  path: s800_findings.db
+  auto_commit: true
+
+# Fuzzing defaults
+fuzzing:
+  default_duration: 300
+  default_rate: 100
+  enable_crash_detection: true
+  anomaly_threshold: 0.8
 ```
 
-Load configuration in code:
+Load configuration:
 
 ```python
-from s800_framework import S800Framework
+from s800.config import load_config
 
-# Initialize framework with config
-framework = S800Framework(config_file='s800_config.yaml')
+config = load_config('s800_config.yaml')
+interface = CANInterface(**config['interface'])
+```
 
-# Access configured interfaces
-can_interface = framework.get_interface('primary')
+### Environment Variables
 
-# Get configuration values
-bitrate = framework.config['can_settings']['bitrate']
+```bash
+# Set environment variables for sensitive data
+export S800_INTERFACE=can0
+export S800_BITRATE=500000
+export S800_LOG_LEVEL=DEBUG
+export S800_DB_PATH=/path/to/findings.db
 ```
 
 ## Common Testing Patterns
 
-### Pattern 1: Full Vehicle Security Audit
+### Complete ECU Security Assessment
 
 ```python
-from s800_framework import VehicleAuditor
+from s800.assessment import ECUAssessment
 
-auditor = VehicleAuditor(interface='can0')
-
-# Run comprehensive security audit
-report = auditor.run_full_audit(
-    modules=[
-        'ecu_enumeration',
-        'protocol_analysis',
-        'replay_testing',
-        'fuzzing',
-        'security_access',
-        'gateway_testing'
-    ],
-    output_format='html',
-    save_to='audit_report.html'
+# Initialize assessment
+assessment = ECUAssessment(
+    interface=interface,
+    target_id=0x7E0,
+    response_id=0x7E8
 )
 
-print(f"Audit completed. Found {report['vulnerability_count']} potential issues.")
-```
-
-### Pattern 2: Continuous Monitoring
-
-```python
-from s800_framework import CANMonitor
-import time
-
-monitor = CANMonitor(interface='can0')
-
-# Define baseline behavior
-monitor.learn_baseline(duration=300)
-
-# Start anomaly detection
-monitor.start_monitoring(
-    callback=lambda anomaly: print(f"Anomaly: {anomaly}"),
-    sensitivity='medium'
+# Run comprehensive test suite
+results = assessment.run_full_assessment(
+    tests=[
+        'service_enumeration',
+        'security_access_bypass',
+        'session_control',
+        'memory_read',
+        'firmware_extraction',
+        'authentication_bruteforce'
+    ]
 )
 
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    monitor.stop_monitoring()
-    monitor.save_report('monitoring_report.json')
+# Generate report
+assessment.generate_report('ecu_assessment_report.html')
+
+# Export findings
+for finding in results['vulnerabilities']:
+    print(f"[{finding['severity']}] {finding['title']}")
+    print(f"Description: {finding['description']}")
+    print(f"Recommendation: {finding['recommendation']}\n")
 ```
 
-### Pattern 3: Custom Attack Script
+### Gateway Bypass Testing
 
 ```python
-from s800_framework import CANInterface
-import time
+from s800.gateway import GatewayTester
 
-interface = CANInterface('can0')
+tester = GatewayTester(interface)
 
-# Custom DoS attack scenario (for authorized testing only)
-def dos_attack(target_id, duration_seconds):
-    end_time = time.time() + duration_seconds
-    count = 0
-    
-    while time.time() < end_time:
-        interface.send(
-            can_id=target_id,
-            data=[0xFF] * 8,
-            extended=False
-        )
-        count += 1
-        time.sleep(0.001)  # 1ms delay
-    
-    return count
+# Test gateway filtering
+bypass_results = tester.test_gateway_bypass(
+    source_network='can0',
+    target_network='can1',
+    methods=['id_spoofing', 'timing_attack', 'sequence_manipulation']
+)
 
-# Execute controlled test
-messages_sent = dos_attack(target_id=0x100, duration_seconds=5)
-print(f"Sent {messages_sent} messages")
+if bypass_results['bypassed']:
+    print(f"Gateway bypass successful using: {bypass_results['method']}")
 ```
 
 ## Troubleshooting
 
-### Issue: Cannot access CAN interface
-
-```bash
-# Check if interface exists
-ip link show can0
-
-# Verify permissions
-sudo chmod 666 /dev/can0
-
-# Check kernel modules
-lsmod | grep can
-
-# Reload modules if necessary
-sudo modprobe -r can_raw
-sudo modprobe can_raw
-```
-
-### Issue: No messages captured
+### CAN Interface Not Found
 
 ```python
-# Verify interface is up and configured
-from s800_framework import InterfaceDiagnostics
+# List available interfaces
+from s800.utils import list_interfaces
 
-diag = InterfaceDiagnostics('can0')
-status = diag.check_interface()
+interfaces = list_interfaces()
+print("Available interfaces:", interfaces)
 
-if not status['is_up']:
-    print("Interface is down. Bringing up...")
-    diag.bring_up_interface(bitrate=500000)
+# Test interface connectivity
+from s800.utils import test_interface
 
-if status['rx_errors'] > 0:
-    print(f"RX errors detected: {status['rx_errors']}")
-    diag.reset_interface()
+if test_interface('can0'):
+    print("Interface can0 is working")
+else:
+    print("Interface can0 failed - check connection and drivers")
 ```
 
-### Issue: Permission denied errors
+### Permission Denied Errors
 
 ```bash
-# Add user to dialout group
+# Add user to dialout group for device access
 sudo usermod -a -G dialout $USER
 
-# Set capabilities for Python binary
-sudo setcap cap_net_raw+ep $(which python3)
-
 # Or run with sudo (not recommended for production)
-sudo python3 your_script.py
+sudo python s800_script.py
 ```
 
-## Safety and Legal Considerations
-
-**IMPORTANT**: This framework is intended for authorized security testing only.
+### No Messages Received
 
 ```python
-from s800_framework import SafetyGuard
+# Verify bus is active
+from s800.diagnostics import check_bus_activity
 
-# Enable safety mechanisms
-safety = SafetyGuard()
-
-# Require explicit confirmation for dangerous operations
-@safety.require_confirmation
-def write_to_ecu(ecu_id, data):
-    # Implementation
-    pass
-
-# Create restore point before testing
-safety.create_backup('pre_test_backup')
-
-try:
-    # Perform testing
-    pass
-except Exception as e:
-    # Restore if something goes wrong
-    safety.restore_backup('pre_test_backup')
+activity = check_bus_activity(interface, duration=10)
+if activity['message_count'] == 0:
+    print("No activity detected - check connections and bitrate")
+    print("Try different bitrates: 125k, 250k, 500k, 1M")
 ```
 
-Always obtain proper authorization before testing any vehicle network system. Unauthorized testing may violate laws and regulations.
+### Buffer Overflows
+
+```python
+# Increase buffer size for high-traffic scenarios
+interface = CANInterface(
+    channel='can0',
+    bustype='socketcan',
+    receive_buffer_size=65536
+)
+```
+
+## Best Practices
+
+1. **Always test in isolated environment** - Never test on production vehicles or public roads
+2. **Use blacklists** - Protect critical safety systems from fuzzing
+3. **Monitor for anomalies** - Watch for unexpected ECU behavior or error codes
+4. **Document findings** - Record all vulnerabilities with reproduction steps
+5. **Respect legal boundaries** - Only test systems you own or have authorization for
+6. **Backup before testing** - Save ECU configurations before modification attempts
+
+## References
+
+- CAN Bus Protocol: ISO 11898
+- UDS Protocol: ISO 14229
+- OBD-II Standard: SAE J1979
+- Automotive Security Best Practices: SAE J3061
