@@ -1,517 +1,458 @@
 ---
 name: s800-vehicle-network-security-testing
-description: Framework for testing and analyzing vehicle network security, including CAN bus fuzzing and vulnerability assessment
+description: Security testing framework for automotive vehicle networks (CAN, LIN, FlexRay) with fuzzing and penetration testing capabilities
 triggers:
-  - test vehicle network security
+  - how do I test vehicle network security
+  - set up S800 vehicle security testing
   - fuzz CAN bus messages
-  - analyze automotive network protocols
+  - test automotive network vulnerabilities
   - perform vehicle penetration testing
-  - scan car ECU vulnerabilities
-  - simulate vehicle network attacks
-  - test in-vehicle communication security
-  - audit automotive control systems
+  - analyze car network traffic with S800
+  - use S800 framework for automotive security
+  - scan vehicle ECU for vulnerabilities
 ---
 
 # S800 Vehicle Network Security Testing Framework
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-## Overview
-
-S800 is a vehicle network security testing framework designed for penetration testing and security analysis of automotive networks, particularly CAN (Controller Area Network) bus systems. It provides tools for fuzzing, message injection, protocol analysis, and vulnerability assessment of in-vehicle communication systems.
+S800 is a comprehensive security testing framework designed for automotive vehicle networks including CAN (Controller Area Network), LIN (Local Interconnect Network), and FlexRay protocols. It provides fuzzing capabilities, traffic analysis, penetration testing tools, and vulnerability assessment features for electronic control units (ECUs) and in-vehicle networks.
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.7+
-- SocketCAN interface (Linux)
-- CAN hardware adapter (e.g., PCAN, CANable, etc.)
-- Root/sudo privileges for CAN interface access
-
-### Setup
-
 ```bash
-# Clone the repository
-git clone https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework.git
-cd S800-Vehicle-Network-Security-Testing-Framework
+# System dependencies (Linux/Ubuntu)
+sudo apt-get update
+sudo apt-get install -y python3 python3-pip can-utils git
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up CAN interface (Linux)
+# Enable SocketCAN (Linux kernel CAN interface)
 sudo modprobe can
 sudo modprobe can_raw
 sudo modprobe vcan
+```
 
-# Create virtual CAN interface for testing
+### Clone and Install
+
+```bash
+git clone https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework.git
+cd S800-Vehicle-Network-Security-Testing-Framework
+pip3 install -r requirements.txt
+```
+
+### Virtual CAN Setup (for testing without hardware)
+
+```bash
+# Create virtual CAN interface
 sudo ip link add dev vcan0 type vcan
 sudo ip link set up vcan0
 
-# For physical CAN adapter (example with SocketCAN)
+# Verify interface
+ifconfig vcan0
+```
+
+### Hardware CAN Setup
+
+```bash
+# For physical CAN adapter (e.g., CAN-USB)
 sudo ip link set can0 type can bitrate 500000
 sudo ip link set up can0
 ```
 
-### Environment Variables
-
-```bash
-export CAN_INTERFACE=can0  # or vcan0 for testing
-export CAN_BITRATE=500000
-export S800_LOG_LEVEL=INFO
-export S800_OUTPUT_DIR=./results
-```
-
 ## Core Components
 
-### 1. CAN Bus Sniffer
+### 1. CAN Bus Fuzzing
 
-Capture and analyze CAN bus traffic:
+Fuzz CAN messages to discover vulnerabilities in ECU implementations:
+
+```python
+from s800.fuzzing import CANFuzzer
+from s800.interfaces import CANInterface
+
+# Initialize CAN interface
+interface = CANInterface(channel='vcan0', bustype='socketcan', bitrate=500000)
+
+# Create fuzzer instance
+fuzzer = CANFuzzer(interface)
+
+# Define fuzzing parameters
+fuzzer.configure(
+    arbitration_id_range=(0x100, 0x7FF),  # Standard CAN IDs
+    data_length_range=(0, 8),              # CAN data length
+    mutation_rate=0.3,                     # 30% mutation probability
+    duration=3600                          # Run for 1 hour
+)
+
+# Start fuzzing
+fuzzer.start()
+```
+
+### 2. Traffic Sniffing and Analysis
+
+Capture and analyze vehicle network traffic:
 
 ```python
 from s800.sniffer import CANSniffer
-import os
+from s800.analysis import TrafficAnalyzer
 
 # Initialize sniffer
-interface = os.getenv('CAN_INTERFACE', 'vcan0')
-sniffer = CANSniffer(interface=interface)
+sniffer = CANSniffer(channel='can0')
 
-# Start capturing
-sniffer.start()
+# Capture traffic
+sniffer.start_capture(
+    duration=60,  # 60 seconds
+    output_file='capture.log'
+)
 
-# Capture for duration
-messages = sniffer.capture(duration=30)  # 30 seconds
+# Analyze captured traffic
+analyzer = TrafficAnalyzer('capture.log')
+stats = analyzer.get_statistics()
 
-# Filter by arbitration ID
-filtered = sniffer.filter_by_id(messages, arb_id=0x123)
+print(f"Total messages: {stats['total_messages']}")
+print(f"Unique IDs: {stats['unique_ids']}")
+print(f"Message frequency: {stats['frequency']}")
 
-# Save to file
-sniffer.save_capture(messages, 'capture.log')
-
-# Stop sniffer
-sniffer.stop()
+# Identify periodic messages
+periodic = analyzer.find_periodic_messages(tolerance=0.01)
+for msg_id, interval in periodic.items():
+    print(f"ID {hex(msg_id)}: {interval}ms interval")
 ```
 
-### 2. CAN Message Fuzzer
+### 3. ECU Enumeration
 
-Fuzz CAN messages to identify vulnerabilities:
-
-```python
-from s800.fuzzer import CANFuzzer
-from s800.payloads import PayloadGenerator
-
-# Initialize fuzzer
-fuzzer = CANFuzzer(interface='can0')
-
-# Generate payloads
-payload_gen = PayloadGenerator()
-
-# Fuzz specific CAN ID with random payloads
-fuzzer.fuzz_id(
-    arb_id=0x123,
-    count=1000,
-    payload_generator=payload_gen.random_bytes(8),
-    delay=0.01  # 10ms between messages
-)
-
-# Fuzz with incremental payloads
-fuzzer.fuzz_id(
-    arb_id=0x456,
-    count=256,
-    payload_generator=payload_gen.incremental(start=0, length=8),
-    delay=0.005
-)
-
-# Fuzz range of IDs
-fuzzer.fuzz_range(
-    start_id=0x100,
-    end_id=0x200,
-    payload_generator=payload_gen.random_bytes(8),
-    messages_per_id=100
-)
-
-# Monitor for anomalies during fuzzing
-fuzzer.enable_monitoring(callback=lambda msg: print(f"Response: {msg}"))
-```
-
-### 3. Message Injection
-
-Inject custom CAN messages:
-
-```python
-from s800.injector import CANInjector
-from s800.message import CANMessage
-
-# Initialize injector
-injector = CANInjector(interface='can0')
-
-# Send single message
-msg = CANMessage(
-    arb_id=0x123,
-    data=[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08],
-    extended=False
-)
-injector.send(msg)
-
-# Send periodic message
-injector.send_periodic(
-    msg=msg,
-    interval=0.1,  # 100ms
-    duration=10    # 10 seconds
-)
-
-# Replay captured traffic
-injector.replay('capture.log', speed=1.0)
-
-# Send burst of messages
-messages = [
-    CANMessage(0x100, [0x00] * 8),
-    CANMessage(0x101, [0xFF] * 8),
-    CANMessage(0x102, [0xAA] * 8)
-]
-injector.send_burst(messages, delay=0.001)
-```
-
-### 4. Protocol Analyzer
-
-Analyze automotive protocols:
-
-```python
-from s800.analyzer import ProtocolAnalyzer
-from s800.protocols import UDS, OBD2
-
-# Initialize analyzer
-analyzer = ProtocolAnalyzer(interface='can0')
-
-# Analyze UDS (Unified Diagnostic Services)
-uds = UDS(analyzer)
-
-# Read diagnostic trouble codes
-dtcs = uds.read_dtc()
-print(f"DTCs found: {dtcs}")
-
-# Read data by identifier
-data = uds.read_data_by_id(0x0110)  # VIN
-
-# Session control
-uds.diagnostic_session_control(session_type=0x03)  # Extended diagnostic
-
-# Security access attempt
-seed = uds.security_access_request_seed(level=0x01)
-# Calculate key (implementation-specific)
-key = calculate_security_key(seed)
-uds.security_access_send_key(key)
-
-# OBD-II analysis
-obd = OBD2(analyzer)
-speed = obd.get_vehicle_speed()
-rpm = obd.get_engine_rpm()
-fuel_level = obd.get_fuel_level()
-
-print(f"Speed: {speed} km/h, RPM: {rpm}, Fuel: {fuel_level}%")
-```
-
-### 5. ECU Scanner
-
-Scan for active ECUs on the network:
+Discover active ECUs on the network:
 
 ```python
 from s800.scanner import ECUScanner
 
-# Initialize scanner
-scanner = ECUScanner(interface='can0')
+scanner = ECUScanner(channel='can0')
 
-# Scan for active ECUs
-ecus = scanner.scan(
-    id_range=(0x700, 0x7FF),  # Typical diagnostic range
-    timeout=1.0
+# Scan for active ECUs using UDS (Unified Diagnostic Services)
+ecus = scanner.scan_uds(
+    id_range=(0x700, 0x7FF),  # Diagnostic ID range
+    timeout=0.1
 )
 
-print(f"Found {len(ecus)} ECUs:")
 for ecu in ecus:
-    print(f"  ID: 0x{ecu.id:03X}")
-    print(f"  Response ID: 0x{ecu.response_id:03X}")
-    print(f"  Services: {ecu.supported_services}")
+    print(f"ECU found: ID={hex(ecu['id'])}, Response={ecu['response']}")
 
-# Fingerprint ECU
-fingerprint = scanner.fingerprint_ecu(0x7E0)
-print(f"ECU Info: {fingerprint}")
+# Read DTC (Diagnostic Trouble Codes)
+for ecu in ecus:
+    dtcs = scanner.read_dtc(ecu['id'])
+    if dtcs:
+        print(f"ECU {hex(ecu['id'])} DTCs: {dtcs}")
 ```
 
-### 6. Vulnerability Scanner
+### 4. Message Injection and Replay
 
-Automated vulnerability detection:
+Inject custom CAN messages or replay captured traffic:
 
 ```python
-from s800.vuln_scanner import VulnerabilityScanner
-from s800.exploits import ExploitDB
+from s800.injector import CANInjector
 
-# Initialize scanner
-vuln_scanner = VulnerabilityScanner(interface='can0')
+injector = CANInjector(channel='can0')
 
-# Run comprehensive scan
-results = vuln_scanner.scan_all(
-    checks=[
-        'authentication_bypass',
-        'buffer_overflow',
-        'replay_attack',
-        'dos_susceptibility',
-        'unauthorized_access',
-        'session_hijacking'
-    ]
+# Send single message
+injector.send_message(
+    arbitration_id=0x123,
+    data=[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08],
+    extended_id=False
 )
 
-# Print vulnerabilities
-for vuln in results.vulnerabilities:
-    print(f"[{vuln.severity}] {vuln.name}")
-    print(f"  Description: {vuln.description}")
-    print(f"  Affected ECU: 0x{vuln.ecu_id:03X}")
-    print(f"  Remediation: {vuln.remediation}")
+# Send periodic message
+injector.send_periodic(
+    arbitration_id=0x200,
+    data=[0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+    interval=0.1  # 100ms
+)
 
-# Generate report
-results.export_report('security_assessment.html', format='html')
-results.export_report('security_assessment.json', format='json')
+# Replay captured traffic
+injector.replay_log(
+    log_file='capture.log',
+    speed_multiplier=1.0,  # Real-time replay
+    loop=False
+)
 ```
 
-## Common Testing Patterns
+### 5. UDS (Unified Diagnostic Services) Testing
 
-### Pattern 1: Baseline Traffic Analysis
-
-```python
-from s800.sniffer import CANSniffer
-from s800.analyzer import TrafficAnalyzer
-
-# Capture baseline traffic
-sniffer = CANSniffer(interface='can0')
-baseline = sniffer.capture(duration=60)
-
-# Analyze patterns
-analyzer = TrafficAnalyzer()
-stats = analyzer.analyze(baseline)
-
-print(f"Unique IDs: {stats.unique_ids}")
-print(f"Message rate: {stats.messages_per_second}")
-print(f"Most active ID: 0x{stats.most_active_id:03X}")
-
-# Detect anomalies in new traffic
-new_traffic = sniffer.capture(duration=10)
-anomalies = analyzer.detect_anomalies(new_traffic, baseline)
-
-for anomaly in anomalies:
-    print(f"Anomaly: {anomaly.type} at {anomaly.timestamp}")
-```
-
-### Pattern 2: Targeted ECU Testing
+Test diagnostic services implementation:
 
 ```python
-from s800.testing import ECUTester
+from s800.uds import UDSClient
 
-# Target specific ECU
-tester = ECUTester(interface='can0', target_id=0x7E0)
-
-# Test authentication
-auth_result = tester.test_authentication()
-if auth_result.vulnerable:
-    print("Authentication bypass possible!")
-
-# Test input validation
-tester.test_buffer_overflow(payload_sizes=[8, 16, 32, 64, 128])
-
-# Test rate limiting
-tester.test_dos_resistance(message_rate=10000)  # msgs/sec
-
-# Generate test report
-report = tester.generate_report()
-report.save('ecu_test_results.pdf')
-```
-
-### Pattern 3: Replay Attack Simulation
-
-```python
-from s800.attacks import ReplayAttack
-
-# Capture legitimate traffic
-attack = ReplayAttack(interface='can0')
-
-# Record unlock sequence
-print("Recording unlock sequence...")
-unlock_msgs = attack.record_sequence(duration=5)
-
-# Replay attack
-print("Attempting replay attack...")
-success = attack.replay(unlock_msgs, repeat=3)
-
-if success:
-    print("Replay attack successful!")
-else:
-    print("Replay attack mitigated")
-```
-
-### Pattern 4: Fuzzing Campaign
-
-```python
-from s800.campaigns import FuzzingCampaign
-
-# Create fuzzing campaign
-campaign = FuzzingCampaign(
-    interface='can0',
-    name='ECU_Robustness_Test',
-    output_dir=os.getenv('S800_OUTPUT_DIR', './results')
+# Connect to ECU via UDS
+uds = UDSClient(
+    channel='can0',
+    request_id=0x7E0,  # Tester ID
+    response_id=0x7E8  # ECU ID
 )
 
-# Add fuzzing targets
-campaign.add_target(
-    id_range=(0x100, 0x1FF),
-    strategy='random',
-    iterations=10000
+# Start diagnostic session
+uds.start_diagnostic_session(session_type=0x03)  # Extended diagnostic
+
+# Read data by identifier
+vin = uds.read_data_by_identifier(identifier=0xF190)  # VIN
+print(f"VIN: {vin}")
+
+# Security access attempt (for testing)
+seed = uds.request_seed(level=0x01)
+key = calculate_security_key(seed)  # Custom key calculation
+uds.send_key(key)
+
+# Read memory
+memory_data = uds.read_memory_by_address(
+    address=0x00000000,
+    length=256
 )
-
-campaign.add_target(
-    id_range=(0x700, 0x7FF),
-    strategy='protocol_aware',
-    protocol='UDS',
-    iterations=5000
-)
-
-# Run campaign with monitoring
-campaign.run(
-    monitor_crashes=True,
-    save_interesting=True,
-    callback=lambda status: print(f"Progress: {status.percent}%")
-)
-
-# Analyze results
-crashes = campaign.get_crashes()
-interesting = campaign.get_interesting_cases()
-
-print(f"Campaign completed: {len(crashes)} crashes found")
 ```
 
 ## Configuration
 
-### Config File Example
+### Framework Configuration
 
-```python
-# s800_config.py
-CONFIG = {
-    'can': {
-        'interface': 'can0',
-        'bitrate': 500000,
-        'fd_mode': False,
-        'timeout': 1.0
-    },
-    'fuzzing': {
-        'default_delay': 0.01,
-        'max_payload_size': 8,
-        'enable_monitoring': True
-    },
-    'logging': {
-        'level': 'INFO',
-        'file': 's800.log',
-        'console': True
-    },
-    'safety': {
-        'enable_safety_checks': True,
-        'blacklist_ids': [0x000, 0x001],  # Critical IDs
-        'require_confirmation': True
-    }
+Create `config.json`:
+
+```json
+{
+  "interface": {
+    "type": "socketcan",
+    "channel": "can0",
+    "bitrate": 500000
+  },
+  "fuzzing": {
+    "max_concurrent_ids": 50,
+    "mutation_strategies": ["bit_flip", "byte_randomize", "sequential"],
+    "blacklist_ids": [0x000, 0x7FF]
+  },
+  "logging": {
+    "level": "INFO",
+    "output_dir": "./logs",
+    "format": "csv"
+  },
+  "safety": {
+    "enable_emergency_stop": true,
+    "watchdog_timeout": 5
+  }
 }
-
-# Load config
-from s800.config import load_config
-load_config('s800_config.py')
 ```
 
-## Safety Considerations
+Load configuration:
 
 ```python
-from s800.safety import SafetyController
+from s800.config import Config
 
-# Enable safety mode
-safety = SafetyController()
+config = Config.load('config.json')
+fuzzer = CANFuzzer(config=config)
+```
 
-# Register protected IDs
-safety.protect_ids([0x000, 0x001, 0x100])  # Critical systems
+## Common Testing Patterns
 
-# Require confirmation for dangerous operations
-@safety.require_confirmation
-def perform_dos_test():
-    # Requires user confirmation before execution
-    pass
+### Pattern 1: Baseline Traffic Profiling
 
-# Emergency stop
-safety.emergency_stop_all()
+```python
+from s800.profiler import NetworkProfiler
+
+profiler = NetworkProfiler(channel='can0')
+
+# Capture baseline during normal operation
+baseline = profiler.create_baseline(duration=300)  # 5 minutes
+baseline.save('baseline_profile.json')
+
+# Later, detect anomalies
+profiler.load_baseline('baseline_profile.json')
+anomalies = profiler.monitor_anomalies(duration=60)
+
+for anomaly in anomalies:
+    print(f"Anomaly detected: {anomaly}")
+```
+
+### Pattern 2: DoS Attack Testing
+
+```python
+from s800.attacks import DoSAttack
+
+dos = DoSAttack(channel='can0')
+
+# Bus flooding attack
+dos.flood_attack(
+    arbitration_id=0x000,  # Highest priority
+    rate=10000,            # Messages per second
+    duration=10            # 10 seconds
+)
+
+# Measure bus load during attack
+bus_load = dos.measure_bus_load()
+print(f"Bus load: {bus_load}%")
+```
+
+### Pattern 3: Session Hijacking Test
+
+```python
+from s800.attacks import SessionHijack
+
+hijacker = SessionHijack(channel='can0')
+
+# Monitor legitimate diagnostic session
+session = hijacker.monitor_session(
+    tester_id=0x7E0,
+    ecu_id=0x7E8,
+    timeout=30
+)
+
+# Attempt session takeover
+if session:
+    hijacker.takeover_session(session)
+    # Send malicious diagnostic commands
+    hijacker.send_diagnostic_command(service=0x2E, data=[0x01, 0x02])
+```
+
+### Pattern 4: Vulnerability Scanning
+
+```python
+from s800.scanner import VulnerabilityScanner
+
+vuln_scanner = VulnerabilityScanner(channel='can0')
+
+# Run comprehensive vulnerability scan
+results = vuln_scanner.scan_all(
+    tests=[
+        'uds_security_bypass',
+        'weak_authentication',
+        'buffer_overflow',
+        'injection_flaws',
+        'replay_attacks'
+    ]
+)
+
+# Generate report
+vuln_scanner.generate_report(results, output='vulnerability_report.html')
+```
+
+## CLI Usage
+
+### Basic Commands
+
+```bash
+# Sniff CAN traffic
+python3 s800_cli.py sniff --channel can0 --duration 60 --output traffic.log
+
+# Fuzz CAN bus
+python3 s800_cli.py fuzz --channel can0 --id-range 0x100-0x7FF --duration 3600
+
+# Scan for ECUs
+python3 s800_cli.py scan --channel can0 --protocol uds
+
+# Replay captured traffic
+python3 s800_cli.py replay --channel can0 --file traffic.log --speed 1.0
+
+# Generate traffic report
+python3 s800_cli.py analyze --file traffic.log --output report.html
+```
+
+### Advanced Options
+
+```bash
+# Fuzz with custom mutation strategy
+python3 s800_cli.py fuzz --channel can0 --strategy bit_flip --mutation-rate 0.5
+
+# Monitor with anomaly detection
+python3 s800_cli.py monitor --channel can0 --baseline baseline.json --alert-threshold 0.8
+
+# UDS diagnostic session
+python3 s800_cli.py uds --channel can0 --request-id 0x7E0 --response-id 0x7E8 --service read_vin
 ```
 
 ## Troubleshooting
 
 ### CAN Interface Not Found
 
-```python
-from s800.utils import check_interface
+```bash
+# Check available interfaces
+ip link show
 
-if not check_interface('can0'):
-    print("CAN interface not available")
-    print("Run: sudo ip link set can0 up type can bitrate 500000")
+# Verify CAN module loaded
+lsmod | grep can
+
+# Reload CAN modules
+sudo modprobe -r can_raw can
+sudo modprobe can can_raw
 ```
 
-### Permission Errors
+### Permission Denied
 
 ```bash
-# Add user to dialout group
+# Add user to dialout group (for USB CAN adapters)
 sudo usermod -a -G dialout $USER
 
 # Or run with sudo (not recommended for production)
-sudo python3 test_script.py
+sudo python3 script.py
 ```
 
-### No Messages Received
+### No Response from ECUs
 
 ```python
-# Verify interface is up and has traffic
-from s800.diagnostics import diagnose_interface
+# Increase timeout
+scanner = ECUScanner(channel='can0', timeout=0.5)
 
-diag = diagnose_interface('can0')
-print(f"Interface up: {diag.is_up}")
-print(f"Traffic detected: {diag.has_traffic}")
-print(f"Bitrate: {diag.bitrate}")
+# Verify correct bitrate
+interface = CANInterface(channel='can0', bitrate=500000)  # Try 250000, 500000, 1000000
+
+# Check termination resistance (120Ω required on CAN bus)
 ```
 
-### Incomplete Captures
+### High Bus Load Warnings
 
 ```python
-# Increase buffer size
-sniffer = CANSniffer(interface='can0', buffer_size=10000)
+from s800.utils import BusMonitor
 
-# Check for drops
-stats = sniffer.get_stats()
-if stats.dropped_messages > 0:
-    print(f"Warning: {stats.dropped_messages} messages dropped")
+monitor = BusMonitor(channel='can0')
+load = monitor.get_bus_load()
+
+if load > 0.8:
+    print("Warning: High bus load, reduce fuzzing rate")
+    fuzzer.set_rate(rate=100)  # Reduce to 100 msg/s
 ```
 
-## Legal and Ethical Usage
+## Security Considerations
 
-**IMPORTANT**: This framework is for authorized security testing only. Always:
-
-- Obtain written permission before testing
-- Test only on isolated systems or your own vehicles
-- Follow responsible disclosure practices
-- Comply with local laws and regulations
-- Never test on public roads or operational vehicles
-- Document all testing activities
+**IMPORTANT**: This framework is for authorized security testing only.
 
 ```python
-# Example: Safety checklist
-from s800.legal import SafetyChecklist
+# Always implement safety checks
+from s800.safety import SafetyMonitor
 
-checklist = SafetyChecklist()
-checklist.confirm_authorization()
-checklist.confirm_isolated_environment()
-checklist.confirm_backup_available()
+safety = SafetyMonitor(
+    channel='can0',
+    emergency_stop_callback=lambda: print("EMERGENCY STOP"),
+    critical_ids=[0x100, 0x200]  # IDs that should never be fuzzed
+)
 
-if checklist.all_confirmed():
-    # Proceed with testing
-    pass
-else:
-    print("Safety requirements not met. Aborting.")
+# Use in isolated test environment
+assert os.getenv('S800_TEST_MODE') == 'isolated', "Must run in isolated environment"
+
+# Enable logging for audit trail
+import logging
+logging.basicConfig(filename='audit.log', level=logging.INFO)
+```
+
+## Integration with Other Tools
+
+### Export to Wireshark
+
+```python
+from s800.export import WiresharkExporter
+
+exporter = WiresharkExporter()
+exporter.convert_log('capture.log', 'capture.pcap')
+```
+
+### Integration with CANalyzer
+
+```python
+from s800.export import CANalyzerExporter
+
+exporter = CANalyzerExporter()
+exporter.export_to_asc('capture.log', 'capture.asc')
 ```
