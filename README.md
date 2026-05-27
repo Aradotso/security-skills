@@ -92,6 +92,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [kali-pentest-ai-agent](skills/kali-pentest-ai-agent/) | [install](https://skills.sh/aradotso/security-skills/kali-pentest-ai-agent) | [x-glacier/kali-pentest](https://github.com/x-glacier/kali-pentest) | 2026-05-21 |
 | [s800-vehicle-network-security-testing](skills/s800-vehicle-network-security-testing/) | [install](https://skills.sh/aradotso/security-skills/s800-vehicle-network-security-testing) | [zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework](https://github.com/zhu-zhu666/S800-Vehicle-Network-Security-Testing-Framework) | 2026-05-21 |
 | [foundry-security-spec](skills/foundry-security-spec/) | [install](https://skills.sh/aradotso/security-skills/foundry-security-spec) | [CiscoDevNet/foundry-security-spec](https://github.com/CiscoDevNet/foundry-security-spec) | 2026-05-22 |
+| [web-security-scanner-pro](skills/web-security-scanner-pro/) | [install](https://skills.sh/aradotso/security-skills/web-security-scanner-pro) | [miladrezanezhad/web-security-scanner-pro](https://github.com/miladrezanezhad/web-security-scanner-pro) | 2026-05-27 |
 <!-- SKILL_INDEX -->
 
 ---
