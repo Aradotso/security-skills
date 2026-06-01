@@ -95,6 +95,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [web-security-scanner-pro](skills/web-security-scanner-pro/) | [install](https://skills.sh/aradotso/security-skills/web-security-scanner-pro) | [miladrezanezhad/web-security-scanner-pro](https://github.com/miladrezanezhad/web-security-scanner-pro) | 2026-05-27 |
 | [pentestcompanion-workspace](skills/pentestcompanion-workspace/) | [install](https://skills.sh/aradotso/security-skills/pentestcompanion-workspace) | [Poellie01/PentestCompanion](https://github.com/Poellie01/PentestCompanion) | 2026-05-29 |
 | [email-security-auditor-cpp](skills/email-security-auditor-cpp/) | [install](https://skills.sh/aradotso/security-skills/email-security-auditor-cpp) | [sipaaryadi06864/Email-Security-Auditor](https://github.com/sipaaryadi06864/Email-Security-Auditor) | 2026-05-31 |
+| [agentic-security-scanner](skills/agentic-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/agentic-security-scanner) | [Clear-Capabilities/agentic-security](https://github.com/Clear-Capabilities/agentic-security) | 2026-06-01 |
 <!-- SKILL_INDEX -->
 
 ---
