@@ -97,6 +97,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [email-security-auditor-cpp](skills/email-security-auditor-cpp/) | [install](https://skills.sh/aradotso/security-skills/email-security-auditor-cpp) | [sipaaryadi06864/Email-Security-Auditor](https://github.com/sipaaryadi06864/Email-Security-Auditor) | 2026-05-31 |
 | [agentic-security-scanner](skills/agentic-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/agentic-security-scanner) | [Clear-Capabilities/agentic-security](https://github.com/Clear-Capabilities/agentic-security) | 2026-06-01 |
 | [vibe-pentest-ai-security-testing](skills/vibe-pentest-ai-security-testing/) | [install](https://skills.sh/aradotso/security-skills/vibe-pentest-ai-security-testing) | [ok-helloworld/vibe-pentest](https://github.com/ok-helloworld/vibe-pentest) | 2026-06-03 |
+| [pentestops-dashboard](skills/pentestops-dashboard/) | [install](https://skills.sh/aradotso/security-skills/pentestops-dashboard) | [0xBugatti/PentestOPS](https://github.com/0xBugatti/PentestOPS) | 2026-06-07 |
 <!-- SKILL_INDEX -->
 
 ---
