@@ -98,6 +98,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [agentic-security-scanner](skills/agentic-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/agentic-security-scanner) | [Clear-Capabilities/agentic-security](https://github.com/Clear-Capabilities/agentic-security) | 2026-06-01 |
 | [vibe-pentest-ai-security-testing](skills/vibe-pentest-ai-security-testing/) | [install](https://skills.sh/aradotso/security-skills/vibe-pentest-ai-security-testing) | [ok-helloworld/vibe-pentest](https://github.com/ok-helloworld/vibe-pentest) | 2026-06-03 |
 | [pentestops-dashboard](skills/pentestops-dashboard/) | [install](https://skills.sh/aradotso/security-skills/pentestops-dashboard) | [0xBugatti/PentestOPS](https://github.com/0xBugatti/PentestOPS) | 2026-06-07 |
+| [pentest-toolkit-pro-html](skills/pentest-toolkit-pro-html/) | [install](https://skills.sh/aradotso/security-skills/pentest-toolkit-pro-html) | [Cyber-Autopsie/PenTest-Toolkit-Pro](https://github.com/Cyber-Autopsie/PenTest-Toolkit-Pro) | 2026-06-07 |
 <!-- SKILL_INDEX -->
 
 ---
