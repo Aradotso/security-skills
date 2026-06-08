@@ -102,6 +102,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [dfyx-code-security-review](skills/dfyx-code-security-review/) | [install](https://skills.sh/aradotso/security-skills/dfyx-code-security-review) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-07 |
 | [dfyx-code-security-auditor](skills/dfyx-code-security-auditor/) | [install](https://skills.sh/aradotso/security-skills/dfyx-code-security-auditor) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-07 |
 | [eastsword-dfyx-code-security-review](skills/eastsword-dfyx-code-security-review/) | [install](https://skills.sh/aradotso/security-skills/eastsword-dfyx-code-security-review) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-08 |
+| [malwarebytes-premium-security-cracked-distribution](skills/malwarebytes-premium-security-cracked-distribution/) | [install](https://skills.sh/aradotso/security-skills/malwarebytes-premium-security-cracked-distribution) | [Chunkcleprovide/Malwarebytes-Premium-Security-Suite](https://github.com/Chunkcleprovide/Malwarebytes-Premium-Security-Suite) | 2026-06-08 |
 <!-- SKILL_INDEX -->
 
 ---
