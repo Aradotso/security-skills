@@ -1,945 +1,950 @@
 ---
 name: dfyx-code-security-review
-description: Expert-level code security auditing skill using deep data flow analysis and business logic understanding for 9 languages
+description: Expert-level white-box code security audit skill using deep data flow analysis and business logic understanding for 9 languages
 triggers:
   - audit this project for security vulnerabilities
-  - perform a code security review
-  - check this code for security issues
-  - scan for security vulnerabilities in the codebase
-  - conduct a security audit
+  - perform code security review
+  - check code for security issues
   - analyze code security
-  - find security flaws in this project
-  - run a security code review
+  - find security vulnerabilities in this code
+  - run security audit
+  - review code for vulnerabilities
+  - scan for security flaws
 ---
 
 # dfyx-code-security-review
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-Expert-level code security auditing skill using white-box static analysis methodology. Employs a five-phase standardized audit protocol to systematically discover and validate security vulnerabilities in source code through deep data flow analysis and business logic understanding.
+Expert-level code security audit skill designed for AI coding agents, implementing a five-phase standardized audit protocol with dual-track analysis models (Sink-driven, Control-driven, Config-driven) for comprehensive vulnerability discovery.
 
 ## Overview
 
-**dfyx_code_security_review** is a professional code security audit skill designed for AI coding agents. It uses a comprehensive approach covering:
+**dfyx_code_security_review** performs professional white-box static code analysis across 9 programming languages and 10 security dimensions. It combines pattern matching, taint analysis, and business logic understanding to systematically identify and validate security vulnerabilities.
 
-- **9 Languages**: Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust
-- **10 Security Dimensions**: Injection, Authentication, Authorization, Deserialization, File Operations, SSRF, Cryptography, Configuration, Business Logic, Supply Chain
-- **Dual-Track Audit Model**: Sink-driven + Control-driven + Config-driven analysis
-- **Five-Phase Protocol**: Reconnaissance → Pattern Matching → Taint Tracking → Validation → Reporting
+### Supported Languages & Frameworks
+
+- **Java**: Spring Boot, MyBatis, Struts
+- **Python**: Django, Flask, FastAPI
+- **Go**: Gin, Echo
+- **PHP**: Laravel, Symfony, ProcessWire
+- **JavaScript/Node.js**: Express, Koa, NestJS
+- **C/C++**: Native applications
+- **.NET/C#**: ASP.NET Core
+- **Ruby**: Rails
+- **Rust**: Actix, Rocket
+
+### 10 Security Dimensions
+
+| Dimension | Coverage |
+|-----------|----------|
+| D1: Injection | SQL, Command, LDAP, SSTI, SpEL, JNDI |
+| D2: Authentication | Token, Session, JWT, Filter chains |
+| D3: Authorization | CRUD consistency, IDOR, horizontal privilege escalation |
+| D4: Deserialization | Java, Python, PHP gadget chains |
+| D5: File Operations | Upload, download, path traversal |
+| D6: SSRF | URL injection, protocol restrictions |
+| D7: Cryptography | Key management, encryption modes, KDF |
+| D8: Configuration | Actuator, CORS, information disclosure |
+| D9: Business Logic | Race conditions, mass assignment, state machines |
+| D10: Supply Chain | Dependency CVEs, version checks |
 
 ## Installation
 
-Clone the repository to your project or a global location:
+This skill is triggered automatically by AI coding agents when security audit requests are detected. No manual installation required in most AI environments.
+
+For standalone use or custom integration:
 
 ```bash
-# Clone repository
-git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
-cd skill-dfyx_code_security_review
+# Clone or copy to AI agent skills directory
+# Claude Code
+cp -r dfyx_code_security_review ~/.claude/skills/
 
-# Install Python dependencies (optional, for standalone scripts)
+# Cursor/other agents
+# Copy to appropriate skills directory per agent documentation
+```
+
+### Optional Python Scripts
+
+Install dependencies for standalone script usage:
+
+```bash
 pip install -r requirements.txt
 ```
 
-For AI agent integration, ensure the skill directory is accessible to your AI coding agent's skill loading mechanism.
+Dependencies include: `tree-sitter`, `semgrep`, `bandit`, `safety`, `pyyaml`, `gitpython`, `requests`
 
-## Core Audit Protocol
+## Audit Modes
 
-### Five-Phase Standardized Audit
+| Mode | Use Case | Scope | Duration |
+|------|----------|-------|----------|
+| **Quick** | CI/CD, small projects | High-risk vulns, secrets, dependency CVEs | 5-10 min |
+| **Standard** | Regular audits | OWASP Top 10, auth/authz, crypto | 30-60 min |
+| **Deep** | Critical projects, pentest prep | Full coverage, attack chains, business logic | 1-3 hours |
+
+## Five-Phase Audit Protocol
 
 ```
-Phase 1: Reconnaissance & Mapping (10%)
+Phase 1: Reconnaissance (10%)
     ↓ Output: Architecture diagram, attack surface inventory
-    
-Phase 2: Parallel Pattern Matching (30%)
-    ↓ Output: High-risk area checklist
-    
-Phase 3: Deep Taint Tracking & Practical Testing (40%)
-    ↓ Output: Confirmed vulnerability list, test validation reports
-    
-Phase 4: Validation & Attack Chain Construction (15%)
-    ↓ Output: Vulnerability validation reports
-    
+Phase 2: Pattern Matching (30%)
+    ↓ Output: High-risk area list
+Phase 3: Taint Tracking & Validation (40%)
+    ↓ Output: Confirmed vulnerabilities, test validation
+Phase 4: Verification & Attack Chain (15%)
+    ↓ Output: Vulnerability validation report
 Phase 5: Structured Reporting (5%)
     ↓ Output: Complete audit report
 ```
 
-### Dual-Track Audit Model
+## Usage Examples
 
-| Track | Dimensions | Method | Target |
-|-------|-----------|--------|--------|
-| **Sink-driven** | D1 Injection, D4 Deserialization, D5 File, D6 SSRF | Grep dangerous functions → Track data flow → Verify no protection | Existing dangerous code |
-| **Control-driven** | D3 Authorization, D9 Business Logic | Enumerate endpoints → Verify security controls → Missing = Vulnerability | Missing security controls |
-| **Config-driven** | D2 Authentication, D7 Crypto, D8 Config, D10 Supply Chain | Search configs → Compare security baseline | Misconfigurations |
+### Basic Audit Request
 
-## Security Dimensions
+```
+User: Please audit /path/to/spring-boot-app for security vulnerabilities
 
-### D1: Injection Vulnerabilities
+AI Response:
+[MODE] standard
+[RECON] 347 files, Spring Boot 2.7 + MyBatis + Thymeleaf
+[PLAN] 3 Agents, D1-D8 coverage, estimated 60 turns
+[SCOPE] Focus: SQL Injection, Auth, IDOR, Crypto
+Confirm to start audit? (yes/no)
+```
 
-**Detection Pattern (SQL Injection in Python/Django)**:
+### Deep Audit with Specific Focus
+
+```
+User: Run deep security audit on this Django project, focus on authentication and authorization
+
+AI Response:
+[MODE] deep
+[RECON] 524 files, Django 3.2 + DRF + Celery + PostgreSQL
+[PLAN] 5 Agents, D2-D3 priority, D1,D4-D10 secondary
+[SCOPE] 
+- Phase 1: Map auth middleware chain
+- Phase 2: Scan @login_required, permissions
+- Phase 3: Trace user input → DB queries
+- Phase 4: Test IDOR, horizontal escalation
+Estimated 90 turns. Proceed? (yes/no)
+```
+
+## Dual-Track Analysis Models
+
+### 1. Sink-Driven (D1, D4, D5, D6)
 
 ```python
-# VULNERABLE: Direct string interpolation
-def get_user(username):
-    query = f"SELECT * FROM users WHERE username = '{username}'"
-    cursor.execute(query)  # SQL injection risk
-    return cursor.fetchone()
-
-# VULNERABLE: String concatenation
-def search_products(category):
-    query = "SELECT * FROM products WHERE category = '" + category + "'"
-    return db.execute(query)
-
-# SECURE: Parameterized queries
-def get_user_secure(username):
-    query = "SELECT * FROM users WHERE username = %s"
-    cursor.execute(query, (username,))
-    return cursor.fetchone()
-
-# SECURE: ORM usage
-from django.db.models import Q
-def search_products_secure(category):
-    return Product.objects.filter(category=category)
-```
-
-**Detection Pattern (Command Injection in Python)**:
-
-```python
-import subprocess
-import shlex
-
-# VULNERABLE: Direct user input in shell command
-def backup_file(filename):
-    subprocess.call(f"tar -czf backup.tar.gz {filename}", shell=True)
-    # filename = "file.txt; rm -rf /" leads to command injection
-
-# VULNERABLE: os.system with user input
-import os
-def process_image(image_path):
-    os.system(f"convert {image_path} output.png")
-
-# SECURE: Use array form without shell
-def backup_file_secure(filename):
-    subprocess.call(["tar", "-czf", "backup.tar.gz", filename])
-
-# SECURE: Validate and sanitize input
-def backup_file_validated(filename):
-    if not re.match(r'^[a-zA-Z0-9_\-\.]+$', filename):
-        raise ValueError("Invalid filename")
-    subprocess.call(["tar", "-czf", "backup.tar.gz", filename])
-```
-
-**Detection Pattern (SQL Injection in Java/MyBatis)**:
-
-```java
-// VULNERABLE: String concatenation in MyBatis
-@Select("SELECT * FROM users WHERE username = '${username}'")
-User findByUsername(@Param("username") String username);
-
-// VULNERABLE: Dynamic SQL with concatenation
-public List<Product> searchProducts(String category) {
-    String sql = "SELECT * FROM products WHERE category = '" + category + "'";
-    return jdbcTemplate.query(sql, new ProductRowMapper());
-}
-
-// SECURE: Parameterized queries with #{}
-@Select("SELECT * FROM users WHERE username = #{username}")
-User findByUsernameSafe(@Param("username") String username);
-
-// SECURE: PreparedStatement
-public List<Product> searchProductsSafe(String category) {
-    String sql = "SELECT * FROM products WHERE category = ?";
-    return jdbcTemplate.query(sql, new Object[]{category}, new ProductRowMapper());
-}
-```
-
-### D2: Authentication Vulnerabilities
-
-**Detection Pattern (JWT Security in Node.js)**:
-
-```javascript
-const jwt = require('jsonwebtoken');
-
-// VULNERABLE: Hardcoded secret in code
-const SECRET_KEY = 'my-secret-key';
-function generateToken(user) {
-    return jwt.sign({ userId: user.id }, SECRET_KEY);
-}
-
-// VULNERABLE: No algorithm specification (algorithm confusion attack)
-function verifyToken(token) {
-    return jwt.verify(token, SECRET_KEY);
-}
-
-// VULNERABLE: Weak secret
-const WEAK_SECRET = '12345';
-
-// SECURE: Environment variable for secret
-function generateTokenSecure(user) {
-    return jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET,
-        { 
-            algorithm: 'HS256',
-            expiresIn: '1h'
-        }
-    );
-}
-
-// SECURE: Explicit algorithm verification
-function verifyTokenSecure(token) {
-    return jwt.verify(token, process.env.JWT_SECRET, {
-        algorithms: ['HS256']
-    });
-}
-
-// SECURE: Token rotation and refresh
-function refreshToken(refreshToken) {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    return generateTokenSecure(decoded);
-}
-```
-
-**Detection Pattern (Session Management in Python/Flask)**:
-
-```python
-from flask import Flask, session
-import secrets
-
-app = Flask(__name__)
-
-# VULNERABLE: Weak secret key
-app.secret_key = 'dev'
-
-# VULNERABLE: No session timeout
-@app.route('/login', methods=['POST'])
-def login():
-    # ... authentication ...
-    session['user_id'] = user.id
-    return redirect('/dashboard')
-
-# SECURE: Strong secret from environment
-app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
-
-# SECURE: Session configuration
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # HTTPS only
-    SESSION_COOKIE_HTTPONLY=True,  # No JavaScript access
-    SESSION_COOKIE_SAMESITE='Lax',  # CSRF protection
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=1)
-)
-
-# SECURE: Session validation
-@app.before_request
-def validate_session():
-    if 'user_id' in session:
-        if session.get('expires_at', 0) < time.time():
-            session.clear()
-            return redirect('/login')
-```
-
-### D3: Authorization Vulnerabilities
-
-**Detection Pattern (IDOR in RESTful API - Python/Flask)**:
-
-```python
-from flask import Flask, request, jsonify
-from functools import wraps
-
-app = Flask(__name__)
-
-# VULNERABLE: No authorization check (IDOR)
-@app.route('/api/users/<int:user_id>')
-def get_user(user_id):
-    user = User.query.get(user_id)
-    return jsonify(user.to_dict())
-
-# VULNERABLE: Missing ownership verification
-@app.route('/api/documents/<int:doc_id>', methods=['DELETE'])
-def delete_document(doc_id):
-    document = Document.query.get(doc_id)
-    db.session.delete(document)
-    db.session.commit()
-    return '', 204
-
-# SECURE: Verify user owns the resource
-def require_ownership(resource_class, id_param='id'):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            resource_id = kwargs.get(id_param)
-            resource = resource_class.query.get_or_404(resource_id)
-            current_user_id = get_current_user_id()
-            
-            if resource.owner_id != current_user_id:
-                return jsonify({'error': 'Forbidden'}), 403
-            
-            kwargs['resource'] = resource
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
-
-@app.route('/api/users/<int:user_id>')
-def get_user_secure(user_id):
-    current_user_id = get_current_user_id()
-    if user_id != current_user_id and not is_admin():
-        return jsonify({'error': 'Forbidden'}), 403
-    user = User.query.get_or_404(user_id)
-    return jsonify(user.to_dict())
-
-@app.route('/api/documents/<int:doc_id>', methods=['DELETE'])
-@require_ownership(Document, 'doc_id')
-def delete_document_secure(doc_id, resource):
-    db.session.delete(resource)
-    db.session.commit()
-    return '', 204
-```
-
-**Detection Pattern (Horizontal Privilege Escalation in Java/Spring)**:
-
-```java
-// VULNERABLE: No authorization check
-@GetMapping("/api/orders/{orderId}")
-public Order getOrder(@PathVariable Long orderId) {
-    return orderRepository.findById(orderId).orElseThrow();
-}
-
-// VULNERABLE: Only checking authentication, not authorization
-@GetMapping("/api/profile/{userId}")
-@PreAuthorize("isAuthenticated()")
-public User getProfile(@PathVariable Long userId) {
-    return userRepository.findById(userId).orElseThrow();
-}
-
-// SECURE: Verify ownership
-@GetMapping("/api/orders/{orderId}")
-public Order getOrderSecure(@PathVariable Long orderId, Authentication auth) {
-    Order order = orderRepository.findById(orderId).orElseThrow();
-    String currentUsername = auth.getName();
-    
-    if (!order.getUser().getUsername().equals(currentUsername)) {
-        throw new AccessDeniedException("Not authorized to view this order");
-    }
-    
-    return order;
-}
-
-// SECURE: Using Spring Security SpEL
-@GetMapping("/api/orders/{orderId}")
-@PreAuthorize("@orderSecurity.canAccess(#orderId, authentication)")
-public Order getOrderSpEL(@PathVariable Long orderId) {
-    return orderRepository.findById(orderId).orElseThrow();
-}
-
-// Security service
-@Service
-public class OrderSecurity {
-    @Autowired
-    private OrderRepository orderRepository;
-    
-    public boolean canAccess(Long orderId, Authentication auth) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order == null) return false;
-        return order.getUser().getUsername().equals(auth.getName());
-    }
-}
-```
-
-### D4: Deserialization Vulnerabilities
-
-**Detection Pattern (Python Pickle)**:
-
-```python
-import pickle
-import json
-import hmac
-import hashlib
-
-# VULNERABLE: Deserializing untrusted data
-def load_session(session_data):
-    return pickle.loads(session_data)  # RCE risk
-
-# VULNERABLE: No integrity check
-def load_user_profile(data):
-    return pickle.loads(base64.b64decode(data))
-
-# SECURE: Use JSON instead of pickle
-def load_session_secure(session_data):
-    return json.loads(session_data)
-
-# SECURE: If pickle is necessary, use HMAC signature
-def serialize_with_hmac(obj):
-    data = pickle.dumps(obj)
-    signature = hmac.new(
-        os.environ['SECRET_KEY'].encode(),
-        data,
-        hashlib.sha256
-    ).hexdigest()
-    return base64.b64encode(data).decode() + '.' + signature
-
-def deserialize_with_hmac(signed_data):
-    try:
-        data_b64, signature = signed_data.rsplit('.', 1)
-        data = base64.b64decode(data_b64)
-        
-        expected_sig = hmac.new(
-            os.environ['SECRET_KEY'].encode(),
-            data,
-            hashlib.sha256
-        ).hexdigest()
-        
-        if not hmac.compare_digest(signature, expected_sig):
-            raise ValueError("Invalid signature")
-        
-        return pickle.loads(data)
-    except Exception as e:
-        raise ValueError(f"Deserialization failed: {e}")
-```
-
-**Detection Pattern (Java Deserialization)**:
-
-```java
-import java.io.*;
-
-// VULNERABLE: Deserializing untrusted data
-public Object loadObject(byte[] data) {
-    try (ObjectInputStream ois = new ObjectInputStream(
-            new ByteArrayInputStream(data))) {
-        return ois.readObject();  // RCE risk with malicious payloads
-    }
-}
-
-// VULNERABLE: XML deserialization without restrictions
-public Object loadFromXML(InputStream xml) {
-    XMLDecoder decoder = new XMLDecoder(xml);
-    return decoder.readObject();
-}
-
-// SECURE: Use JSON instead
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public <T> T loadObjectSecure(String json, Class<T> clazz) {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(json, clazz);
-}
-
-// SECURE: If Java serialization is necessary, use ObjectInputFilter
-public Object loadObjectWithFilter(byte[] data) throws IOException, ClassNotFoundException {
-    try (ObjectInputStream ois = new ObjectInputStream(
-            new ByteArrayInputStream(data))) {
-        
-        // Whitelist allowed classes
-        ObjectInputFilter filter = ObjectInputFilter.Config.createFilter(
-            "com.example.SafeClass;!*"
-        );
-        ois.setObjectInputFilter(filter);
-        
-        return ois.readObject();
-    }
-}
-
-// SECURE: Implement custom serialization validation
-public Object loadObjectValidated(byte[] data) throws Exception {
-    ByteArrayInputStream bis = new ByteArrayInputStream(data);
-    ValidatingObjectInputStream ois = new ValidatingObjectInputStream(bis);
-    
-    // Only allow specific classes
-    ois.accept(SafeClass.class, AnotherSafeClass.class);
-    
-    return ois.readObject();
-}
-
-class ValidatingObjectInputStream extends ObjectInputStream {
-    private Set<Class<?>> allowedClasses = new HashSet<>();
-    
-    public ValidatingObjectInputStream(InputStream in) throws IOException {
-        super(in);
-    }
-    
-    public void accept(Class<?>... classes) {
-        allowedClasses.addAll(Arrays.asList(classes));
-    }
-    
-    @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc) 
-            throws IOException, ClassNotFoundException {
-        Class<?> clazz = super.resolveClass(desc);
-        if (!allowedClasses.contains(clazz)) {
-            throw new InvalidClassException("Unauthorized class: " + clazz.getName());
-        }
-        return clazz;
-    }
-}
-```
-
-### D5: File Operation Vulnerabilities
-
-**Detection Pattern (Path Traversal in Python)**:
-
-```python
-import os
-from pathlib import Path
-
-# VULNERABLE: Direct path concatenation
-@app.route('/download/<filename>')
-def download_file(filename):
-    file_path = f'/var/www/uploads/{filename}'
-    return send_file(file_path)
-    # filename = "../../etc/passwd" leads to path traversal
-
-# VULNERABLE: Insufficient validation
-def read_user_file(filename):
-    if '..' not in filename:  # Weak check, can be bypassed
-        return open(f'/data/{filename}').read()
-
-# SECURE: Resolve and validate path
-UPLOAD_DIR = Path('/var/www/uploads').resolve()
-
-@app.route('/download/<filename>')
-def download_file_secure(filename):
-    # Resolve the full path
-    file_path = (UPLOAD_DIR / filename).resolve()
-    
-    # Ensure path is within allowed directory
-    if not str(file_path).startswith(str(UPLOAD_DIR)):
-        abort(400, "Invalid file path")
-    
-    if not file_path.exists():
-        abort(404)
-    
-    return send_file(file_path)
-
-# SECURE: Use allowed filename whitelist
-import re
-
-def read_user_file_secure(filename):
-    # Only allow alphanumeric, dash, underscore, dot
-    if not re.match(r'^[a-zA-Z0-9_\-\.]+$', filename):
-        raise ValueError("Invalid filename")
-    
-    file_path = (UPLOAD_DIR / filename).resolve()
-    
-    if not str(file_path).startswith(str(UPLOAD_DIR)):
-        raise ValueError("Path traversal detected")
-    
-    return file_path.read_text()
-```
-
-**Detection Pattern (File Upload Vulnerabilities in PHP)**:
-
-```php
-<?php
-// VULNERABLE: No file type validation
-if (isset($_FILES['upload'])) {
-    $target = "uploads/" . $_FILES['upload']['name'];
-    move_uploaded_file($_FILES['upload']['tmp_name'], $target);
-    // Can upload shell.php and execute arbitrary code
-}
-
-// VULNERABLE: Client-side MIME type check only
-if ($_FILES['upload']['type'] == 'image/jpeg') {
-    move_uploaded_file($_FILES['upload']['tmp_name'], 
-                      "uploads/" . $_FILES['upload']['name']);
-    // MIME type can be spoofed
-}
-
-// SECURE: Multiple validation layers
-function secureFileUpload($file) {
-    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-    $max_size = 5 * 1024 * 1024; // 5MB
-    $upload_dir = '/var/www/uploads/';
-    
-    // 1. Check file size
-    if ($file['size'] > $max_size) {
-        throw new Exception("File too large");
-    }
-    
-    // 2. Validate extension
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowed_extensions)) {
-        throw new Exception("Invalid file type");
-    }
-    
-    // 3. Verify actual file type (magic bytes)
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
-    
-    $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!in_array($mime, $allowed_mimes)) {
-        throw new Exception("Invalid MIME type");
-    }
-    
-    // 4. Generate random filename
-    $new_filename = bin2hex(random_bytes(16)) . '.' . $ext;
-    $target_path = $upload_dir . $new_filename;
-    
-    // 5. Move file
-    if (!move_uploaded_file($file['tmp_name'], $target_path)) {
-        throw new Exception("Upload failed");
-    }
-    
-    // 6. Set restrictive permissions
-    chmod($target_path, 0644);
-    
-    return $new_filename;
-}
-
-// SECURE: Additional re-encoding for images
-function secureImageUpload($file) {
-    $tmp_path = $file['tmp_name'];
-    
-    // Re-encode image to strip metadata and potential exploits
-    $image = imagecreatefromstring(file_get_contents($tmp_path));
-    if ($image === false) {
-        throw new Exception("Invalid image");
-    }
-    
-    $new_filename = bin2hex(random_bytes(16)) . '.png';
-    $target_path = '/var/www/uploads/' . $new_filename;
-    
-    imagepng($image, $target_path);
-    imagedestroy($image);
-    
-    chmod($target_path, 0644);
-    
-    return $new_filename;
-}
-?>
-```
-
-### D6: SSRF Vulnerabilities
-
-**Detection Pattern (SSRF in Python)**:
-
-```python
-import requests
-from urllib.parse import urlparse
-import ipaddress
-
-# VULNERABLE: No URL validation
-@app.route('/fetch')
-def fetch_url():
-    url = request.args.get('url')
-    response = requests.get(url)
-    # url = "http://169.254.169.254/latest/meta-data/" (AWS metadata)
-    # url = "http://localhost:8080/admin" (internal services)
-    return response.content
-
-# VULNERABLE: Weak validation
-def fetch_image(url):
-    if url.startswith('http://') or url.startswith('https://'):
-        return requests.get(url).content
-    # Can be bypassed with redirect chains
-
-# SECURE: Whitelist allowed domains
-ALLOWED_DOMAINS = ['api.example.com', 'cdn.example.com']
-
-def is_safe_url(url):
-    try:
-        parsed = urlparse(url)
-        
-        # Only allow http/https
-        if parsed.scheme not in ['http', 'https']:
-            return False
-        
-        # Check domain whitelist
-        if parsed.hostname not in ALLOWED_DOMAINS:
-            return False
-        
-        # Resolve IP and check it's not private
-        import socket
-        ip = socket.gethostbyname(parsed.hostname)
-        ip_obj = ipaddress.ip_address(ip)
-        
-        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local:
-            return False
-        
-        return True
-    except Exception:
-        return False
-
-@app.route('/fetch')
-def fetch_url_secure():
-    url = request.args.get('url')
-    
-    if not is_safe_url(url):
-        abort(400, "Invalid URL")
-    
-    # Disable redirects to prevent bypass
-    response = requests.get(url, allow_redirects=False, timeout=5)
-    
-    return response.content
-
-# SECURE: Use allowlist with additional checks
-def fetch_external_api(endpoint):
-    base_url = 'https://api.example.com'
-    
-    # Validate endpoint format
-    if not re.match(r'^/[a-z0-9/\-]+$', endpoint):
-        raise ValueError("Invalid endpoint")
-    
-    url = f"{base_url}{endpoint}"
-    
-    # Additional safeguards
-    response = requests.get(
-        url,
-        allow_redirects=False,
-        timeout=5,
-        verify=True  # Verify SSL certificates
-    )
-    
-    return response.json()
-```
-
-**Detection Pattern (SSRF in Java/Spring)**:
-
-```java
-import org.springframework.web.client.RestTemplate;
-import java.net.URI;
-import java.net.InetAddress;
-
-// VULNERABLE: No URL validation
-@GetMapping("/proxy")
-public String proxyRequest(@RequestParam String url) {
-    RestTemplate restTemplate = new RestTemplate();
-    return restTemplate.getForObject(url, String.class);
-}
-
-// SECURE: Validate and restrict URLs
-@GetMapping("/proxy")
-public String proxyRequestSecure(@RequestParam String url) throws Exception {
-    // Parse URL
-    URI uri = new URI(url);
-    
-    // Only allow http/https
-    if (!uri.getScheme().matches("^https?$")) {
-        throw new IllegalArgumentException("Invalid protocol");
-    }
-    
-    // Check domain whitelist
-    List<String> allowedDomains = Arrays.asList("api.example.com", "cdn.example.com");
-    if (!allowedDomains.contains(uri.getHost())) {
-        throw new IllegalArgumentException("Domain not allowed");
-    }
-    
-    // Resolve and check IP
-    InetAddress address = InetAddress.getByName(uri.getHost());
-    if (address.isLoopbackAddress() || 
-        address.isLinkLocalAddress() || 
-        address.isSiteLocalAddress()) {
-        throw new IllegalArgumentException("Private IP not allowed");
-    }
-    
-    // Configure RestTemplate with restrictions
-    RestTemplate restTemplate = new RestTemplate();
-    restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory() {{
-        setConnectTimeout(5000);
-        setReadTimeout(5000);
-    }});
-    
-    return restTemplate.getForObject(uri, String.class);
-}
-
-// SECURE: Custom HTTP client with safeguards
-private boolean isPrivateIP(String hostname) throws Exception {
-    InetAddress address = InetAddress.getByName(hostname);
-    return address.isLoopbackAddress() || 
-           address.isLinkLocalAddress() || 
-           address.isSiteLocalAddress() ||
-           address.getHostAddress().startsWith("169.254.");
-}
-```
-
-## Audit Modes
-
-### Quick Mode (5-10 minutes)
-
-Focus on high-severity issues:
-- Critical injection vulnerabilities (SQL, Command, SSTI)
-- Hardcoded secrets and credentials
-- Known vulnerable dependencies (CVEs)
-- Authentication bypass patterns
-
-```python
-# Example: Quick scan for hardcoded secrets
-import re
-
-SECRET_PATTERNS = [
-    (r'password\s*=\s*["\']([^"\']+)["\']', 'Hardcoded password'),
-    (r'api[_-]?key\s*=\s*["\']([^"\']+)["\']', 'Hardcoded API key'),
-    (r'secret[_-]?key\s*=\s*["\']([^"\']+)["\']', 'Hardcoded secret'),
-    (r'AKIA[0-9A-Z]{16}', 'AWS Access Key'),
-    (r'mongodb(\+srv)?://[^/]+/[^"\']+', 'MongoDB connection string'),
+# Example: SQL Injection Detection
+# Pattern: Search for dangerous sinks
+dangerous_sinks = [
+    'execute(', 'executemany(', 'raw(',  # Python
+    'createQuery(', 'createNativeQuery(',  # Java
+    'DB::raw(', 'DB::select('  # PHP Laravel
 ]
 
-def quick_secret_scan(file_path):
-    findings = []
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
-        for pattern, description in SECRET_PATTERNS:
-            matches = re.finditer(pattern, content, re.IGNORECASE)
-            for match in matches:
-                findings.append({
-                    'file': file_path,
-                    'line': content[:match.start()].count('\n') + 1,
-                    'type': description,
-                    'match': match.group(0)
-                })
-    return findings
+# Taint tracking flow
+user_input = request.GET['id']  # Source (tainted)
+query = f"SELECT * FROM users WHERE id={user_input}"  # No sanitization
+cursor.execute(query)  # Sink - VULNERABILITY CONFIRMED
+
+# Verification checklist:
+# ✓ Source identified: HTTP parameter
+# ✓ No sanitization middleware
+# ✓ Direct string concatenation
+# ✓ Sink reached: SQL execute
 ```
 
-### Standard Mode (30-60 minutes)
+### 2. Control-Driven (D3, D9)
 
-Comprehensive coverage of OWASP Top 10:
-- All injection types
-- Authentication and session management
-- Authorization checks (IDOR, privilege escalation)
-- Sensitive data exposure
-- Security misconfigurations
+```java
+// Example: Authorization Check
+// Pattern: Enumerate endpoints → verify security controls
 
-### Deep Mode (1-3 hours)
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+    
+    // GOOD: Authorization present
+    @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(#id, 'Order', 'READ')")
+    public Order getOrder(@PathVariable Long id) {
+        return orderService.findById(id);
+    }
+    
+    // VULNERABLE: Missing authorization check
+    @DeleteMapping("/{id}")  // ❌ No @PreAuthorize
+    public void deleteOrder(@PathVariable Long id) {
+        orderService.delete(id);  // IDOR vulnerability
+    }
+}
 
-Full coverage with attack chain analysis:
-- Business logic vulnerabilities
-- Race conditions
-- Complex data flow analysis
-- Multi-stage attack chains
-- Configuration drift analysis
+// Verification:
+// ✓ CRUD operations: GET, POST, PUT, DELETE
+// ✗ DELETE missing @PreAuthorize → IDOR confirmed
+// Attack: User A can delete User B's order
+```
 
-## Using Auxiliary Scripts
+### 3. Config-Driven (D2, D7, D8, D10)
+
+```yaml
+# Example: Spring Boot Configuration Audit
+# File: application.yml
+
+spring:
+  security:
+    # VULNERABLE: JWT secret in config
+    jwt:
+      secret: "hardcoded-secret-key-123"  # ❌ Should use ${JWT_SECRET}
+  
+  # VULNERABLE: Actuator exposed
+  boot:
+    admin:
+      context-path: /admin
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "*"  # ❌ Exposes /actuator/env, /actuator/heapdump
+
+# Verification against baseline:
+# ✗ Hardcoded secrets (D7)
+# ✗ Actuator fully exposed without auth (D8)
+# ✗ No rate limiting config (D9)
+```
+
+## Real Code Examples
+
+### SQL Injection Detection (Java/MyBatis)
+
+```java
+// VULNERABLE CODE
+@Mapper
+public interface UserMapper {
+    @Select("SELECT * FROM users WHERE username = '${username}'")
+    User findByUsername(@Param("username") String username);
+    // ❌ ${} causes SQL injection
+}
+
+// TAINT ANALYSIS
+// Source: @RequestParam String username
+// Flow: Controller → Service → Mapper
+// Sink: @Select with ${}
+// Vulnerability: SQL Injection (Critical)
+
+// FIX
+@Mapper
+public interface UserMapper {
+    @Select("SELECT * FROM users WHERE username = #{username}")
+    User findByUsername(@Param("username") String username);
+    // ✓ #{} uses PreparedStatement
+}
+```
+
+### Command Injection (Python/Flask)
+
+```python
+# VULNERABLE CODE
+from flask import Flask, request
+import subprocess
+
+@app.route('/ping')
+def ping():
+    host = request.args.get('host')
+    # ❌ Direct shell injection
+    result = subprocess.run(f'ping -c 4 {host}', shell=True, capture_output=True)
+    return result.stdout
+
+# TAINT FLOW
+# Source: request.args.get('host')
+# Sanitization: None
+# Sink: subprocess.run(..., shell=True)
+# PoC: /ping?host=example.com;whoami
+
+# FIX
+import shlex
+@app.route('/ping')
+def ping():
+    host = request.args.get('host')
+    # Whitelist validation
+    if not re.match(r'^[a-zA-Z0-9.-]+$', host):
+        return 'Invalid host', 400
+    # Avoid shell=True
+    result = subprocess.run(['ping', '-c', '4', host], capture_output=True)
+    return result.stdout
+```
+
+### IDOR (Insecure Direct Object Reference)
+
+```javascript
+// VULNERABLE CODE (Node.js/Express)
+app.get('/api/documents/:id', async (req, res) => {
+    // ❌ No ownership check
+    const doc = await Document.findById(req.params.id);
+    res.json(doc);
+});
+
+// ATTACK VECTOR
+// 1. User A creates document (id=123)
+// 2. User B requests /api/documents/123
+// 3. User B receives User A's document
+
+// FIX: Add authorization
+app.get('/api/documents/:id', authenticateUser, async (req, res) => {
+    const doc = await Document.findById(req.params.id);
+    
+    // ✓ Ownership check
+    if (doc.userId !== req.user.id) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+    
+    res.json(doc);
+});
+```
+
+### Deserialization (Java)
+
+```java
+// VULNERABLE CODE
+public class UserController {
+    @PostMapping("/import")
+    public void importData(@RequestParam("file") MultipartFile file) throws Exception {
+        ObjectInputStream ois = new ObjectInputStream(file.getInputStream());
+        Object obj = ois.readObject();  // ❌ Untrusted deserialization
+        processData(obj);
+    }
+}
+
+// EXPLOITATION
+// 1. Attacker crafts malicious serialized object (CommonsCollections gadget)
+// 2. Uploads via /import endpoint
+// 3. readObject() triggers RCE
+
+// FIX: Use safe formats
+@PostMapping("/import")
+public void importData(@RequestParam("file") MultipartFile file) throws Exception {
+    // ✓ Use JSON instead of Java serialization
+    ObjectMapper mapper = new ObjectMapper();
+    UserData data = mapper.readValue(file.getInputStream(), UserData.class);
+    
+    // Additional validation
+    validator.validate(data);
+    processData(data);
+}
+```
+
+### Path Traversal (Go)
+
+```go
+// VULNERABLE CODE
+func downloadFile(w http.ResponseWriter, r *http.Request) {
+    filename := r.URL.Query().Get("file")
+    // ❌ No path validation
+    data, err := ioutil.ReadFile("/var/uploads/" + filename)
+    if err != nil {
+        http.Error(w, "File not found", 404)
+        return
+    }
+    w.Write(data)
+}
+
+// ATTACK: /download?file=../../etc/passwd
+
+// FIX: Validate and sanitize path
+import "path/filepath"
+
+func downloadFile(w http.ResponseWriter, r *http.Request) {
+    filename := r.URL.Query().Get("file")
+    
+    // ✓ Clean path
+    cleanPath := filepath.Clean(filename)
+    
+    // ✓ Prevent directory traversal
+    if strings.Contains(cleanPath, "..") {
+        http.Error(w, "Invalid filename", 400)
+        return
+    }
+    
+    // ✓ Join safely
+    fullPath := filepath.Join("/var/uploads", cleanPath)
+    
+    // ✓ Verify path is within uploads directory
+    if !strings.HasPrefix(fullPath, "/var/uploads/") {
+        http.Error(w, "Access denied", 403)
+        return
+    }
+    
+    data, err := ioutil.ReadFile(fullPath)
+    // ... rest of code
+}
+```
+
+## Anti-Hallucination Mechanisms
+
+The skill implements strict validation to prevent false positives:
+
+```markdown
+### Evidence Requirements
+- ✓ Source code snippet (exact line numbers)
+- ✓ Complete data flow path
+- ✓ Proof of missing sanitization
+- ✓ Actual test validation (PoC when possible)
+
+### Path Completeness
+Source → [Intermediate Steps] → Sink
+- All intermediate functions traced
+- Framework middleware considered
+- Sanitization/validation points checked
+
+### Severity Validation Matrix
+| Severity | Requirements |
+|----------|--------------|
+| Critical | Unauthenticated RCE/SQLi with PoC |
+| High | Authenticated RCE/SQLi, or unauth data leak |
+| Medium | Requires specific conditions |
+| Low | Theoretical or low impact |
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# For standalone script usage
+export AUDIT_MODE=deep  # quick|standard|deep
+export AUDIT_OUTPUT_DIR=/path/to/reports
+export AUDIT_INCLUDE_POC=true
+export AUDIT_VERIFY_DEPS=true
+```
+
+### Custom Rules
+
+Create custom detection rules in `resources/rules/`:
+
+```yaml
+# custom_injection_rule.yaml
+rules:
+  - id: custom-sql-injection
+    languages: [python]
+    severity: CRITICAL
+    pattern: |
+      cursor.execute($QUERY)
+    pattern-not: |
+      cursor.execute($QUERY, ...)
+    message: "SQL Injection via string formatting"
+    metadata:
+      dimension: D1
+      cwe: CWE-89
+```
+
+## Standalone Script Usage
+
+### Code Scanner
+
+```bash
+# Full audit
+python scripts/code_scan.py /path/to/project
+
+# Quick scan
+python scripts/code_scan.py /path/to/project --mode quick
+
+# Specific dimensions
+python scripts/code_scan.py /path/to/project --dimensions D1,D3,D4
+
+# Output formats
+python scripts/code_scan.py /path/to/project --format json --output results.json
+```
 
 ### Pattern Scanner
 
-```bash
-# Scan for SQL injection patterns in Python files
-python scripts/pattern_scanner.py \
-  --path /path/to/project \
-  --language python \
-  --pattern sql-injection
-
-# Scan for command injection in all files
-python scripts/pattern_scanner.py \
-  --path /path/to/project \
-  --pattern command-injection \
-  --output results.json
-```
-
-### Data Flow Analyzer
-
 ```python
-# scripts/data_flow_analyzer.py
-from typing import List, Dict, Set
+# scripts/pattern_scanner.py
+from pattern_scanner import PatternScanner
 
-class DataFlowAnalyzer:
-    def __init__(self, code_base_path: str):
-        self.code_base_path = code_base_path
-        self.taint_sources = set()
-        self.sanitizers = set()
-        self.sinks = set()
-        
-    def analyze_taint_flow(self, source_var: str, file_path: str) -> List[Dict]:
-        """
-        Trace data flow from source to potential sinks
-        Returns list of vulnerable paths
-        """
-        vulnerable_paths = []
-        
-        # Example: Trace HTTP parameter to SQL query
-        # Implementation would use AST parsing
-        
-        return vulnerable_paths
-    
-    def register_source(self, pattern: str):
-        """Register taint source (e.g., request.GET, request.POST)"""
-        self.taint_sources.add(pattern)
-    
-    def register_sanitizer(self, function: str):
-        """Register sanitization function"""
-        self.sanitizers.add(function)
-    
-    def register_sink(self, function: str):
-        """Register dangerous sink function"""
-        self.sinks.add(function)
+scanner = PatternScanner('/path/to/project')
 
-# Usage
-analyzer = DataFlowAnalyzer('/path/to/project')
+# Scan for SQL injection
+sql_vulns = scanner.scan_pattern('sql_injection', language='java')
 
-# Configure for Django
-analyzer.register_source('request.GET')
-analyzer.register_source('request.POST')
-analyzer.register_sanitizer('escape')
-analyzer.register_sink('execute')
-analyzer.register_sink('raw')
-
-vulnerabilities = analyzer.analyze_taint_flow('user_input', 'views.py')
-```
-
-### Secret Finder
-
-```bash
-# Scan for exposed secrets
-python scripts/secret_finder.py \
-  --path /path/to/project \
-  --exclude node_modules,venv,.git \
-  --output secrets_report.json
-
-# Check against custom patterns
-python scripts/secret_finder.py \
-  --path /path/to/project \
-  --patterns custom_patterns.yaml
+# Results
+for vuln in sql_vulns:
+    print(f"{vuln['file']}:{vuln['line']} - {vuln['description']}")
+    print(f"Code: {vuln['code_snippet']}")
+    print(f"Severity: {vuln['severity']}\n")
 ```
 
 ### Dependency Analyzer
 
 ```bash
-# Analyze Python dependencies
-python scripts/dependency_analyzer.py \
-  --requirements requirements.txt \
-  --check-cve \
-  --output dependency_report.json
+# Analyze dependencies for CVEs
+python scripts/dependency_analyzer.py /path/to/project
 
-# Analyze npm dependencies
-python scripts/dependency_analyzer.py \
-  --package-json package.json \
-  --check-cve \
-  --severity high,critical
+# Output
+# [HIGH] Spring Framework 5.2.8 - CVE-2021-22118 (CVSS 7.5)
+# [CRITICAL] Log4j 2.14.1 - CVE-2021-44228 (CVSS 10.0)
+# [MEDIUM] Jackson 2.9.8 - CVE-2020-24750 (CVSS 6.5)
 ```
 
-## Configuration
+### Secret Finder
 
-### Audit Configuration (`.dfyx-audit.yaml`)
+```bash
+# Find hardcoded secrets
+python scripts/secret_finder.py /path/to/project
+
+# Output
+# [SECRET] application.yml:12 - JWT secret key
+# [SECRET] config.py:45 - AWS access key
+# [SECRET] .env.example:3 - Database password (example file)
+```
+
+## Common Patterns
+
+### Phase 1: Reconnaissance
+
+```markdown
+## Reconnaissance Checklist
+
+1. Technology Stack Identification
+   - Parse pom.xml, package.json, requirements.txt, go.mod
+   - Identify framework versions
+   - List third-party dependencies
+
+2. Entry Point Enumeration
+   - Web: Controllers, routes, views
+   - API: GraphQL schemas, REST endpoints
+   - CLI: Argument parsers
+
+3. Authentication Flow Mapping
+   - Login endpoints
+   - Token generation/validation
+   - Session management
+   - Password reset flows
+
+4. Data Flow Architecture
+   - Database models
+   - ORM queries
+   - Cache layers
+   - Message queues
+```
+
+### Phase 2: Pattern Matching
+
+```python
+# Multi-language sink detection
+DANGEROUS_SINKS = {
+    'java': [
+        'Runtime.getRuntime().exec(',
+        'ProcessBuilder(',
+        'ScriptEngine.eval(',
+        'statement.execute(',
+        'createNativeQuery('
+    ],
+    'python': [
+        'eval(', 'exec(', 'compile(',
+        'subprocess.run(', 'os.system(',
+        'cursor.execute(', 'pickle.loads('
+    ],
+    'javascript': [
+        'eval(', 'Function(',
+        'child_process.exec(',
+        'vm.runInNewContext(',
+        'query.raw('
+    ],
+    'php': [
+        'eval(', 'assert(',
+        'exec(', 'system(', 'shell_exec(',
+        'unserialize(',
+        'mysql_query(', 'mysqli_query('
+    ]
+}
+```
+
+### Phase 3: Taint Analysis
+
+```markdown
+## Taint Tracking Template
+
+### 1. Identify Sources (User-Controlled Input)
+- HTTP: req.params, req.query, req.body, req.headers
+- CLI: sys.argv, process.argv
+- File: file uploads, config files
+- DB: user-generated content
+- Environment: process.env (if user can modify)
+
+### 2. Trace Propagation
+- Variable assignments
+- Function calls
+- Return values
+- Array/Object modifications
+
+### 3. Check Sanitization
+- Input validation (whitelist, regex)
+- Encoding/escaping
+- Parameterized queries
+- Framework built-in protections
+
+### 4. Identify Sinks
+- SQL execution
+- Command execution
+- Template rendering
+- File operations
+- Deserialization
+```
+
+### Phase 4: Vulnerability Validation
+
+```python
+# Validation checklist generator
+def validate_vulnerability(vuln_candidate):
+    checks = {
+        'source_confirmed': False,
+        'sink_confirmed': False,
+        'no_sanitization': False,
+        'exploitable': False,
+        'poc_created': False
+    }
+    
+    # 1. Confirm source is user-controlled
+    if is_user_input(vuln_candidate.source):
+        checks['source_confirmed'] = True
+    
+    # 2. Confirm sink is dangerous
+    if is_dangerous_sink(vuln_candidate.sink):
+        checks['sink_confirmed'] = True
+    
+    # 3. Verify no sanitization in path
+    if not has_sanitization(vuln_candidate.data_flow):
+        checks['no_sanitization'] = True
+    
+    # 4. Assess exploitability
+    if checks['source_confirmed'] and checks['sink_confirmed'] and checks['no_sanitization']:
+        checks['exploitable'] = True
+    
+    # 5. Create PoC (if safe)
+    if checks['exploitable'] and vuln_candidate.safe_to_test:
+        checks['poc_created'] = create_poc(vuln_candidate)
+    
+    return checks
+```
+
+## Troubleshooting
+
+### Issue: Too Many False Positives
+
+```markdown
+Solution: Enable strict validation mode
+
+In AI conversation:
+"Please re-audit with strict validation: require complete data flow paths and proof of missing sanitization"
+
+Or in config:
+export AUDIT_STRICT_MODE=true
+python scripts/code_scan.py /path/to/project --strict
+```
+
+### Issue: Audit Takes Too Long
+
+```markdown
+Solution: Use Quick mode or limit dimensions
+
+"Run quick audit focusing on D1 (Injection) and D3 (Authorization)"
+
+Or:
+python scripts/code_scan.py /path/to/project --mode quick --dimensions D1,D3
+```
+
+### Issue: Missing Framework-Specific Protections
+
+```markdown
+Solution: Explicitly declare framework versions
+
+"This is Spring Boot 2.7 with Spring Security 5.6 enabled. Re-evaluate auth vulnerabilities."
+
+The skill will adjust analysis based on framework security features:
+- Spring Security → checks for @PreAuthorize, SecurityFilterChain
+- Django → checks for CSRF middleware, permission_classes
+- Express → checks for helmet, express-validator
+```
+
+### Issue: Dependency Scan Fails
+
+```bash
+# Ensure package manifest files are present
+ls pom.xml package.json requirements.txt go.mod Cargo.toml
+
+# Update vulnerability database
+pip install --upgrade safety
+
+# Manual dependency check
+python scripts/dependency_analyzer.py /path/to/project --update-db
+```
+
+### Issue: Need Custom Validation Rules
+
+```python
+# Add custom rule in resources/rules/custom_rules.yaml
+rules:
+  - id: custom-deserialize-check
+    pattern: |
+      pickle.loads($DATA)
+    languages: [python]
+    severity: HIGH
+    message: "Unsafe pickle deserialization"
+    fix: "Use json.loads() or validate input source"
+
+# Reference in audit
+"Apply custom rules from resources/rules/custom_rules.yaml during Phase 2"
+```
+
+## Report Structure
+
+Generated reports follow this structure:
+
+```markdown
+# Security Audit Report
+
+## Executive Summary
+- Total Vulnerabilities: 15 (Critical: 3, High: 5, Medium: 5, Low: 2)
+- Risk Score: 8.2/10
+- OWASP Top 10 Coverage: 9/10 categories
+
+## Critical Findings
+
+### [C1] SQL Injection in User Search
+**Severity**: Critical (CVSS 9.8)
+**Location**: `src/controllers/UserController.java:45`
+**CWE**: CWE-89
+
+#### Vulnerability Details
+```java
+// Vulnerable code
+String query = "SELECT * FROM users WHERE username='" + input + "'";
+stmt.executeQuery(query);
+```
+
+**Data Flow**:
+```
+HTTP Request → @RequestParam username → userService.search(username) 
+  → userRepository.findByUsername(username) → JDBC executeQuery()
+```
+
+**Proof of Concept**:
+```bash
+curl "http://localhost:8080/users/search?username=admin'--"
+# Returns all users without authentication
+```
+
+#### Recommended Fix
+```java
+// Use PreparedStatement
+String query = "SELECT * FROM users WHERE username=?";
+PreparedStatement pstmt = conn.prepareStatement(query);
+pstmt.setString(1, input);
+ResultSet rs = pstmt.executeQuery();
+```
+
+**Alternative Fix**: Use JPA with parameterized queries
+```java
+@Query("SELECT u FROM User u WHERE u.username = :username")
+User findByUsername(@Param("username") String username);
+```
+
+## Appendix
+- Attack Chain Diagrams
+- Dependency CVE List
+- Secure Configuration Baseline
+```
+
+## Advanced Features
+
+### Attack Chain Analysis
+
+The skill can identify multi-stage attacks:
+
+```markdown
+### Attack Chain: Admin Account Takeover
+
+1. [D8] Information Disclosure
+   - /actuator/env exposes JWT secret
+
+2. [D7] Weak Cryptography
+   - JWT uses HS256 with leaked secret
+
+3. [D2] Authentication Bypass
+   - Forge admin JWT token
+
+4. [D3] Authorization Flaw
+   - Admin endpoints don't verify token claims
+
+5. [D1] SQL Injection
+   - Admin SQL query builder lacks sanitization
+
+**Impact**: Complete system compromise
+**Likelihood**: High (all steps confirmed exploitable)
+**CVSS**: 10.0 (Network, Low Complexity, No Privileges Required)
+```
+
+### Multi-Tenant Security
+
+```python
+# Tenant isolation check pattern
+def check_tenant_isolation(model_class, endpoints):
+    issues = []
+    
+    for endpoint in endpoints:
+        # Check 1: Query filters include tenant_id
+        if not has_tenant_filter(endpoint.query):
+            issues.append({
+                'endpoint': endpoint.path,
+                'issue': 'Missing tenant_id filter',
+                'impact': 'Cross-tenant data leak'
+            })
+        
+        # Check 2: Row-level security enabled
+        if not has_rls_policy(model_class):
+            issues.append({
+                'model': model_class.__name__,
+                'issue': 'No RLS policy',
+                'impact': 'Database-level isolation missing'
+            })
+    
+    return issues
+
+# Example finding:
+# [HIGH] /api/documents endpoint missing tenant_id filter
+# User from Tenant A can access Tenant B's documents by ID enumeration
+```
+
+### Business Logic Vulnerabilities
+
+```javascript
+// Race condition detection
+// VULNERABLE: Concurrent withdrawal
+app.post('/withdraw', async (req, res) => {
+    const account = await Account.findById(req.user.accountId);
+    
+    if (account.balance >= req.body.amount) {
+        // ❌ Race condition: balance can be checked twice simultaneously
+        account.balance -= req.body.amount;
+        await account.save();
+        res.json({ success: true });
+    }
+});
+
+// ATTACK:
+// 1. Balance: $100
+// 2. Send two concurrent requests: withdraw $100
+// 3. Both pass balance check
+// 4. Final balance: -$100
+
+// FIX: Use database-level atomic operations
+app.post('/withdraw', async (req, res) => {
+    const result = await Account.updateOne(
+        { 
+            _id: req.user.accountId,
+            balance: { $gte: req.body.amount }  // ✓ Atomic check
+        },
+        { 
+            $inc: { balance: -req.body.amount }  // ✓ Atomic update
+        }
+    );
+    
+    if (result.nModified === 0) {
+        return res.status(400).json({ error: 'Insufficient funds' });
+    }
+    
+    res.json({ success: true });
+});
+```
+
+## Integration with CI/CD
 
 ```yaml
-# Project-specific audit configuration
-audit:
-  mode: deep  # quick | standard | deep
-  
-  # Languages to scan
-  languages:
-    - python
-    - javascript
-    - java
-  
-  # Directories to exclude
-  exclude:
-    - node_modules
-    - venv
-    - .git
-    - build
-    - dist
-    - test
-    - __pycache__
-  
-  # Security dimensions to focus on
-  dimensions:
-    - D1  # Injection
-    - D2  # Authentication
-    - D3  # Authorization
-    - D4  # Deserialization
-    - D5  # File Operations
-    - D6  # SSRF
-    - D7  # Cryptography
-    - D8  # Configuration
-    - D9  # Business Logic
-    - D10 # Supply Chain
-  
+# .github/workflows/security-audit.yml
+name: Security Audit
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r dfyx_code_security_review/requirements.txt
+      
+      - name: Run security audit
+        run: |
+          python dfyx_code_security_review/scripts/code_scan.py . \
+            --mode quick \
+            --format json \
+            --output audit-results.json
+      
+      - name: Check for critical vulnerabilities
+        run: |
+          CRITICAL_COUNT=$(jq '[.vulnerabilities[] | select(.severity=="CRITICAL")] | length' audit-results.json)
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "Found $CRITICAL_COUNT critical vulnerabilities"
+            exit 1
+          fi
+      
+      - name: Upload audit report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-audit-report
+          path: audit-results.json
+```
+
+## Knowledge Base References
+
+The skill utilizes extensive knowledge bases from the project:
+
+- **WooYun Cases**: 10+ real-world vulnerability examples (2010-2016)
+- **OWASP Guidelines**: ASVS, Top 10, Cheat Sheets
+- **CWE Mappings**: 50+ Common Weakness Enumeration entries
+- **Framework Security**: Spring Security, Django Security, Express Security best practices
+
+Access via: `resources/wooyun/wooyun_cases_by_vulnerability_type.md`
+
+## Best Practices
+
+1. **Start with Reconnaissance**: Always run Phase 1 completely before pattern matching
+2. **Validate Data Flows**: Require complete source-to-sink paths with evidence
+3. **Test When Safe**: Create PoCs for critical findings in isolated environments
+4. **Prioritize by Impact**: Fix Critical/High severity issues first
+5. **Document Assumptions**: Note framework versions, security middleware, custom protections
+6. **Re-audit After Fixes**: Verify remediation with focused re-scan
+
+## Performance Optimization
+
+```markdown
+### For Large Codebases (>100k LOC)
+
+1. Use incremental scanning:
+   "Audit only files changed in last commit"
+
+2. Parallelize by dimension:
+   "Run 3 agents: Agent 1 (D1-D3), Agent 2 (D4-D6), Agent 3 (D7-D10)"
+
+3. Focus on high-risk areas:
+   "Priority: Authentication, payment processing, admin panels"
+
+4. Cache analysis results:
+   export AUDIT_CACHE_DIR=/tmp/audit-cache
+```
+
+## License
+
+This skill documentation is provided under MIT License. The original project license applies to all source code and resources.
+
+---
+
+**Security Notice**: This skill is for authorized security testing only. Always obtain proper authorization before auditing production systems. Use PoC exploits only in isolated test environments.
