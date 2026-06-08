@@ -1,811 +1,970 @@
 ---
 name: dfyx-code-security-review
-description: Expert-level code security audit skill using deep data flow analysis, taint tracking, and business logic understanding across 9 languages
+description: AI-powered multi-language code security auditing with deep data flow analysis, taint tracking, and business logic vulnerability detection
 triggers:
-  - "audit this project for security vulnerabilities"
-  - "perform a security code review"
-  - "find security issues in this codebase"
-  - "check for SQL injection and other vulnerabilities"
-  - "run a deep security audit"
-  - "analyze this code for security flaws"
-  - "scan for OWASP Top 10 vulnerabilities"
-  - "do a white-box security assessment"
+  - audit this codebase for security vulnerabilities
+  - perform a security code review
+  - scan for security issues in this project
+  - check for SQL injection and other vulnerabilities
+  - run a deep code security audit
+  - find security vulnerabilities using dfyx
+  - analyze code for OWASP Top 10 issues
+  - perform static security analysis with data flow tracking
 ---
 
-# dfyx-code-security-review
+# dfyx_code_security_review
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-**dfyx_code_security_review** is a professional-grade code security audit skill for AI coding agents, designed by the EastSword team (东方隐侠团队). It uses white-box static analysis methodology with a five-phase standardized audit protocol to systematically discover and validate security vulnerabilities in source code.
+**dfyx_code_security_review** is an expert-level code security auditing framework designed for AI coding agents. It implements a five-phase white-box static analysis methodology that combines pattern matching, deep data flow analysis, taint tracking, and business logic verification to systematically discover and validate security vulnerabilities in source code.
 
 ## What It Does
 
-This skill transforms AI coding agents into expert security auditors capable of:
+This skill enables AI agents to perform comprehensive security audits across 9 programming languages (Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust) and 14 frameworks (Spring Boot, Django, Flask, FastAPI, Express, Laravel, Rails, ASP.NET Core, etc.).
 
-- **Multi-language analysis**: Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust
-- **10 security dimensions**: Injection, Authentication, Authorization, Deserialization, File Operations, SSRF, Cryptography, Configuration, Business Logic, Supply Chain
-- **Triple-track audit model**:
-  - Sink-driven (injection/RCE): Find dangerous functions → trace data flow → validate lack of protection
-  - Control-driven (authorization/business logic): Enumerate endpoints → verify security controls → missing = vulnerability
-  - Config-driven (auth/crypto/config/supply chain): Search configs → compare to security baseline
-- **Real vulnerability validation**: Not just pattern matching, but actual POC construction and testing
-- **Anti-hallucination mechanisms**: Evidence requirements, complete path validation, Docker-based verification
+**Core Capabilities:**
+- **10 Security Dimensions**: Injection (SQL/Cmd/SSTI), Authentication, Authorization, Deserialization, File Operations, SSRF, Cryptography, Configuration, Business Logic, Supply Chain
+- **Triple-Track Audit Model**: Sink-driven (injection/RCE), Control-driven (authorization/business logic), Config-driven (configuration/crypto)
+- **Five-Phase Protocol**: Reconnaissance → Pattern Matching → Taint Tracking → Validation → Reporting
+- **Real Vulnerability Cases**: 200+ WooYun vulnerability cases (2010-2016) for reference patterns
 
 ## Installation
 
-This is an AI agent skill. Install it by placing in your AI client's skills directory:
+This skill is designed to be used directly by AI coding agents (Claude Code, Cursor, etc.) by loading this SKILL.md file. No separate installation required.
+
+For the optional Python helper scripts:
 
 ```bash
-# For Claude Code
+# Clone the repository
 git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
-cp -r skill-dfyx_code_security_review ~/.claude/skills/dfyx-code-security-review
-
-# For other AI clients (adjust path as needed)
-cp -r skill-dfyx_code_security_review /path/to/your/ai/client/skills/
-```
-
-Optional: Install Python helper scripts dependencies:
-
-```bash
 cd skill-dfyx_code_security_review
+
+# Install Python dependencies
 pip install -r requirements.txt
 ```
 
-## Core Audit Protocol
-
-### Five-Phase Methodology
-
+**requirements.txt contents:**
 ```
-Phase 1: Reconnaissance & Mapping (10%)
-    ↓ Output: Architecture diagram, attack surface inventory
-    
-Phase 2: Parallel Pattern Matching (30%)
-    ↓ Output: High-risk areas list
-    
-Phase 3: Deep Taint Tracking & Real Testing (40%)
-    ↓ Output: Confirmed vulnerabilities, test validation reports
-    
-Phase 4: Validation & Attack Chain Construction (15%)
-    ↓ Output: Vulnerability validation reports
-    
-Phase 5: Structured Reporting (5%)
-    ↓ Output: Complete audit report
+libcst>=1.1.0
+tree-sitter>=0.20.0
+tree-sitter-python>=0.20.0
+tree-sitter-java>=0.20.0
+tree-sitter-javascript>=0.20.0
+pyyaml>=6.0
+jinja2>=3.1.2
 ```
 
-### 10 Security Dimensions (D1-D10)
+## Audit Modes
 
-| Dimension | Coverage | Detection Method |
-|-----------|----------|------------------|
-| **D1: Injection** | SQL/Cmd/LDAP/SSTI/SpEL/JNDI | Sink-driven: Find dangerous sinks → trace taint propagation |
-| **D2: Authentication** | Token/Session/JWT/Filter chains | Config-driven: Check session config, JWT validation, filter bypass |
-| **D3: Authorization** | CRUD consistency, IDOR, horizontal privilege escalation | Control-driven: Verify permission checks exist |
-| **D4: Deserialization** | Java/Python/PHP gadget chains | Sink-driven: Find deserialize() → check class whitelist |
-| **D5: File Operations** | Upload/download/path traversal | Sink-driven: Find file I/O → verify path validation |
-| **D6: SSRF** | URL injection, protocol restrictions | Sink-driven: Find HTTP clients → check URL validation |
-| **D7: Cryptography** | Key management, cipher modes, KDF | Config-driven: Search hardcoded keys, weak algorithms |
-| **D8: Configuration** | Actuator, CORS, error disclosure | Config-driven: Check security headers, debug mode |
-| **D9: Business Logic** | Race conditions, mass assignment, state machine, multi-tenancy | Control-driven: Verify business rule enforcement |
-| **D10: Supply Chain** | Dependency CVEs, version checks | Config-driven: Parse manifests, check CVE databases |
+| Mode | Use Case | Scope | Duration |
+|------|----------|-------|----------|
+| **Quick** | CI/CD, small projects | High-severity, secrets, dependency CVEs | 5-10 min |
+| **Standard** | Regular audits | OWASP Top 10, auth/authz, crypto | 30-60 min |
+| **Deep** | Critical projects, pentest prep | Full coverage, attack chains, business logic | 1-3 hours |
 
-## Usage Patterns
+## Usage Pattern
 
-### Basic Security Audit
+### Triggering an Audit
 
-When a user says "audit this project for security vulnerabilities", initiate:
-
+User request examples:
 ```
-[MODE] standard
-[RECON] Analyzing project structure...
-[DETECTED] Spring Boot 2.7 + MyBatis + Thymeleaf
-[SCOPE] 342 files, estimating 60-80 turns
-[PLAN] Launching 3 agents covering D1-D10
-
-Confirm start? (yes/no)
+"Audit this project for security vulnerabilities"
+"Perform a deep security review on /path/to/project"
+"Check for SQL injection and authorization issues"
 ```
 
-### Audit Modes
+### AI Agent Response Flow
 
-**Quick Mode** (5-10 min): CI/CD integration, small projects
-- Focus: High-severity vulns, secrets, dependency CVEs
-- Coverage: D1 (injection), D7 (secrets), D10 (supply chain)
+The AI agent will follow this standardized protocol:
 
-**Standard Mode** (30-60 min): Regular audits
-- Focus: OWASP Top 10, auth/authz, crypto
-- Coverage: D1-D8
+```
+[MODE] deep
+[RECON] Analyzing codebase...
+  - Language: Python
+  - Framework: Django 3.2
+  - Files: 342 Python files
+  - Entry points: 45 views, 12 API endpoints
+[PLAN] 
+  - 3 parallel agents
+  - Coverage: D1-D10 (all dimensions)
+  - Estimated: 80 turns, 5-12 vulnerabilities
+[SCOPE] Focus areas:
+  - Authentication: JWT implementation
+  - Authorization: View-level permissions
+  - Injection: ORM query construction
+  - Business Logic: Payment flow
 
-**Deep Mode** (1-3 hours): Critical projects, pentest prep
-- Focus: Full coverage, attack chains, business logic
-- Coverage: D1-D10, attack chain construction
-
-### Language-Specific Patterns
-
-#### Java/Spring Boot Projects
-
-```java
-// VULNERABILITY: SQL Injection in MyBatis
-// File: UserMapper.java
-@Select("SELECT * FROM users WHERE username = '${username}'")
-User findByUsername(String username);
-
-// TAINT FLOW:
-// UserController.login(@RequestParam username) → UserService → UserMapper
-// ↑ User input                                                  ↑ SQL sink
-// NO SANITIZATION in between
-
-// FIX: Use parameterized query
-@Select("SELECT * FROM users WHERE username = #{username}")
-User findByUsername(String username);
+Confirm to start audit? (yes/no)
 ```
 
-Detection logic:
-1. Search for `@Select`, `@Update`, `@Delete` with `${...}` (string concatenation)
-2. Trace parameter source to HTTP request
-3. Verify no validation/sanitization in path
-4. Construct POC: `username=admin'--`
+## Five-Phase Audit Protocol
 
-#### Python/Django Projects
+### Phase 1: Reconnaissance (10%)
+
+**Objective**: Map architecture and attack surface
 
 ```python
-# VULNERABILITY: Command Injection
-# File: views.py
-def backup_database(request):
-    db_name = request.GET.get('db')
-    # SINK: os.system with user input
-    os.system(f'pg_dump {db_name} > /tmp/backup.sql')
-    return JsonResponse({'status': 'ok'})
+# Example: Identifying entry points in Django
+# The AI agent will analyze urls.py patterns
 
-# TAINT FLOW:
-# request.GET['db'] → db_name → os.system()
-# ↑ User input                  ↑ Command sink
+# urls.py
+from django.urls import path
+from . import views
 
-# FIX: Use subprocess with argument list
+urlpatterns = [
+    path('api/users/<int:user_id>/', views.get_user),  # IDOR risk
+    path('api/upload/', views.upload_file),            # File upload risk
+    path('api/search/', views.search),                 # Injection risk
+]
+
+# Agent identifies:
+# - 3 API endpoints (attack surface)
+# - Parameter types (user_id: int, others: unconstrained)
+# - No visible authentication decorators
+```
+
+**Output**: Architecture diagram, entry point inventory, technology stack
+
+### Phase 2: Pattern Matching (30%)
+
+**Objective**: Identify high-risk code patterns across all dimensions
+
+```python
+# Example: Detecting SQL injection patterns in Python
+
+# VULNERABLE: String concatenation in query
+def search_users(request):
+    query = request.GET.get('q')
+    # D1: SQL Injection - unsanitized input in raw query
+    sql = f"SELECT * FROM users WHERE name LIKE '%{query}%'"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+# VULNERABLE: ORM filter with raw SQL
+def get_products(category):
+    # D1: SQL Injection via extra()
+    return Product.objects.extra(
+        where=[f"category = '{category}'"]
+    )
+
+# SAFE: Parameterized query
+def search_users_safe(request):
+    query = request.GET.get('q')
+    cursor.execute(
+        "SELECT * FROM users WHERE name LIKE %s",
+        [f'%{query}%']
+    )
+    return cursor.fetchall()
+```
+
+**Pattern Rules** (from `resources/rules/sql_injection_rules.md`):
+
+```yaml
+# SQL Injection Detection Rules
+D1_SQL_INJECTION:
+  sinks:
+    python:
+      - "cursor.execute()"
+      - "cursor.executemany()"
+      - "Model.objects.raw()"
+      - "Model.objects.extra()"
+    java:
+      - "Statement.execute()"
+      - "Statement.executeQuery()"
+      - "createNativeQuery()"
+    php:
+      - "mysql_query()"
+      - "mysqli_query()"
+      - "PDO->query()"
+  
+  unsafe_patterns:
+    - string_concatenation
+    - f-string_interpolation
+    - format_string
+    - raw_sql_fragments
+  
+  safe_patterns:
+    - parameterized_queries
+    - ORM_query_builder
+    - prepared_statements
+```
+
+### Phase 3: Taint Tracking & Data Flow Analysis (40%)
+
+**Objective**: Trace data flow from source to sink, validate exploitability
+
+```python
+# Example: Deep taint analysis for command injection
+
+# VULNERABLE: Multi-hop taint flow
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 import subprocess
-def backup_database(request):
-    db_name = request.GET.get('db')
-    if not re.match(r'^[a-zA-Z0-9_]+$', db_name):
-        return JsonResponse({'error': 'Invalid db name'}, status=400)
-    subprocess.run(['pg_dump', db_name], 
-                   stdout=open('/tmp/backup.sql', 'w'))
-```
-
-Detection logic:
-1. Search for dangerous functions: `os.system()`, `os.popen()`, `eval()`, `exec()`
-2. Check if input contains `request.GET`, `request.POST`, `request.FILES`
-3. Verify no whitelist validation
-4. Construct POC: `db=test; cat /etc/passwd`
-
-#### PHP Projects
-
-```php
-// VULNERABILITY: File Upload + Path Traversal
-// File: upload.php
-<?php
-$target = $_POST['path'] . '/' . $_FILES['file']['name'];
-move_uploaded_file($_FILES['file']['tmp_name'], $target);
-?>
-
-// TAINT FLOW:
-// $_POST['path'] → $target → move_uploaded_file()
-// ↑ User input              ↑ File write sink
-
-// FIX: Validate path and extension
-<?php
-$allowed_ext = ['jpg', 'png', 'gif'];
-$path = basename($_POST['path']); // Remove ../ 
-$ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-
-if (!in_array($ext, $allowed_ext)) {
-    die('Invalid file type');
-}
-if (strpos(realpath($path), realpath('/var/www/uploads')) !== 0) {
-    die('Invalid path');
-}
-$target = $path . '/' . basename($_FILES['file']['name']);
-move_uploaded_file($_FILES['file']['tmp_name'], $target);
-?>
-```
-
-#### JavaScript/Node.js Projects
-
-```javascript
-// VULNERABILITY: NoSQL Injection in MongoDB
-// File: routes/users.js
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  // SINK: Direct object injection into query
-  const user = await User.findOne({ 
-    username: username, 
-    password: password 
-  });
-  if (user) {
-    req.session.userId = user._id;
-    res.json({ success: true });
-  }
-});
-
-// ATTACK: POST /login
-// {"username": {"$ne": null}, "password": {"$ne": null}}
-// Bypasses authentication
-
-// FIX: Sanitize input or use strict comparison
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  // Ensure strings only
-  if (typeof username !== 'string' || typeof password !== 'string') {
-    return res.status(400).json({ error: 'Invalid input' });
-  }
-  
-  const user = await User.findOne({ username });
-  if (user && await bcrypt.compare(password, user.passwordHash)) {
-    req.session.userId = user._id;
-    res.json({ success: true });
-  }
-});
-```
-
-## Business Logic Vulnerability Detection
-
-### Race Condition Example
-
-```python
-# VULNERABILITY: Race condition in withdrawal
-# File: banking/views.py
-@transaction.atomic
-def withdraw(request):
-    account = Account.objects.get(user=request.user)
-    amount = int(request.POST['amount'])
-    
-    # CHECK-THEN-USE race window
-    if account.balance >= amount:  # ← Check
-        time.sleep(0.1)  # Simulating processing
-        account.balance -= amount  # ← Use
-        account.save()
-        return JsonResponse({'status': 'ok'})
-
-# ATTACK: Send 2 concurrent requests with amount=balance
-# Request 1: Check (balance=100, amount=100) → PASS
-# Request 2: Check (balance=100, amount=100) → PASS
-# Request 1: balance = 0
-# Request 2: balance = -100 (overdraft!)
-
-# FIX: Use database-level atomic operations
-@transaction.atomic
-def withdraw(request):
-    amount = int(request.POST['amount'])
-    
-    # Atomic update with WHERE clause
-    updated = Account.objects.filter(
-        user=request.user,
-        balance__gte=amount  # Check in WHERE
-    ).update(balance=F('balance') - amount)  # Update atomically
-    
-    if updated:
-        return JsonResponse({'status': 'ok'})
-    return JsonResponse({'error': 'Insufficient funds'}, status=400)
-```
-
-Detection logic:
-1. Search for patterns: read → delay → write
-2. Check if resource is shared (database record, file)
-3. Verify no row-level locking or atomic operations
-4. Suggest concurrent request attack
-
-### Horizontal Privilege Escalation (IDOR)
-
-```java
-// VULNERABILITY: Missing user ownership check
-// File: DocumentController.java
-@GetMapping("/api/documents/{id}")
-public Document getDocument(@PathVariable Long id) {
-    // MISSING: Verify document belongs to current user
-    return documentRepository.findById(id).orElseThrow();
-}
-
-// ATTACK: User A can access User B's documents
-// GET /api/documents/123 (where 123 belongs to User B)
-
-// FIX: Add ownership verification
-@GetMapping("/api/documents/{id}")
-public Document getDocument(@PathVariable Long id, 
-                           @AuthenticationPrincipal User currentUser) {
-    Document doc = documentRepository.findById(id).orElseThrow();
-    
-    if (!doc.getOwnerId().equals(currentUser.getId())) {
-        throw new AccessDeniedException("Not your document");
-    }
-    
-    return doc;
-}
-```
-
-Detection logic:
-1. Enumerate all CRUD endpoints
-2. Check if user/tenant ownership verification exists
-3. For endpoints with IDs, verify authorization logic
-4. Missing check = IDOR vulnerability
-
-## Configuration Vulnerability Detection
-
-### Secrets in Code
-
-```python
-# VULNERABILITY: Hardcoded credentials
-# File: config.py
-DATABASE_URL = "postgresql://admin:P@ssw0rd123@db.internal:5432/prod"
-AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"
-JWT_SECRET = "my-secret-key-12345"
-
-# FIX: Use environment variables
 import os
 
-DATABASE_URL = os.getenv('DATABASE_URL')
-AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
-JWT_SECRET = os.getenv('JWT_SECRET')
+@require_POST
+def backup_database(request):
+    # SOURCE: User-controlled input
+    db_name = request.POST.get('database')  # ← Taint source
+    
+    # HOP 1: Propagates to variable
+    backup_path = f"/backups/{db_name}.sql"
+    
+    # HOP 2: Propagates to environment variable
+    os.environ['BACKUP_FILE'] = backup_path
+    
+    # HOP 3: Propagates to command
+    cmd = f"mysqldump {db_name} > {backup_path}"
+    
+    # SINK: Command execution without sanitization
+    subprocess.call(cmd, shell=True)  # ← Command Injection (D1)
+    
+    return JsonResponse({'status': 'success'})
 
-if not all([DATABASE_URL, AWS_ACCESS_KEY, JWT_SECRET]):
-    raise RuntimeError("Missing required environment variables")
+# Agent taint analysis output:
+# [TAINT_FLOW]
+#   Source: request.POST.get('database') [Line 8]
+#   → db_name [Line 8]
+#   → backup_path (f-string interpolation) [Line 11]
+#   → os.environ['BACKUP_FILE'] [Line 14]
+#   → cmd (f-string interpolation) [Line 17]
+#   → subprocess.call() with shell=True [Line 20]
+# 
+# [SANITIZATION_CHECK]
+#   ✗ No input validation
+#   ✗ No allowlist check
+#   ✗ No shell escaping
+# 
+# [EXPLOITABILITY] HIGH
+#   Payload: database="; rm -rf / #"
+#   Result: Command injection leading to RCE
 ```
 
-Detection regex patterns:
-```python
-patterns = [
-    r'password\s*=\s*["\'][^"\']+["\']',
-    r'api[_-]?key\s*=\s*["\'][^"\']+["\']',
-    r'secret\s*=\s*["\'][^"\']+["\']',
-    r'AKIA[0-9A-Z]{16}',  # AWS access key
-    r'postgresql://[^:]+:[^@]+@',  # DB URL with password
-]
-```
-
-### Weak Cryptography
-
-```java
-// VULNERABILITY: Weak cipher mode
-// File: EncryptionUtil.java
-Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-// ECB mode is vulnerable to pattern analysis
-
-// FIX: Use authenticated encryption
-Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv);
-cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
-```
-
-Detection logic:
-1. Search for `Cipher.getInstance()`, `hashlib.md5()`, `DES`, `RC4`
-2. Check cipher modes: ECB (bad), CBC without MAC (bad), GCM (good)
-3. Check hash functions: MD5/SHA1 (bad for passwords), bcrypt/argon2 (good)
-4. Verify IV generation: static IV (bad), random IV (good)
-
-## Helper Scripts Usage
-
-While primarily AI-driven, the skill includes optional Python scripts:
-
-### Pattern Scanner
-
-```bash
-# Scan for SQL injection patterns
-python scripts/pattern_scanner.py /path/to/project --pattern sql_injection
-
-# Scan for all vulnerabilities
-python scripts/pattern_scanner.py /path/to/project --all
-```
+**Enhanced Taint Analysis** (from `resources/knowledge/taint_analysis_enhanced.md`):
 
 ```python
-# In Python code
-from scripts.pattern_scanner import PatternScanner
+# Example: Inter-procedural taint tracking
 
-scanner = PatternScanner()
-results = scanner.scan_directory('/path/to/project', 
-                                  patterns=['sql_injection', 'xss'])
+class UserService:
+    def get_user_input(self, request):
+        # SOURCE: Tainted input
+        return request.GET.get('user_id')
+    
+    def build_query(self, user_id):
+        # PROPAGATION: Taint flows through method call
+        return f"SELECT * FROM users WHERE id = {user_id}"
+    
+    def execute(self, request):
+        user_id = self.get_user_input(request)  # Taint enters
+        query = self.build_query(user_id)       # Taint propagates
+        cursor.execute(query)                   # SINK: SQL Injection
 
-for result in results:
-    print(f"{result['file']}:{result['line']} - {result['type']}")
+# Agent inter-procedural analysis:
+# [CALL_GRAPH]
+#   execute() → get_user_input() → build_query() → cursor.execute()
+# 
+# [TAINT_PATH]
+#   request.GET.get('user_id') 
+#   → return value of get_user_input()
+#   → user_id parameter in build_query()
+#   → f-string in build_query()
+#   → return value of build_query()
+#   → cursor.execute() argument
+# 
+# [VULNERABILITY] D1: SQL Injection via inter-procedural taint flow
 ```
 
-### Data Flow Analyzer
+### Phase 4: Validation & Attack Chain Construction (15%)
 
-```bash
-# Trace taint flow from source to sink
-python scripts/data_flow_analyzer.py /path/to/project \
-    --source "request.GET" \
-    --sink "os.system"
-```
+**Objective**: Verify exploitability, construct proof-of-concept
 
 ```python
-from scripts.data_flow_analyzer import DataFlowAnalyzer
+# Example: Authorization bypass chain
 
-analyzer = DataFlowAnalyzer()
-flows = analyzer.trace_taint('/path/to/project', 
-                              source_pattern='request.GET',
-                              sink_pattern='os.system')
+# FILE: views.py
+from django.contrib.auth.decorators import login_required
 
-for flow in flows:
-    print(f"Taint flow: {' → '.join(flow['path'])}")
+@login_required
+def update_user_profile(request, user_id):
+    # D3: IDOR - No ownership check
+    user = User.objects.get(id=user_id)
+    user.email = request.POST.get('email')
+    user.save()
+    return JsonResponse({'status': 'updated'})
+
+@login_required
+def delete_user(request, user_id):
+    # D3: Horizontal privilege escalation
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+    
+    # D3: Missing ownership validation for staff users
+    User.objects.filter(id=user_id).delete()
+    return JsonResponse({'status': 'deleted'})
+
+# Agent validation output:
+# [VULNERABILITY_CHAIN]
+#   Step 1: Create low-privilege account (user_a)
+#   Step 2: Identify target user ID (user_b, id=100)
+#   Step 3: Exploit IDOR in update_user_profile:
+#           POST /api/users/100/update
+#           Body: email=attacker@evil.com
+#           → Updates user_b's email without ownership check
+#   Step 4: Trigger password reset for user_b
+#   Step 5: Gain access to user_b account
+# 
+# [POC]
+#   curl -X POST http://target/api/users/100/update \
+#     -H "Cookie: sessionid=<user_a_session>" \
+#     -d "email=attacker@evil.com"
+# 
+# [IMPACT] High - Account takeover of arbitrary users
 ```
 
-### Secret Finder
+**Business Logic Vulnerability Example**:
 
-```bash
-# Find hardcoded secrets
-python scripts/secret_finder.py /path/to/project --output secrets.json
+```python
+# Example: Race condition in payment processing
+
+from django.db import transaction
+from decimal import Decimal
+
+class PaymentView(APIView):
+    def post(self, request):
+        user = request.user
+        amount = Decimal(request.data['amount'])
+        
+        # D9: Race condition - No atomic balance check
+        if user.balance >= amount:
+            # VULNERABLE: Time window between check and update
+            time.sleep(0.1)  # Simulate processing delay
+            user.balance -= amount
+            user.save()
+            
+            Payment.objects.create(user=user, amount=amount)
+            return Response({'status': 'success'})
+        
+        return Response({'error': 'insufficient funds'}, status=400)
+
+# FIX: Use database-level atomic operations
+class PaymentViewFixed(APIView):
+    def post(self, request):
+        user = request.user
+        amount = Decimal(request.data['amount'])
+        
+        with transaction.atomic():
+            # Lock the row during transaction
+            user = User.objects.select_for_update().get(id=user.id)
+            
+            if user.balance >= amount:
+                user.balance -= amount
+                user.save()
+                Payment.objects.create(user=user, amount=amount)
+                return Response({'status': 'success'})
+            
+            return Response({'error': 'insufficient funds'}, status=400)
+
+# Agent identifies:
+# [D9_BUSINESS_LOGIC] Race Condition
+#   Exploit: Send multiple concurrent payment requests
+#   Result: Spend same balance multiple times
+#   Fix: select_for_update() with transaction.atomic()
 ```
 
-Detects:
-- AWS/Azure/GCP credentials
-- Database connection strings
-- API keys
-- Private keys
-- JWT secrets
+### Phase 5: Structured Reporting (5%)
 
-### Dependency Analyzer
-
-```bash
-# Check for vulnerable dependencies
-python scripts/dependency_analyzer.py /path/to/project
-
-# Output:
-# [CRITICAL] jackson-databind 2.9.8 - CVE-2019-12384
-# [HIGH] spring-web 5.0.7 - CVE-2020-5421
-```
-
-### Vulnerability Validator
-
-```bash
-# Validate SQL injection with Docker
-python scripts/vulnerability_validator.py \
-    --type sql_injection \
-    --file UserMapper.java \
-    --line 42 \
-    --docker-compose docker-compose.yml
-```
-
-Creates isolated test environment, sends POC payload, validates actual exploitability.
-
-## Report Generation
-
-### Standard Report Format
+**Objective**: Generate actionable security report
 
 ```markdown
 # Security Audit Report
 
 ## Executive Summary
-- **Project**: MyApp v2.1
-- **Language**: Java + Spring Boot 2.7
-- **Audit Date**: 2026-06-06
-- **Severity**: 3 Critical, 7 High, 12 Medium, 5 Low
+- **Total Vulnerabilities**: 12 (3 Critical, 5 High, 3 Medium, 1 Low)
+- **Project**: Django E-commerce Platform
+- **Audit Mode**: Deep
+- **Coverage**: D1-D10 (100%)
 
 ## Critical Vulnerabilities
 
-### [C1] SQL Injection in User Authentication
-- **File**: `src/main/java/com/example/UserMapper.java:42`
-- **Severity**: Critical (CVSS 9.8)
-- **CWE**: CWE-89
+### [CRITICAL-1] SQL Injection in Product Search
+**Severity**: Critical (CVSS 9.8)
+**Dimension**: D1 - Injection
+**Location**: `app/views.py:45-48`
 
 **Vulnerable Code**:
-```java
-@Select("SELECT * FROM users WHERE username = '${username}'")
+```python
+def search_products(request):
+    query = request.GET.get('q')
+    sql = f"SELECT * FROM products WHERE name LIKE '%{query}%'"
+    cursor.execute(sql)
 ```
 
-**Taint Flow**:
+**Data Flow**:
 ```
-UserController.login(@RequestParam username)
-  ↓ [No sanitization]
-UserService.authenticate(username)
-  ↓ [No sanitization]
-UserMapper.findByUsername(username)
-  ↓ [String concatenation]
-SQL Query (SINK)
+request.GET.get('q') → query → f-string → cursor.execute()
 ```
 
-**POC**:
+**Proof of Concept**:
 ```bash
-curl -X POST http://localhost:8080/login \
-  -d "username=admin'--&password=any"
-# Successfully bypasses authentication
+curl "http://target/search?q=test'%20UNION%20SELECT%20username,password%20FROM%20users--"
+```
+
+**Impact**: Database compromise, credential theft, data exfiltration
+
+**Fix**:
+```python
+def search_products(request):
+    query = request.GET.get('q')
+    cursor.execute(
+        "SELECT * FROM products WHERE name LIKE %s",
+        [f'%{query}%']
+    )
+```
+
+**Verification**:
+```python
+# Test that parameterization prevents injection
+query = "test' OR '1'='1"
+cursor.execute("SELECT * FROM products WHERE name LIKE %s", [f'%{query}%'])
+# Query becomes: WHERE name LIKE '%test\' OR \'1\'=\'1%'
+# Special chars are escaped, preventing injection
+```
+
+---
+
+### [CRITICAL-2] Authentication Bypass via JWT Algorithm Confusion
+**Severity**: Critical (CVSS 9.1)
+**Dimension**: D2 - Authentication
+**Location**: `app/auth.py:12-20`
+
+**Vulnerable Code**:
+```python
+import jwt
+
+def verify_token(token):
+    # D2: Accepts 'none' algorithm
+    decoded = jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=['HS256', 'RS256', 'none']  # ← Vulnerability
+    )
+    return decoded
+```
+
+**Exploit**:
+```python
+# Attacker creates unsigned token with alg=none
+import jwt
+import base64
+
+header = base64.b64encode(b'{"alg":"none","typ":"JWT"}').decode()
+payload = base64.b64encode(b'{"user_id":1,"is_admin":true}').decode()
+fake_token = f"{header}.{payload}."
+
+# Server accepts it because 'none' is in algorithms list
 ```
 
 **Fix**:
-```java
-@Select("SELECT * FROM users WHERE username = #{username}")
+```python
+def verify_token(token):
+    decoded = jwt.decode(
+        token,
+        settings.SECRET_KEY,
+        algorithms=['HS256']  # Only allow expected algorithm
+    )
+    return decoded
+```
 ```
 
-**Impact**: Complete authentication bypass, data exfiltration
-**Priority**: P0 - Fix immediately
+## Configuration
+
+### Audit Scope Configuration
+
+Create `.dfyx_audit.yaml` in project root:
+
+```yaml
+# .dfyx_audit.yaml
+audit:
+  mode: deep  # quick | standard | deep
+  
+  dimensions:
+    - D1  # Injection
+    - D2  # Authentication
+    - D3  # Authorization
+    - D4  # Deserialization
+    - D5  # File Operations
+    - D6  # SSRF
+    - D7  # Cryptography
+    - D8  # Configuration
+    - D9  # Business Logic
+    - D10 # Supply Chain
+  
+  exclude_paths:
+    - "*/tests/*"
+    - "*/migrations/*"
+    - "*/static/*"
+    - "node_modules/*"
+  
+  include_paths:
+    - "app/*"
+    - "api/*"
+    - "services/*"
+  
+  severity_threshold: medium  # low | medium | high | critical
+  
+  frameworks:
+    python:
+      - django
+      - flask
+    java:
+      - spring-boot
+      - mybatis
+  
+  custom_sinks:
+    # Add project-specific dangerous functions
+    python:
+      - "custom_module.execute_raw_query"
+      - "legacy.unsafe_operation"
+  
+  custom_sanitizers:
+    # Add project-specific sanitization functions
+    python:
+      - "utils.sanitize_input"
+      - "validators.clean_sql"
 ```
 
-### Generate Report
+### Environment Variables
 
 ```bash
-# Generate from scan results
+# For optional Python scripts
+export DFYX_AUDIT_MODE=deep
+export DFYX_OUTPUT_FORMAT=markdown  # markdown | json | html
+export DFYX_REPORT_PATH=./security_report.md
+export DFYX_LOG_LEVEL=INFO  # DEBUG | INFO | WARNING | ERROR
+```
+
+## Optional Python Scripts
+
+While the AI agent uses the skill directly, Python scripts are provided for standalone use:
+
+### Code Scanning
+
+```bash
+# Full audit with default settings
+python scripts/code_scan.py /path/to/project
+
+# Quick scan for CI/CD
+python scripts/code_scan.py /path/to/project --mode quick
+
+# Deep scan with custom config
+python scripts/code_scan.py /path/to/project \
+  --mode deep \
+  --config .dfyx_audit.yaml \
+  --output results.json
+```
+
+### Pattern Scanner
+
+```python
+# scripts/pattern_scanner.py
+from pattern_scanner import PatternScanner
+
+scanner = PatternScanner(
+    language='python',
+    rules_path='resources/rules/'
+)
+
+# Scan for SQL injection patterns
+results = scanner.scan_directory(
+    '/path/to/project',
+    dimensions=['D1'],  # Focus on injection
+    exclude_patterns=['*/tests/*']
+)
+
+for vuln in results:
+    print(f"{vuln.severity}: {vuln.type} at {vuln.file}:{vuln.line}")
+    print(f"Code: {vuln.code_snippet}")
+    print(f"Fix: {vuln.recommendation}\n")
+```
+
+### Data Flow Analyzer
+
+```python
+# scripts/data_flow_analyzer.py
+from data_flow_analyzer import TaintAnalyzer
+
+analyzer = TaintAnalyzer(language='python')
+
+# Analyze taint flow from source to sink
+flow = analyzer.trace_taint(
+    source_file='views.py',
+    source_line=45,
+    source_var='user_input',
+    max_depth=10  # Maximum call depth
+)
+
+print(f"Taint flow path:")
+for hop in flow.path:
+    print(f"  {hop.file}:{hop.line} - {hop.function}() - {hop.variable}")
+
+if flow.reaches_sink:
+    print(f"\nReaches dangerous sink: {flow.sink.function}()")
+    print(f"Exploitability: {flow.exploitability_score}/10")
+```
+
+### Secret Detection
+
+```bash
+# Find hardcoded secrets
+python scripts/secret_finder.py /path/to/project \
+  --output secrets.json \
+  --exclude "*/tests/*"
+```
+
+```python
+# scripts/secret_finder.py usage in code
+from secret_finder import SecretDetector
+
+detector = SecretDetector()
+secrets = detector.scan_directory('/path/to/project')
+
+for secret in secrets:
+    print(f"[{secret.type}] {secret.file}:{secret.line}")
+    print(f"  Pattern: {secret.pattern}")
+    print(f"  Entropy: {secret.entropy}")
+    if secret.is_high_confidence:
+        print(f"  ⚠️  High confidence real secret")
+```
+
+### Dependency Analysis
+
+```bash
+# Check for vulnerable dependencies
+python scripts/dependency_analyzer.py /path/to/project
+
+# Output CVEs and vulnerable versions
+# CVE-2023-12345: Django < 3.2.18 - SQL Injection
+# CVE-2023-67890: requests < 2.31.0 - SSRF
+```
+
+### Report Generation
+
+```bash
+# Generate Markdown report
 python scripts/report_generator.py \
-    --input results.json \
-    --output report.md \
-    --template templates/report-templates/web-app-report-template.md
+  --input results.json \
+  --output report.md \
+  --template templates/report-templates/web-app-report-template.md
+
+# Generate HTML report
+python scripts/report_generator.py \
+  --input results.json \
+  --output report.html \
+  --format html
 ```
 
-## Anti-Hallucination Mechanisms
+## Language-Specific Examples
 
-The skill enforces strict verification to prevent false positives:
-
-### Evidence Requirements
-
-Every vulnerability must have:
-1. **Exact file path and line number**
-2. **Complete taint flow** from source to sink
-3. **Actual code snippet** (not paraphrased)
-4. **POC that demonstrates exploitability**
-
-### Path Validation
-
-```
-✅ VALID PATH:
-request.POST['user_id'] → user_id → User.objects.get(id=user_id)
-[Source: HTTP input] → [Variable] → [Sink: DB query]
-
-❌ INVALID PATH (missing steps):
-request.POST → User.objects.get()
-[What variable? What happened in between?]
-```
-
-### Real Testing Requirement
-
-For Deep mode, vulnerabilities must be validated:
-
-```bash
-# Automated validation with Docker
-python scripts/vulnerability_validator.py \
-    --vuln sql_injection \
-    --payload "admin'--" \
-    --expect "authentication bypass"
-```
-
-If POC fails → Not a real vulnerability → Discard
-
-## Framework-Specific Knowledge
-
-### Spring Boot Security
+### Java (Spring Boot)
 
 ```java
-// Check 1: Verify Spring Security is enabled
-// File: pom.xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-security-starter</artifactId>
-</dependency>
+// VULNERABLE: SQL Injection via MyBatis
+@Mapper
+public interface UserMapper {
+    // D1: SQL Injection - ${} inserts value directly without escaping
+    @Select("SELECT * FROM users WHERE username = '${username}'")
+    User findByUsername(@Param("username") String username);
+}
 
-// Check 2: Verify filter chain configuration
-// File: SecurityConfig.java
-@EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-            .antMatchers("/admin/**").hasRole("ADMIN")  // Good
-            .antMatchers("/api/**").permitAll();        // Potential issue
+// FIX: Use #{} for parameterization
+@Mapper
+public interface UserMapperFixed {
+    @Select("SELECT * FROM users WHERE username = #{username}")
+    User findByUsername(@Param("username") String username);
+}
+
+// VULNERABLE: Deserialization
+@RestController
+public class DataController {
+    @PostMapping("/import")
+    public ResponseEntity<?> importData(@RequestBody String data) {
+        // D4: Insecure deserialization
+        ObjectInputStream ois = new ObjectInputStream(
+            new ByteArrayInputStream(Base64.getDecoder().decode(data))
+        );
+        Object obj = ois.readObject();  // RCE via gadget chains
+        return ResponseEntity.ok(obj);
     }
 }
 
-// Check 3: Method-level security
-@PreAuthorize("hasRole('ADMIN')")  // Good
-public void deleteUser(Long id) { }
-
-// Missing @PreAuthorize = Potential authz issue
+// FIX: Use JSON instead of Java serialization
+@PostMapping("/import")
+public ResponseEntity<?> importData(@RequestBody DataDTO data) {
+    // Safe: JSON deserialization with whitelisted types
+    return ResponseEntity.ok(processData(data));
+}
 ```
 
-### Django Security
+### PHP (Laravel)
+
+```php
+<?php
+// VULNERABLE: Mass Assignment
+class UserController extends Controller {
+    public function update(Request $request, $id) {
+        $user = User::find($id);
+        // D9: Mass Assignment - user can set is_admin=1
+        $user->update($request->all());
+        return response()->json($user);
+    }
+}
+
+// FIX: Whitelist allowed fields
+class UserControllerFixed extends Controller {
+    public function update(Request $request, $id) {
+        $user = User::find($id);
+        $user->update($request->only(['name', 'email']));
+        return response()->json($user);
+    }
+}
+
+// VULNERABLE: File Upload
+public function upload(Request $request) {
+    // D5: No file type validation
+    $file = $request->file('upload');
+    $path = $file->store('uploads');
+    return response()->json(['path' => $path]);
+}
+
+// FIX: Validate file type and sanitize filename
+public function uploadFixed(Request $request) {
+    $request->validate([
+        'upload' => 'required|file|mimes:jpg,png,pdf|max:2048'
+    ]);
+    
+    $file = $request->file('upload');
+    $filename = Str::random(40) . '.' . $file->extension();
+    $path = $file->storeAs('uploads', $filename);
+    
+    return response()->json(['path' => $path]);
+}
+?>
+```
+
+### Go (Gin Framework)
+
+```go
+// VULNERABLE: Command Injection
+func BackupHandler(c *gin.Context) {
+    filename := c.Query("file")
+    
+    // D1: Command injection via unsanitized input
+    cmd := exec.Command("sh", "-c", "tar -czf /backups/"+filename)
+    output, _ := cmd.CombinedOutput()
+    
+    c.String(200, string(output))
+}
+
+// FIX: Avoid shell, use argument array
+func BackupHandlerFixed(c *gin.Context) {
+    filename := c.Query("file")
+    
+    // Validate filename
+    if !isValidFilename(filename) {
+        c.JSON(400, gin.H{"error": "invalid filename"})
+        return
+    }
+    
+    // Safe: No shell interpretation
+    cmd := exec.Command("tar", "-czf", "/backups/"+filename)
+    output, err := cmd.CombinedOutput()
+    
+    if err != nil {
+        c.JSON(500, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.String(200, string(output))
+}
+
+func isValidFilename(name string) bool {
+    // Only allow alphanumeric, dash, underscore
+    matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+\.tar\.gz$`, name)
+    return matched
+}
+```
+
+### JavaScript/Node.js (Express)
+
+```javascript
+// VULNERABLE: NoSQL Injection
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  // D1: NoSQL Injection - object injection in MongoDB
+  const user = await User.findOne({
+    username: username,
+    password: password  // Attacker sends: {"$ne": null}
+  });
+  
+  if (user) {
+    res.json({ token: generateToken(user) });
+  }
+});
+
+// FIX: Ensure string types and use password hashing
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  // Ensure string types
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return res.status(400).json({ error: 'Invalid input' });
+  }
+  
+  const user = await User.findOne({ username });
+  
+  if (user && await bcrypt.compare(password, user.passwordHash)) {
+    res.json({ token: generateToken(user) });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// VULNERABLE: SSRF
+app.get('/fetch', async (req, res) => {
+  const url = req.query.url;
+  
+  // D6: SSRF - can access internal services
+  const response = await axios.get(url);
+  res.send(response.data);
+});
+
+// FIX: Whitelist allowed domains
+const ALLOWED_DOMAINS = ['api.example.com', 'cdn.example.com'];
+
+app.get('/fetch', async (req, res) => {
+  const url = req.query.url;
+  
+  try {
+    const parsedUrl = new URL(url);
+    
+    // Check protocol
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return res.status(400).json({ error: 'Invalid protocol' });
+    }
+    
+    // Check domain whitelist
+    if (!ALLOWED_DOMAINS.includes(parsedUrl.hostname)) {
+      return res.status(400).json({ error: 'Domain not allowed' });
+    }
+    
+    const response = await axios.get(url, {
+      timeout: 5000,
+      maxRedirects: 0
+    });
+    
+    res.send(response.data);
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid URL' });
+  }
+});
+```
+
+## Common Patterns & Anti-Patterns
+
+### Authentication Patterns
 
 ```python
-# Check 1: Verify middleware
-# File: settings.py
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',  # Must have
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-]
+# ANTI-PATTERN: Weak session management
+def login(request):
+    user = authenticate(username=request.POST['username'],
+                       password=request.POST['password'])
+    if user:
+        # D2: Predictable session ID
+        request.session['user_id'] = user.id
+        request.session['session_id'] = str(user.id) + str(int(time.time()))
+        return redirect('dashboard')
 
-# Check 2: Security settings
-SECURE_SSL_REDIRECT = True  # Good
-SESSION_COOKIE_SECURE = True  # Good
-CSRF_COOKIE_HTTPONLY = True  # Good
-SECRET_KEY = os.getenv('SECRET_KEY')  # Good, not hardcoded
+# PATTERN: Secure session management
+from django.contrib.auth import login as django_login
 
-# Check 3: View-level protection
-from django.contrib.auth.decorators import login_required, permission_required
-
-@login_required  # Good
-@permission_required('app.delete_user')  # Good
-def delete_user(request, user_id):
-    pass
+def login_secure(request):
+    user = authenticate(username=request.POST['username'],
+                       password=request.POST['password'])
+    if user:
+        django_login(request, user)  # Uses cryptographically secure session
+        return redirect('dashboard')
 ```
 
-## Common Attack Chains
+### Authorization Patterns
 
-### Chain 1: Auth Bypass → Privilege Escalation → Data Exfil
+```python
+# ANTI-PATTERN: Missing authorization checks
+@login_required
+def delete_document(request, doc_id):
+    # D3: Any authenticated user can delete any document
+    Document.objects.filter(id=doc_id).delete()
+    return JsonResponse({'status': 'deleted'})
 
+# PATTERN: Proper authorization
+@login_required
+def delete_document_secure(request, doc_id):
+    try:
+        doc = Document.objects.get(id=doc_id)
+        
+        # Check ownership
+        if doc.owner != request.user:
+            return JsonResponse({'error': 'forbidden'}, status=403)
+        
+        doc.delete()
+        return JsonResponse({'status': 'deleted'})
+    except Document.DoesNotExist:
+        return JsonResponse({'error': 'not found'}, status=404)
 ```
-1. SQL Injection in login bypasses authentication
-   → Gain user session
 
-2. IDOR in /api/users/{id} allows viewing any user
-   → Enumerate admin user ID
+### Cryptography Patterns
 
-3. Mass assignment in /api/users/{id}/update allows role change
-   → {"role": "admin"} → Become admin
+```python
+# ANTI-PATTERN: Weak encryption
+from Crypto.Cipher import AES
+import base64
 
-4. Missing access control on /api/export allows data export
-   → Download entire database
-```
+def encrypt_data(data):
+    # D7: ECB mode, static IV, weak key derivation
+    key = hashlib.md5(b'my_secret_key').digest()
+    cipher = AES.new(key, AES.MODE_ECB)
+    encrypted = cipher.encrypt(pad(data))
+    return base64.b64encode(encrypted)
 
-### Chain 2: File Upload → RCE
+# PATTERN: Strong encryption
+from cryptography.fernet import Fernet
+import os
 
-```
-1. No file type validation in upload endpoint
-   → Upload shell.jsp
+def encrypt_data_secure(data):
+    # Use Fernet (AES-128-CBC + HMAC)
+    key = os.environ.get('ENCRYPTION_KEY').encode()  # From env, not hardcoded
+    f = Fernet(key)
+    encrypted = f.encrypt(data.encode())
+    return encrypted
 
-2. Predictable upload directory (/uploads/)
-   → Access http://target/uploads/shell.jsp
-
-3. JSP execution enabled in Tomcat config
-   → Remote code execution
+# Generate key once:
+# key = Fernet.generate_key()
+# Store securely in environment: export ENCRYPTION_KEY=<key>
 ```
 
 ## Troubleshooting
 
-### Issue: Too many false positives
+### False Positives
 
-**Solution**: 
-- Use Deep mode for better context understanding
-- Enable real testing validation: `--validate-with-docker`
-- Check if framework has built-in protection (e.g., Django ORM auto-escapes SQL)
+**Issue**: AI reports vulnerabilities in test code or mock data
 
-### Issue: Missing vulnerabilities in framework code
-
-**Solution**:
-- Ensure all framework-specific rules are loaded
-- Check `resources/knowledge/` for framework coverage
-- Add custom rules in `resources/rules/custom_rules.md`
-
-### Issue: Slow scanning on large projects
-
-**Solution**:
-```bash
-# Use Quick mode for initial scan
---mode quick
-
-# Focus on high-risk directories
---include "src/main/java/com/example/controllers/**"
---exclude "src/test/**"
-
-# Parallelize with multiple agents
---agents 5
-```
-
-### Issue: Cannot validate POC in Docker
-
-**Solution**:
+**Solution**: Configure exclusion paths in `.dfyx_audit.yaml`:
 ```yaml
-# Ensure docker-compose.yml is present
-version: '3'
-services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=db
-  db:
-    image: postgres:13
+exclude_paths:
+  - "*/tests/*"
+  - "*/test_*.py"
+  - "*/mocks/*"
+  - "*_test.go"
 ```
 
-```bash
-# Run validation
-python scripts/vulnerability_validator.py \
-    --docker-compose docker-compose.yml \
-    --wait-for-healthy 30
-```
-
-## Advanced Usage
-
-### Custom Rule Development
-
-Create custom detection rules in `resources/rules/custom_rules.md`:
-
-```yaml
-rule:
-  id: CUSTOM-001
-  name: Unsafe Reflection in Java
-  severity: HIGH
-  pattern:
-    - Class.forName($userInput)
-    - $class.newInstance()
-  taint_sources:
-    - request.getParameter()
-    - request.getHeader()
-  validation:
-    - Verify no whitelist of allowed classes
-  fix: |
-    Use a whitelist:
-    Set<String> allowedClasses = Set.of("com.example.SafeClass");
-    if (!allowedClasses.contains(className)) {
-        throw new SecurityException("Class not allowed");
-    }
-```
-
-### Integration with CI/CD
-
-```yaml
-# .github/workflows/security-audit.yml
-name: Security Audit
-
-on: [push, pull_request]
-
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Run Security Audit
-        run: |
-          python scripts/code_scan.py . \
-            --mode quick \
-            --output results.json \
-            --fail-on critical,high
-      
-      - name: Upload Results
-        uses: actions/upload-artifact@v2
-        with:
-          name: security-audit
-          path: results.json
-```
-
-### WooYun Case Database
-
-The skill includes 200+ real-world vulnerabilities from WooYun (2010-2016):
-
-```
-resources/wooyun/wooyun_cases_by_vulnerability_type.md
-├── SQL Injection (50 cases)
-├── XSS (30 cases)
-├── File Upload (25 cases)
-├── SSRF (20 cases)
-└── ... (more categories)
-```
-
-Reference format:
-```markdown
-### WooYun-2015-123456: Dedecms SQL Injection
-
-**Vulnerability**: SQL injection in article search
-**File**: `plus/search.php`
-**Code**:
-```php
-$keyword = $_GET['keyword'];
-$sql = "SELECT * FROM articles WHERE title LIKE '%{$keyword}%'";
-```
-
-**Exploit**: `keyword=test%' UNION SELECT user,password FROM admin--`
-**Impact**: Database compromise
-```
-
-Use for learning attack patterns and validation techniques.
-
----
-
-## Reference Documentation
-
-Key files in `resources/knowledge/`:
-
-- `architecture_analysis.md`: Phase 1 methodology
-- `pattern_scanning.md`: Phase 2 methodology  
-- `data_flow_analysis.md`: Phase 3 methodology
-- `taint_analysis_enhanced.md`: Advanced taint tracking
-- `vulnerability_validation.md`: Phase 4 methodology
-- `attack_chain_analysis.md`: Multi-vulnerability chaining
-- `anti_hallucination.md`: Accuracy enforcement
-- `docker_verification.md`: Automated POC validation
-
-This skill is maintained by the EastSword team for security research and education purposes only. Use responsibly and only on systems you have permission to test.
+### Missing Vulnerabilities
