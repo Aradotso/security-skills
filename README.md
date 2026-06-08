@@ -104,6 +104,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [eastsword-dfyx-code-security-review](skills/eastsword-dfyx-code-security-review/) | [install](https://skills.sh/aradotso/security-skills/eastsword-dfyx-code-security-review) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-08 |
 | [malwarebytes-premium-security-cracked-distribution](skills/malwarebytes-premium-security-cracked-distribution/) | [install](https://skills.sh/aradotso/security-skills/malwarebytes-premium-security-cracked-distribution) | [Chunkcleprovide/Malwarebytes-Premium-Security-Suite](https://github.com/Chunkcleprovide/Malwarebytes-Premium-Security-Suite) | 2026-06-08 |
 | [security-investigator-automation](skills/security-investigator-automation/) | [install](https://skills.sh/aradotso/security-skills/security-investigator-automation) | [SCStelz/security-investigator](https://github.com/SCStelz/security-investigator) | 2026-06-08 |
+| [pentest-skills-framework](skills/pentest-skills-framework/) | [install](https://skills.sh/aradotso/security-skills/pentest-skills-framework) | [crazyMarky/pentest-skills](https://github.com/crazyMarky/pentest-skills) | 2026-06-08 |
 <!-- SKILL_INDEX -->
 
 ---
