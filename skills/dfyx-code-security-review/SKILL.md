@@ -1,970 +1,750 @@
 ---
 name: dfyx-code-security-review
-description: AI-powered multi-language code security auditing with deep data flow analysis, taint tracking, and business logic vulnerability detection
+description: Expert-level code security audit skill using deep data flow analysis, taint tracking, and business logic understanding for 9 languages
 triggers:
   - audit this codebase for security vulnerabilities
   - perform a security code review
-  - scan for security issues in this project
-  - check for SQL injection and other vulnerabilities
-  - run a deep code security audit
-  - find security vulnerabilities using dfyx
-  - analyze code for OWASP Top 10 issues
-  - perform static security analysis with data flow tracking
+  - check this code for security issues
+  - run a security audit on this project
+  - find security vulnerabilities in the code
+  - analyze this code for security flaws
+  - conduct a code security assessment
+  - review code for OWASP Top 10 vulnerabilities
 ---
 
-# dfyx_code_security_review
+# dfyx-code-security-review
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-**dfyx_code_security_review** is an expert-level code security auditing framework designed for AI coding agents. It implements a five-phase white-box static analysis methodology that combines pattern matching, deep data flow analysis, taint tracking, and business logic verification to systematically discover and validate security vulnerabilities in source code.
+A professional white-box static analysis skill for AI coding agents that performs systematic security audits using a five-phase protocol. Supports 9 languages (Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust) and covers 10 security dimensions including injection, authentication, authorization, deserialization, file operations, SSRF, encryption, configuration, business logic, and supply chain.
 
-## What It Does
+## Overview
 
-This skill enables AI agents to perform comprehensive security audits across 9 programming languages (Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust) and 14 frameworks (Spring Boot, Django, Flask, FastAPI, Express, Laravel, Rails, ASP.NET Core, etc.).
+**dfyx_code_security_review** implements a dual-track audit model:
+- **Sink-driven**: Traces dangerous functions backward to find injection/RCE
+- **Control-driven**: Enumerates endpoints to find missing security controls
+- **Config-driven**: Scans configurations against security baselines
 
-**Core Capabilities:**
-- **10 Security Dimensions**: Injection (SQL/Cmd/SSTI), Authentication, Authorization, Deserialization, File Operations, SSRF, Cryptography, Configuration, Business Logic, Supply Chain
-- **Triple-Track Audit Model**: Sink-driven (injection/RCE), Control-driven (authorization/business logic), Config-driven (configuration/crypto)
-- **Five-Phase Protocol**: Reconnaissance → Pattern Matching → Taint Tracking → Validation → Reporting
-- **Real Vulnerability Cases**: 200+ WooYun vulnerability cases (2010-2016) for reference patterns
+### Core Capabilities
+
+- **10 Security Dimensions (D1-D10)**:
+  - D1: Injection (SQL/Cmd/LDAP/SSTI/SpEL/JNDI)
+  - D2: Authentication (Token/Session/JWT/Filter chain)
+  - D3: Authorization (CRUD consistency, IDOR, horizontal privilege escalation)
+  - D4: Deserialization (Java/Python/PHP gadget chains)
+  - D5: File Operations (Upload/Download/Path traversal)
+  - D6: SSRF (URL injection, protocol restrictions)
+  - D7: Cryptography (Key management, encryption modes, KDF)
+  - D8: Configuration (Actuator, CORS, error message exposure)
+  - D9: Business Logic (Race conditions, mass assignment, state machines, multi-tenancy)
+  - D10: Supply Chain (Dependency CVEs, version checks)
+
+- **Three Audit Modes**:
+  - **Quick**: CI/CD integration, 5-10 min (high-risk + secrets + CVEs)
+  - **Standard**: OWASP Top 10, 30-60 min
+  - **Deep**: Full coverage + attack chains, 1-3 hours
+
+## Five-Phase Audit Protocol
+
+```
+Phase 1: Reconnaissance (10%)
+  → Architecture diagram, attack surface inventory
+
+Phase 2: Pattern Matching (30%)
+  → High-risk area identification
+
+Phase 3: Taint Tracking + Validation (40%)
+  → Confirmed vulnerabilities with POCs
+
+Phase 4: Attack Chain Construction (15%)
+  → Multi-vulnerability exploitation scenarios
+
+Phase 5: Structured Reporting (5%)
+  → Complete audit report with remediation
+```
 
 ## Installation
 
-This skill is designed to be used directly by AI coding agents (Claude Code, Cursor, etc.) by loading this SKILL.md file. No separate installation required.
+This skill is designed to be used directly by AI coding agents. No separate installation is required — the agent will reference the knowledge base and scripts as needed.
 
-For the optional Python helper scripts:
+For manual use of helper scripts:
 
 ```bash
 # Clone the repository
 git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
 cd skill-dfyx_code_security_review
 
-# Install Python dependencies
+# Install Python dependencies (optional, for standalone scripts)
 pip install -r requirements.txt
 ```
 
-**requirements.txt contents:**
-```
-libcst>=1.1.0
-tree-sitter>=0.20.0
-tree-sitter-python>=0.20.0
-tree-sitter-java>=0.20.0
-tree-sitter-javascript>=0.20.0
-pyyaml>=6.0
-jinja2>=3.1.2
-```
+## Usage Patterns
 
-## Audit Modes
+### Basic Audit Request
 
-| Mode | Use Case | Scope | Duration |
-|------|----------|-------|----------|
-| **Quick** | CI/CD, small projects | High-severity, secrets, dependency CVEs | 5-10 min |
-| **Standard** | Regular audits | OWASP Top 10, auth/authz, crypto | 30-60 min |
-| **Deep** | Critical projects, pentest prep | Full coverage, attack chains, business logic | 1-3 hours |
-
-## Usage Pattern
-
-### Triggering an Audit
-
-User request examples:
-```
-"Audit this project for security vulnerabilities"
-"Perform a deep security review on /path/to/project"
-"Check for SQL injection and authorization issues"
-```
-
-### AI Agent Response Flow
-
-The AI agent will follow this standardized protocol:
+When a user requests a security audit, initiate the five-phase protocol:
 
 ```
+User: "Audit this codebase for security vulnerabilities"
+
+Agent Response:
 [MODE] deep
-[RECON] Analyzing codebase...
-  - Language: Python
-  - Framework: Django 3.2
-  - Files: 342 Python files
-  - Entry points: 45 views, 12 API endpoints
-[PLAN] 
-  - 3 parallel agents
-  - Coverage: D1-D10 (all dimensions)
-  - Estimated: 80 turns, 5-12 vulnerabilities
-[SCOPE] Focus areas:
-  - Authentication: JWT implementation
-  - Authorization: View-level permissions
-  - Injection: ORM query construction
-  - Business Logic: Payment flow
-
+[RECON] 874 files detected, Tech Stack: Spring Boot 1.5 + Shiro 1.6 + JPA + Freemarker
+[PLAN] 5 Agents, D1-D10 coverage, estimated 125 turns
+[SCOPE] Expected findings: 8-15 vulnerabilities
 Confirm to start audit? (yes/no)
 ```
 
-## Five-Phase Audit Protocol
+### Phase 1: Reconnaissance
 
-### Phase 1: Reconnaissance (10%)
-
-**Objective**: Map architecture and attack surface
+**Objective**: Map attack surface and identify technology stack
 
 ```python
-# Example: Identifying entry points in Django
-# The AI agent will analyze urls.py patterns
-
-# urls.py
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('api/users/<int:user_id>/', views.get_user),  # IDOR risk
-    path('api/upload/', views.upload_file),            # File upload risk
-    path('api/search/', views.search),                 # Injection risk
-]
-
-# Agent identifies:
-# - 3 API endpoints (attack surface)
-# - Parameter types (user_id: int, others: unconstrained)
-# - No visible authentication decorators
-```
-
-**Output**: Architecture diagram, entry point inventory, technology stack
-
-### Phase 2: Pattern Matching (30%)
-
-**Objective**: Identify high-risk code patterns across all dimensions
-
-```python
-# Example: Detecting SQL injection patterns in Python
-
-# VULNERABLE: String concatenation in query
-def search_users(request):
-    query = request.GET.get('q')
-    # D1: SQL Injection - unsanitized input in raw query
-    sql = f"SELECT * FROM users WHERE name LIKE '%{query}%'"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-# VULNERABLE: ORM filter with raw SQL
-def get_products(category):
-    # D1: SQL Injection via extra()
-    return Product.objects.extra(
-        where=[f"category = '{category}'"]
-    )
-
-# SAFE: Parameterized query
-def search_users_safe(request):
-    query = request.GET.get('q')
-    cursor.execute(
-        "SELECT * FROM users WHERE name LIKE %s",
-        [f'%{query}%']
-    )
-    return cursor.fetchall()
-```
-
-**Pattern Rules** (from `resources/rules/sql_injection_rules.md`):
-
-```yaml
-# SQL Injection Detection Rules
-D1_SQL_INJECTION:
-  sinks:
-    python:
-      - "cursor.execute()"
-      - "cursor.executemany()"
-      - "Model.objects.raw()"
-      - "Model.objects.extra()"
-    java:
-      - "Statement.execute()"
-      - "Statement.executeQuery()"
-      - "createNativeQuery()"
-    php:
-      - "mysql_query()"
-      - "mysqli_query()"
-      - "PDO->query()"
-  
-  unsafe_patterns:
-    - string_concatenation
-    - f-string_interpolation
-    - format_string
-    - raw_sql_fragments
-  
-  safe_patterns:
-    - parameterized_queries
-    - ORM_query_builder
-    - prepared_statements
-```
-
-### Phase 3: Taint Tracking & Data Flow Analysis (40%)
-
-**Objective**: Trace data flow from source to sink, validate exploitability
-
-```python
-# Example: Deep taint analysis for command injection
-
-# VULNERABLE: Multi-hop taint flow
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-import subprocess
+# Pattern: Identify framework and version
+import re
 import os
 
-@require_POST
-def backup_database(request):
-    # SOURCE: User-controlled input
-    db_name = request.POST.get('database')  # ← Taint source
+def detect_tech_stack(project_path):
+    """Detect technology stack from project files"""
+    findings = {
+        'language': None,
+        'framework': None,
+        'version': None,
+        'dependencies': []
+    }
     
-    # HOP 1: Propagates to variable
-    backup_path = f"/backups/{db_name}.sql"
+    # Check for pom.xml (Java/Maven)
+    pom_path = os.path.join(project_path, 'pom.xml')
+    if os.path.exists(pom_path):
+        with open(pom_path, 'r') as f:
+            content = f.read()
+            # Extract Spring Boot version
+            spring_match = re.search(r'<spring-boot.version>([\d.]+)</spring-boot.version>', content)
+            if spring_match:
+                findings['framework'] = 'Spring Boot'
+                findings['version'] = spring_match.group(1)
     
-    # HOP 2: Propagates to environment variable
-    os.environ['BACKUP_FILE'] = backup_path
+    # Check for requirements.txt (Python)
+    req_path = os.path.join(project_path, 'requirements.txt')
+    if os.path.exists(req_path):
+        findings['language'] = 'Python'
+        with open(req_path, 'r') as f:
+            for line in f:
+                if 'django' in line.lower():
+                    findings['framework'] = 'Django'
+                    version = re.search(r'[=<>]+(\d+\.\d+)', line)
+                    if version:
+                        findings['version'] = version.group(1)
+                elif 'flask' in line.lower():
+                    findings['framework'] = 'Flask'
     
-    # HOP 3: Propagates to command
-    cmd = f"mysqldump {db_name} > {backup_path}"
+    # Check for package.json (Node.js)
+    pkg_path = os.path.join(project_path, 'package.json')
+    if os.path.exists(pkg_path):
+        import json
+        findings['language'] = 'JavaScript'
+        with open(pkg_path, 'r') as f:
+            data = json.load(f)
+            if 'express' in data.get('dependencies', {}):
+                findings['framework'] = 'Express'
+                findings['version'] = data['dependencies']['express']
     
-    # SINK: Command execution without sanitization
-    subprocess.call(cmd, shell=True)  # ← Command Injection (D1)
-    
-    return JsonResponse({'status': 'success'})
+    return findings
 
-# Agent taint analysis output:
-# [TAINT_FLOW]
-#   Source: request.POST.get('database') [Line 8]
-#   → db_name [Line 8]
-#   → backup_path (f-string interpolation) [Line 11]
-#   → os.environ['BACKUP_FILE'] [Line 14]
-#   → cmd (f-string interpolation) [Line 17]
-#   → subprocess.call() with shell=True [Line 20]
-# 
-# [SANITIZATION_CHECK]
-#   ✗ No input validation
-#   ✗ No allowlist check
-#   ✗ No shell escaping
-# 
-# [EXPLOITABILITY] HIGH
-#   Payload: database="; rm -rf / #"
-#   Result: Command injection leading to RCE
+# Generate attack surface map
+def map_attack_surface(project_path):
+    """Enumerate entry points and data flows"""
+    entry_points = []
+    
+    # Find HTTP endpoints
+    for root, dirs, files in os.walk(project_path):
+        for file in files:
+            if file.endswith(('.java', '.py', '.js', '.php')):
+                filepath = os.path.join(root, file)
+                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                    
+                    # Spring Boot endpoints
+                    if '@RequestMapping' in content or '@GetMapping' in content or '@PostMapping' in content:
+                        endpoints = re.findall(r'@(?:Request|Get|Post|Put|Delete)Mapping\(["\']([^"\']+)["\']', content)
+                        for ep in endpoints:
+                            entry_points.append({
+                                'file': filepath,
+                                'endpoint': ep,
+                                'type': 'HTTP',
+                                'framework': 'Spring Boot'
+                            })
+                    
+                    # Django views
+                    if 'def ' in content and 'request' in content and file.endswith('.py'):
+                        methods = re.findall(r'def\s+(\w+)\s*\([^)]*request[^)]*\)', content)
+                        for method in methods:
+                            entry_points.append({
+                                'file': filepath,
+                                'endpoint': method,
+                                'type': 'HTTP',
+                                'framework': 'Django'
+                            })
+    
+    return entry_points
 ```
 
-**Enhanced Taint Analysis** (from `resources/knowledge/taint_analysis_enhanced.md`):
+### Phase 2: Pattern Matching
+
+**Objective**: Identify high-risk code patterns using sink-driven analysis
+
+#### D1: SQL Injection Detection
 
 ```python
-# Example: Inter-procedural taint tracking
+# Pattern: Find SQL injection vulnerabilities
+import re
 
-class UserService:
-    def get_user_input(self, request):
-        # SOURCE: Tainted input
-        return request.GET.get('user_id')
+def scan_sql_injection(file_path, language='java'):
+    """Detect SQL injection patterns"""
+    vulnerabilities = []
     
-    def build_query(self, user_id):
-        # PROPAGATION: Taint flows through method call
-        return f"SELECT * FROM users WHERE id = {user_id}"
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        lines = f.readlines()
     
-    def execute(self, request):
-        user_id = self.get_user_input(request)  # Taint enters
-        query = self.build_query(user_id)       # Taint propagates
-        cursor.execute(query)                   # SINK: SQL Injection
-
-# Agent inter-procedural analysis:
-# [CALL_GRAPH]
-#   execute() → get_user_input() → build_query() → cursor.execute()
-# 
-# [TAINT_PATH]
-#   request.GET.get('user_id') 
-#   → return value of get_user_input()
-#   → user_id parameter in build_query()
-#   → f-string in build_query()
-#   → return value of build_query()
-#   → cursor.execute() argument
-# 
-# [VULNERABILITY] D1: SQL Injection via inter-procedural taint flow
-```
-
-### Phase 4: Validation & Attack Chain Construction (15%)
-
-**Objective**: Verify exploitability, construct proof-of-concept
-
-```python
-# Example: Authorization bypass chain
-
-# FILE: views.py
-from django.contrib.auth.decorators import login_required
-
-@login_required
-def update_user_profile(request, user_id):
-    # D3: IDOR - No ownership check
-    user = User.objects.get(id=user_id)
-    user.email = request.POST.get('email')
-    user.save()
-    return JsonResponse({'status': 'updated'})
-
-@login_required
-def delete_user(request, user_id):
-    # D3: Horizontal privilege escalation
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'forbidden'}, status=403)
-    
-    # D3: Missing ownership validation for staff users
-    User.objects.filter(id=user_id).delete()
-    return JsonResponse({'status': 'deleted'})
-
-# Agent validation output:
-# [VULNERABILITY_CHAIN]
-#   Step 1: Create low-privilege account (user_a)
-#   Step 2: Identify target user ID (user_b, id=100)
-#   Step 3: Exploit IDOR in update_user_profile:
-#           POST /api/users/100/update
-#           Body: email=attacker@evil.com
-#           → Updates user_b's email without ownership check
-#   Step 4: Trigger password reset for user_b
-#   Step 5: Gain access to user_b account
-# 
-# [POC]
-#   curl -X POST http://target/api/users/100/update \
-#     -H "Cookie: sessionid=<user_a_session>" \
-#     -d "email=attacker@evil.com"
-# 
-# [IMPACT] High - Account takeover of arbitrary users
-```
-
-**Business Logic Vulnerability Example**:
-
-```python
-# Example: Race condition in payment processing
-
-from django.db import transaction
-from decimal import Decimal
-
-class PaymentView(APIView):
-    def post(self, request):
-        user = request.user
-        amount = Decimal(request.data['amount'])
+    if language == 'java':
+        # Dangerous patterns
+        dangerous_patterns = [
+            (r'createQuery\s*\(\s*["\'].*?\+.*?["\']', 'JPA native query with concatenation'),
+            (r'Statement\s+\w+\s*=.*?createStatement\(\)', 'JDBC Statement usage'),
+            (r'\.execute\w*\(\s*["\'].*?\+', 'SQL execution with concatenation'),
+            (r'jdbcTemplate\.query\w*\([^?]*\+', 'JdbcTemplate without parameterization')
+        ]
         
-        # D9: Race condition - No atomic balance check
-        if user.balance >= amount:
-            # VULNERABLE: Time window between check and update
-            time.sleep(0.1)  # Simulate processing delay
-            user.balance -= amount
-            user.save()
+        for i, line in enumerate(lines):
+            for pattern, description in dangerous_patterns:
+                if re.search(pattern, line):
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'SQL Injection',
+                        'severity': 'CRITICAL',
+                        'description': description,
+                        'cwe': 'CWE-89'
+                    })
+    
+    elif language == 'python':
+        # Django ORM raw queries
+        if 'raw(' in ''.join(lines) or 'execute(' in ''.join(lines):
+            for i, line in enumerate(lines):
+                if '.raw(' in line and '%' in line:
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'SQL Injection',
+                        'severity': 'CRITICAL',
+                        'description': 'Django raw() with string formatting',
+                        'cwe': 'CWE-89'
+                    })
+                elif 'cursor.execute(' in line and ('%' in line or '+' in line or 'format(' in line):
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'SQL Injection',
+                        'severity': 'CRITICAL',
+                        'description': 'cursor.execute with string interpolation',
+                        'cwe': 'CWE-89'
+                    })
+    
+    elif language == 'php':
+        for i, line in enumerate(lines):
+            if 'mysql_query' in line or 'mysqli_query' in line:
+                if '$_GET' in line or '$_POST' in line or '$_REQUEST' in line:
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'SQL Injection',
+                        'severity': 'CRITICAL',
+                        'description': 'Direct user input in SQL query',
+                        'cwe': 'CWE-89'
+                    })
+    
+    return vulnerabilities
+
+# Example usage
+# results = scan_sql_injection('UserController.java', 'java')
+```
+
+#### D1: Command Injection Detection
+
+```python
+def scan_command_injection(file_path, language='java'):
+    """Detect command injection vulnerabilities"""
+    vulnerabilities = []
+    
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        lines = f.readlines()
+    
+    if language == 'java':
+        dangerous_patterns = [
+            (r'Runtime\.getRuntime\(\)\.exec\s*\(', 'Runtime.exec() usage'),
+            (r'ProcessBuilder\s*\(.*?\+', 'ProcessBuilder with concatenation'),
+            (r'new\s+ProcessBuilder\s*\([^)]*\+[^)]*\)', 'ProcessBuilder with dynamic args')
+        ]
+        
+        for i, line in enumerate(lines):
+            for pattern, description in dangerous_patterns:
+                if re.search(pattern, line):
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'Command Injection',
+                        'severity': 'CRITICAL',
+                        'description': description,
+                        'cwe': 'CWE-78'
+                    })
+    
+    elif language == 'python':
+        for i, line in enumerate(lines):
+            if any(func in line for func in ['os.system(', 'os.popen(', 'subprocess.call(', 'subprocess.run(', 'subprocess.Popen(']):
+                if 'shell=True' in line or ('f"' in line or "f'" in line):
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'Command Injection',
+                        'severity': 'CRITICAL',
+                        'description': 'Shell command with shell=True or f-string',
+                        'cwe': 'CWE-78'
+                    })
+    
+    elif language == 'php':
+        dangerous_funcs = ['exec', 'shell_exec', 'system', 'passthru', 'popen', 'proc_open']
+        for i, line in enumerate(lines):
+            for func in dangerous_funcs:
+                if func + '(' in line and ('$_' in line or '$' in line):
+                    vulnerabilities.append({
+                        'file': file_path,
+                        'line': i + 1,
+                        'code': line.strip(),
+                        'type': 'Command Injection',
+                        'severity': 'CRITICAL',
+                        'description': f'{func}() with user input',
+                        'cwe': 'CWE-78'
+                    })
+    
+    return vulnerabilities
+```
+
+#### D4: Deserialization Vulnerabilities
+
+```python
+def scan_deserialization(file_path, language='java'):
+    """Detect insecure deserialization"""
+    vulnerabilities = []
+    
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        lines = f.readlines()
+    
+    if language == 'java':
+        for i, line in enumerate(lines):
+            # ObjectInputStream usage
+            if 'ObjectInputStream' in line and 'readObject()' in line:
+                vulnerabilities.append({
+                    'file': file_path,
+                    'line': i + 1,
+                    'code': line.strip(),
+                    'type': 'Insecure Deserialization',
+                    'severity': 'CRITICAL',
+                    'description': 'ObjectInputStream.readObject() without validation',
+                    'cwe': 'CWE-502'
+                })
             
-            Payment.objects.create(user=user, amount=amount)
-            return Response({'status': 'success'})
-        
-        return Response({'error': 'insufficient funds'}, status=400)
-
-# FIX: Use database-level atomic operations
-class PaymentViewFixed(APIView):
-    def post(self, request):
-        user = request.user
-        amount = Decimal(request.data['amount'])
-        
-        with transaction.atomic():
-            # Lock the row during transaction
-            user = User.objects.select_for_update().get(id=user.id)
+            # XMLDecoder usage
+            if 'XMLDecoder' in line and ('readObject' in line or 'new XMLDecoder' in line):
+                vulnerabilities.append({
+                    'file': file_path,
+                    'line': i + 1,
+                    'code': line.strip(),
+                    'type': 'Insecure Deserialization',
+                    'severity': 'CRITICAL',
+                    'description': 'XMLDecoder usage (gadget chain risk)',
+                    'cwe': 'CWE-502'
+                })
+    
+    elif language == 'python':
+        for i, line in enumerate(lines):
+            if 'pickle.loads(' in line or 'pickle.load(' in line:
+                vulnerabilities.append({
+                    'file': file_path,
+                    'line': i + 1,
+                    'code': line.strip(),
+                    'type': 'Insecure Deserialization',
+                    'severity': 'CRITICAL',
+                    'description': 'pickle deserialization (RCE risk)',
+                    'cwe': 'CWE-502'
+                })
             
-            if user.balance >= amount:
-                user.balance -= amount
-                user.save()
-                Payment.objects.create(user=user, amount=amount)
-                return Response({'status': 'success'})
+            if 'yaml.load(' in line and 'Loader=' not in line:
+                vulnerabilities.append({
+                    'file': file_path,
+                    'line': i + 1,
+                    'code': line.strip(),
+                    'type': 'Insecure Deserialization',
+                    'severity': 'HIGH',
+                    'description': 'yaml.load() without safe loader',
+                    'cwe': 'CWE-502'
+                })
+    
+    elif language == 'php':
+        for i, line in enumerate(lines):
+            if 'unserialize(' in line and ('$_' in line or '$' in line):
+                vulnerabilities.append({
+                    'file': file_path,
+                    'line': i + 1,
+                    'code': line.strip(),
+                    'type': 'Insecure Deserialization',
+                    'severity': 'CRITICAL',
+                    'description': 'unserialize() with user input',
+                    'cwe': 'CWE-502'
+                })
+    
+    return vulnerabilities
+```
+
+### Phase 3: Taint Tracking
+
+**Objective**: Trace data flow from source to sink to confirm exploitability
+
+```python
+def taint_analysis(file_path, sink_line, language='java'):
+    """
+    Backward taint analysis from dangerous sink
+    Returns: data flow path, sanitization status, exploitability
+    """
+    
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        lines = f.readlines()
+    
+    # Extract method containing the sink
+    method_start = None
+    method_end = None
+    brace_count = 0
+    
+    for i in range(sink_line - 1, -1, -1):
+        if re.search(r'(public|private|protected).*?\(', lines[i]):
+            method_start = i
+            break
+    
+    if method_start is not None:
+        for i in range(method_start, len(lines)):
+            if '{' in lines[i]:
+                brace_count += lines[i].count('{')
+            if '}' in lines[i]:
+                brace_count -= lines[i].count('}')
+            if brace_count == 0 and i > method_start:
+                method_end = i
+                break
+    
+    # Extract variables involved in the sink
+    sink_code = lines[sink_line - 1]
+    variables = re.findall(r'\b([a-zA-Z_]\w*)\b', sink_code)
+    
+    # Trace backward to find sources
+    taint_flow = []
+    sources = []
+    sanitizers = []
+    
+    for var in variables:
+        for i in range(sink_line - 1, method_start - 1, -1):
+            line = lines[i]
             
-            return Response({'error': 'insufficient funds'}, status=400)
-
-# Agent identifies:
-# [D9_BUSINESS_LOGIC] Race Condition
-#   Exploit: Send multiple concurrent payment requests
-#   Result: Spend same balance multiple times
-#   Fix: select_for_update() with transaction.atomic()
-```
-
-### Phase 5: Structured Reporting (5%)
-
-**Objective**: Generate actionable security report
-
-```markdown
-# Security Audit Report
-
-## Executive Summary
-- **Total Vulnerabilities**: 12 (3 Critical, 5 High, 3 Medium, 1 Low)
-- **Project**: Django E-commerce Platform
-- **Audit Mode**: Deep
-- **Coverage**: D1-D10 (100%)
-
-## Critical Vulnerabilities
-
-### [CRITICAL-1] SQL Injection in Product Search
-**Severity**: Critical (CVSS 9.8)
-**Dimension**: D1 - Injection
-**Location**: `app/views.py:45-48`
-
-**Vulnerable Code**:
-```python
-def search_products(request):
-    query = request.GET.get('q')
-    sql = f"SELECT * FROM products WHERE name LIKE '%{query}%'"
-    cursor.execute(sql)
-```
-
-**Data Flow**:
-```
-request.GET.get('q') → query → f-string → cursor.execute()
-```
-
-**Proof of Concept**:
-```bash
-curl "http://target/search?q=test'%20UNION%20SELECT%20username,password%20FROM%20users--"
-```
-
-**Impact**: Database compromise, credential theft, data exfiltration
-
-**Fix**:
-```python
-def search_products(request):
-    query = request.GET.get('q')
-    cursor.execute(
-        "SELECT * FROM products WHERE name LIKE %s",
-        [f'%{query}%']
-    )
-```
-
-**Verification**:
-```python
-# Test that parameterization prevents injection
-query = "test' OR '1'='1"
-cursor.execute("SELECT * FROM products WHERE name LIKE %s", [f'%{query}%'])
-# Query becomes: WHERE name LIKE '%test\' OR \'1\'=\'1%'
-# Special chars are escaped, preventing injection
-```
-
----
-
-### [CRITICAL-2] Authentication Bypass via JWT Algorithm Confusion
-**Severity**: Critical (CVSS 9.1)
-**Dimension**: D2 - Authentication
-**Location**: `app/auth.py:12-20`
-
-**Vulnerable Code**:
-```python
-import jwt
-
-def verify_token(token):
-    # D2: Accepts 'none' algorithm
-    decoded = jwt.decode(
-        token,
-        settings.SECRET_KEY,
-        algorithms=['HS256', 'RS256', 'none']  # ← Vulnerability
-    )
-    return decoded
-```
-
-**Exploit**:
-```python
-# Attacker creates unsigned token with alg=none
-import jwt
-import base64
-
-header = base64.b64encode(b'{"alg":"none","typ":"JWT"}').decode()
-payload = base64.b64encode(b'{"user_id":1,"is_admin":true}').decode()
-fake_token = f"{header}.{payload}."
-
-# Server accepts it because 'none' is in algorithms list
-```
-
-**Fix**:
-```python
-def verify_token(token):
-    decoded = jwt.decode(
-        token,
-        settings.SECRET_KEY,
-        algorithms=['HS256']  # Only allow expected algorithm
-    )
-    return decoded
-```
-```
-
-## Configuration
-
-### Audit Scope Configuration
-
-Create `.dfyx_audit.yaml` in project root:
-
-```yaml
-# .dfyx_audit.yaml
-audit:
-  mode: deep  # quick | standard | deep
-  
-  dimensions:
-    - D1  # Injection
-    - D2  # Authentication
-    - D3  # Authorization
-    - D4  # Deserialization
-    - D5  # File Operations
-    - D6  # SSRF
-    - D7  # Cryptography
-    - D8  # Configuration
-    - D9  # Business Logic
-    - D10 # Supply Chain
-  
-  exclude_paths:
-    - "*/tests/*"
-    - "*/migrations/*"
-    - "*/static/*"
-    - "node_modules/*"
-  
-  include_paths:
-    - "app/*"
-    - "api/*"
-    - "services/*"
-  
-  severity_threshold: medium  # low | medium | high | critical
-  
-  frameworks:
-    python:
-      - django
-      - flask
-    java:
-      - spring-boot
-      - mybatis
-  
-  custom_sinks:
-    # Add project-specific dangerous functions
-    python:
-      - "custom_module.execute_raw_query"
-      - "legacy.unsafe_operation"
-  
-  custom_sanitizers:
-    # Add project-specific sanitization functions
-    python:
-      - "utils.sanitize_input"
-      - "validators.clean_sql"
-```
-
-### Environment Variables
-
-```bash
-# For optional Python scripts
-export DFYX_AUDIT_MODE=deep
-export DFYX_OUTPUT_FORMAT=markdown  # markdown | json | html
-export DFYX_REPORT_PATH=./security_report.md
-export DFYX_LOG_LEVEL=INFO  # DEBUG | INFO | WARNING | ERROR
-```
-
-## Optional Python Scripts
-
-While the AI agent uses the skill directly, Python scripts are provided for standalone use:
-
-### Code Scanning
-
-```bash
-# Full audit with default settings
-python scripts/code_scan.py /path/to/project
-
-# Quick scan for CI/CD
-python scripts/code_scan.py /path/to/project --mode quick
-
-# Deep scan with custom config
-python scripts/code_scan.py /path/to/project \
-  --mode deep \
-  --config .dfyx_audit.yaml \
-  --output results.json
-```
-
-### Pattern Scanner
-
-```python
-# scripts/pattern_scanner.py
-from pattern_scanner import PatternScanner
-
-scanner = PatternScanner(
-    language='python',
-    rules_path='resources/rules/'
-)
-
-# Scan for SQL injection patterns
-results = scanner.scan_directory(
-    '/path/to/project',
-    dimensions=['D1'],  # Focus on injection
-    exclude_patterns=['*/tests/*']
-)
-
-for vuln in results:
-    print(f"{vuln.severity}: {vuln.type} at {vuln.file}:{vuln.line}")
-    print(f"Code: {vuln.code_snippet}")
-    print(f"Fix: {vuln.recommendation}\n")
-```
-
-### Data Flow Analyzer
-
-```python
-# scripts/data_flow_analyzer.py
-from data_flow_analyzer import TaintAnalyzer
-
-analyzer = TaintAnalyzer(language='python')
-
-# Analyze taint flow from source to sink
-flow = analyzer.trace_taint(
-    source_file='views.py',
-    source_line=45,
-    source_var='user_input',
-    max_depth=10  # Maximum call depth
-)
-
-print(f"Taint flow path:")
-for hop in flow.path:
-    print(f"  {hop.file}:{hop.line} - {hop.function}() - {hop.variable}")
-
-if flow.reaches_sink:
-    print(f"\nReaches dangerous sink: {flow.sink.function}()")
-    print(f"Exploitability: {flow.exploitability_score}/10")
-```
-
-### Secret Detection
-
-```bash
-# Find hardcoded secrets
-python scripts/secret_finder.py /path/to/project \
-  --output secrets.json \
-  --exclude "*/tests/*"
-```
-
-```python
-# scripts/secret_finder.py usage in code
-from secret_finder import SecretDetector
-
-detector = SecretDetector()
-secrets = detector.scan_directory('/path/to/project')
-
-for secret in secrets:
-    print(f"[{secret.type}] {secret.file}:{secret.line}")
-    print(f"  Pattern: {secret.pattern}")
-    print(f"  Entropy: {secret.entropy}")
-    if secret.is_high_confidence:
-        print(f"  ⚠️  High confidence real secret")
-```
-
-### Dependency Analysis
-
-```bash
-# Check for vulnerable dependencies
-python scripts/dependency_analyzer.py /path/to/project
-
-# Output CVEs and vulnerable versions
-# CVE-2023-12345: Django < 3.2.18 - SQL Injection
-# CVE-2023-67890: requests < 2.31.0 - SSRF
-```
-
-### Report Generation
-
-```bash
-# Generate Markdown report
-python scripts/report_generator.py \
-  --input results.json \
-  --output report.md \
-  --template templates/report-templates/web-app-report-template.md
-
-# Generate HTML report
-python scripts/report_generator.py \
-  --input results.json \
-  --output report.html \
-  --format html
-```
-
-## Language-Specific Examples
-
-### Java (Spring Boot)
-
-```java
-// VULNERABLE: SQL Injection via MyBatis
-@Mapper
-public interface UserMapper {
-    // D1: SQL Injection - ${} inserts value directly without escaping
-    @Select("SELECT * FROM users WHERE username = '${username}'")
-    User findByUsername(@Param("username") String username);
-}
-
-// FIX: Use #{} for parameterization
-@Mapper
-public interface UserMapperFixed {
-    @Select("SELECT * FROM users WHERE username = #{username}")
-    User findByUsername(@Param("username") String username);
-}
-
-// VULNERABLE: Deserialization
-@RestController
-public class DataController {
-    @PostMapping("/import")
-    public ResponseEntity<?> importData(@RequestBody String data) {
-        // D4: Insecure deserialization
-        ObjectInputStream ois = new ObjectInputStream(
-            new ByteArrayInputStream(Base64.getDecoder().decode(data))
-        );
-        Object obj = ois.readObject();  // RCE via gadget chains
-        return ResponseEntity.ok(obj);
+            # Check if variable is assigned from user input
+            if language == 'java':
+                if f'{var} =' in line or f'{var}=' in line:
+                    if 'getParameter(' in line or 'getHeader(' in line or 'getPathVariable(' in line:
+                        sources.append({
+                            'line': i + 1,
+                            'variable': var,
+                            'source': 'HTTP Request',
+                            'code': line.strip()
+                        })
+                    
+                    # Check for sanitization
+                    if 'escape' in line.lower() or 'sanitize' in line.lower() or 'preparedStatement' in line:
+                        sanitizers.append({
+                            'line': i + 1,
+                            'method': 'Sanitization detected',
+                            'code': line.strip()
+                        })
+            
+            elif language == 'python':
+                if f'{var} =' in line or f'{var}=' in line:
+                    if 'request.' in line and any(x in line for x in ['GET', 'POST', 'args', 'form', 'json']):
+                        sources.append({
+                            'line': i + 1,
+                            'variable': var,
+                            'source': 'HTTP Request',
+                            'code': line.strip()
+                        })
+                    
+                    if 'escape(' in line or 'clean(' in line or 'validate(' in line:
+                        sanitizers.append({
+                            'line': i + 1,
+                            'method': 'Sanitization detected',
+                            'code': line.strip()
+                        })
+    
+    # Determine exploitability
+    exploitable = len(sources) > 0 and len(sanitizers) == 0
+    
+    return {
+        'exploitable': exploitable,
+        'sources': sources,
+        'sanitizers': sanitizers,
+        'confidence': 'HIGH' if exploitable else 'MEDIUM',
+        'data_flow': taint_flow
     }
-}
 
-// FIX: Use JSON instead of Java serialization
-@PostMapping("/import")
-public ResponseEntity<?> importData(@RequestBody DataDTO data) {
-    // Safe: JSON deserialization with whitelisted types
-    return ResponseEntity.ok(processData(data));
-}
+# Example: Trace SQL injection
+# analysis = taint_analysis('UserService.java', 42, 'java')
+# if analysis['exploitable']:
+#     print(f"[CRITICAL] Confirmed SQL injection at line 42")
+#     print(f"Data flow: {analysis['sources']} -> sink (no sanitization)")
 ```
 
-### PHP (Laravel)
-
-```php
-<?php
-// VULNERABLE: Mass Assignment
-class UserController extends Controller {
-    public function update(Request $request, $id) {
-        $user = User::find($id);
-        // D9: Mass Assignment - user can set is_admin=1
-        $user->update($request->all());
-        return response()->json($user);
-    }
-}
-
-// FIX: Whitelist allowed fields
-class UserControllerFixed extends Controller {
-    public function update(Request $request, $id) {
-        $user = User::find($id);
-        $user->update($request->only(['name', 'email']));
-        return response()->json($user);
-    }
-}
-
-// VULNERABLE: File Upload
-public function upload(Request $request) {
-    // D5: No file type validation
-    $file = $request->file('upload');
-    $path = $file->store('uploads');
-    return response()->json(['path' => $path]);
-}
-
-// FIX: Validate file type and sanitize filename
-public function uploadFixed(Request $request) {
-    $request->validate([
-        'upload' => 'required|file|mimes:jpg,png,pdf|max:2048'
-    ]);
-    
-    $file = $request->file('upload');
-    $filename = Str::random(40) . '.' . $file->extension();
-    $path = $file->storeAs('uploads', $filename);
-    
-    return response()->json(['path' => $path]);
-}
-?>
-```
-
-### Go (Gin Framework)
-
-```go
-// VULNERABLE: Command Injection
-func BackupHandler(c *gin.Context) {
-    filename := c.Query("file")
-    
-    // D1: Command injection via unsanitized input
-    cmd := exec.Command("sh", "-c", "tar -czf /backups/"+filename)
-    output, _ := cmd.CombinedOutput()
-    
-    c.String(200, string(output))
-}
-
-// FIX: Avoid shell, use argument array
-func BackupHandlerFixed(c *gin.Context) {
-    filename := c.Query("file")
-    
-    // Validate filename
-    if !isValidFilename(filename) {
-        c.JSON(400, gin.H{"error": "invalid filename"})
-        return
-    }
-    
-    // Safe: No shell interpretation
-    cmd := exec.Command("tar", "-czf", "/backups/"+filename)
-    output, err := cmd.CombinedOutput()
-    
-    if err != nil {
-        c.JSON(500, gin.H{"error": err.Error()})
-        return
-    }
-    
-    c.String(200, string(output))
-}
-
-func isValidFilename(name string) bool {
-    // Only allow alphanumeric, dash, underscore
-    matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+\.tar\.gz$`, name)
-    return matched
-}
-```
-
-### JavaScript/Node.js (Express)
-
-```javascript
-// VULNERABLE: NoSQL Injection
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  // D1: NoSQL Injection - object injection in MongoDB
-  const user = await User.findOne({
-    username: username,
-    password: password  // Attacker sends: {"$ne": null}
-  });
-  
-  if (user) {
-    res.json({ token: generateToken(user) });
-  }
-});
-
-// FIX: Ensure string types and use password hashing
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  // Ensure string types
-  if (typeof username !== 'string' || typeof password !== 'string') {
-    return res.status(400).json({ error: 'Invalid input' });
-  }
-  
-  const user = await User.findOne({ username });
-  
-  if (user && await bcrypt.compare(password, user.passwordHash)) {
-    res.json({ token: generateToken(user) });
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
-  }
-});
-
-// VULNERABLE: SSRF
-app.get('/fetch', async (req, res) => {
-  const url = req.query.url;
-  
-  // D6: SSRF - can access internal services
-  const response = await axios.get(url);
-  res.send(response.data);
-});
-
-// FIX: Whitelist allowed domains
-const ALLOWED_DOMAINS = ['api.example.com', 'cdn.example.com'];
-
-app.get('/fetch', async (req, res) => {
-  const url = req.query.url;
-  
-  try {
-    const parsedUrl = new URL(url);
-    
-    // Check protocol
-    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      return res.status(400).json({ error: 'Invalid protocol' });
-    }
-    
-    // Check domain whitelist
-    if (!ALLOWED_DOMAINS.includes(parsedUrl.hostname)) {
-      return res.status(400).json({ error: 'Domain not allowed' });
-    }
-    
-    const response = await axios.get(url, {
-      timeout: 5000,
-      maxRedirects: 0
-    });
-    
-    res.send(response.data);
-  } catch (error) {
-    res.status(400).json({ error: 'Invalid URL' });
-  }
-});
-```
-
-## Common Patterns & Anti-Patterns
-
-### Authentication Patterns
+### Phase 3: Authentication & Authorization Analysis (Control-Driven)
 
 ```python
-# ANTI-PATTERN: Weak session management
-def login(request):
-    user = authenticate(username=request.POST['username'],
-                       password=request.POST['password'])
-    if user:
-        # D2: Predictable session ID
-        request.session['user_id'] = user.id
-        request.session['session_id'] = str(user.id) + str(int(time.time()))
-        return redirect('dashboard')
-
-# PATTERN: Secure session management
-from django.contrib.auth import login as django_login
-
-def login_secure(request):
-    user = authenticate(username=request.POST['username'],
-                       password=request.POST['password'])
-    if user:
-        django_login(request, user)  # Uses cryptographically secure session
-        return redirect('dashboard')
-```
-
-### Authorization Patterns
-
-```python
-# ANTI-PATTERN: Missing authorization checks
-@login_required
-def delete_document(request, doc_id):
-    # D3: Any authenticated user can delete any document
-    Document.objects.filter(id=doc_id).delete()
-    return JsonResponse({'status': 'deleted'})
-
-# PATTERN: Proper authorization
-@login_required
-def delete_document_secure(request, doc_id):
-    try:
-        doc = Document.objects.get(id=doc_id)
+def analyze_auth_authorization(project_path, framework='spring'):
+    """
+    Control-driven analysis: Find missing security controls
+    """
+    findings = []
+    
+    if framework == 'spring':
+        # Find security configuration
+        security_config = None
+        for root, dirs, files in os.walk(project_path):
+            for file in files:
+                if 'SecurityConfig' in file or 'WebSecurityConfig' in file:
+                    security_config = os.path.join(root, file)
+                    break
         
-        # Check ownership
-        if doc.owner != request.user:
-            return JsonResponse({'error': 'forbidden'}, status=403)
+        if not security_config:
+            findings.append({
+                'type': 'Missing Security Configuration',
+                'severity': 'HIGH',
+                'description': 'No Spring Security configuration found',
+                'recommendation': 'Implement WebSecurityConfigurerAdapter'
+            })
+        else:
+            with open(security_config, 'r') as f:
+                config = f.read()
+                
+                # Check for permitAll() abuse
+                permit_all = re.findall(r'\.antMatchers\(["\']([^"\']+)["\']\)\.permitAll\(\)', config)
+                for path in permit_all:
+                    if not path.endswith(('.css', '.js', '.png', '.jpg')):
+                        findings.append({
+                            'type': 'Overly Permissive Access Control',
+                            'severity': 'MEDIUM',
+                            'path': path,
+                            'description': f'Endpoint {path} allows unauthenticated access',
+                            'recommendation': 'Review if authentication is required'
+                        })
         
-        doc.delete()
-        return JsonResponse({'status': 'deleted'})
-    except Document.DoesNotExist:
-        return JsonResponse({'error': 'not found'}, status=404)
+        # Find controllers and check for authorization
+        for root, dirs, files in os.walk(project_path):
+            for file in files:
+                if file.endswith('Controller.java'):
+                    filepath = os.path.join(root, file)
+                    with open(filepath, 'r') as f:
+                        content = f.read()
+                        
+                        # Find endpoints
+                        endpoints = re.findall(r'@(Get|Post|Put|Delete)Mapping\(["\']([^"\']+)["\']', content)
+                        
+                        for method, path in endpoints:
+                            # Check for authorization annotations
+                            endpoint_context = content[max(0, content.find(path) - 500):content.find(path) + 100]
+                            
+                            has_preauthorize = '@PreAuthorize' in endpoint_context
+                            has_secured = '@Secured' in endpoint_context
+                            
+                            if method in ['Post', 'Put', 'Delete'] and not (has_preauthorize or has_secured):
+                                findings.append({
+                                    'type': 'Missing Authorization Check',
+                                    'severity': 'HIGH',
+                                    'file': filepath,
+                                    'endpoint': f'{method} {path}',
+                                    'description': 'Mutating endpoint without @PreAuthorize or @Secured',
+                                    'recommendation': 'Add @PreAuthorize annotation to verify permissions',
+                                    'cwe': 'CWE-862'
+                                })
+    
+    elif framework == 'django':
+        # Check settings.py for middleware
+        settings_path = os.path.join(project_path, 'settings.py')
+        if os.path.exists(settings_path):
+            with open(settings_path, 'r') as f:
+                settings = f.read()
+                
+                required_middleware = [
+                    'AuthenticationMiddleware',
+                    'CsrfViewMiddleware',
+                    'SecurityMiddleware'
+                ]
+                
+                for mw in required_middleware:
+                    if mw not in settings:
+                        findings.append({
+                            'type': 'Missing Security Middleware',
+                            'severity': 'HIGH',
+                            'middleware': mw,
+                            'description': f'{mw} not found in MIDDLEWARE',
+                            'recommendation': f'Add django.middleware.{mw.lower()}'
+                        })
+        
+        # Check views for @login_required
+        for root, dirs, files in os.walk(project_path):
+            for file in files:
+                if file.endswith('views.py'):
+                    filepath = os.path.join(root, file)
+                    with open(filepath, 'r') as f:
+                        lines = f.readlines()
+                        
+                        for i, line in enumerate(lines):
+                            if re.match(r'def\s+\w+\s*\(request', line):
+                                # Check if @login_required is present above
+                                decorator_found = False
+                                for j in range(max(0, i - 3), i):
+                                    if '@login_required' in lines[j] or '@permission_required' in lines[j]:
+                                        decorator_found = True
+                                        break
+                                
+                                if not decorator_found:
+                                    findings.append({
+                                        'type': 'Missing Authentication Decorator',
+                                        'severity': 'MEDIUM',
+                                        'file': filepath,
+                                        'line': i + 1,
+                                        'description': 'View function without @login_required',
+                                        'recommendation': 'Add @login_required decorator if authentication needed'
+                                    })
+    
+    return findings
 ```
 
-### Cryptography Patterns
+### Phase 3: Business Logic Vulnerabilities (Control-Driven)
 
 ```python
-# ANTI-PATTERN: Weak encryption
-from Crypto.Cipher import AES
-import base64
-
-def encrypt_data(data):
-    # D7: ECB mode, static IV, weak key derivation
-    key = hashlib.md5(b'my_secret_key').digest()
-    cipher = AES.new(key, AES.MODE_ECB)
-    encrypted = cipher.encrypt(pad(data))
-    return base64.b64encode(encrypted)
-
-# PATTERN: Strong encryption
-from cryptography.fernet import Fernet
-import os
-
-def encrypt_data_secure(data):
-    # Use Fernet (AES-128-CBC + HMAC)
-    key = os.environ.get('ENCRYPTION_KEY').encode()  # From env, not hardcoded
-    f = Fernet(key)
-    encrypted = f.encrypt(data.encode())
-    return encrypted
-
-# Generate key once:
-# key = Fernet.generate_key()
-# Store securely in environment: export ENCRYPTION_KEY=<key>
+def detect_business_logic_flaws(project_path, language='java'):
+    """
+    Find business logic vulnerabilities:
+    - Race conditions
+    - Mass assignment
+    - Price manipulation
+    - IDOR patterns
+    """
+    findings = []
+    
+    # Race condition patterns
+    race_patterns = {
+        'java': [
+            (r'if\s*\([^)]*balance[^)]*\)\s*{[^}]*balance\s*[-=]', 'TOCTOU in balance check'),
+            (r'if\s*\([^)]*stock[^)]*\)\s*{[^}]*stock\s*[-=]', 'TOCTOU in stock check'),
+        ],
+        'python': [
+            (r'if\s+.*?\.balance\s*[<>=].*?:\s*\n\s+.*?\.balance\s*[-+]=', 'TOCTOU in balance update'),
+            (r'if\s+.*?\.quantity\s*[<>=].*?:\s*\n\s+.*?\.quantity\s*[-+]=', 'TOCTOU in quantity check'),
+        ]
+    }
+    
+    # Mass assignment patterns
+    mass_assignment_patterns = {
+        'java': [
+            (r'\.setAll\(', 'Bulk property setter'),
+            (r'BeanUtils\.copyProperties\(', 'BeanUtils copy without whitelist'),
+        ],
+        'python': [
+            (r'for\s+key\s+in\s+request\.\w+:', 'Loop over request data'),
+            (r'\.update\(request\.(?:POST|json)\)', 'Model.update() with request data'),
+        ]
+    }
+    
+    for root, dirs, files in os.walk(project_path):
+        for file in files:
+            if (language == 'java' and file.endswith('.java')) or \
+               (language == 'python' and file.endswith('.py')):
+                
+                filepath = os.path.join(root, file)
+                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                    lines = content.split('\n')
+                
+                # Check race conditions
+                for pattern, description in race_patterns.get(language, []):
+                    matches = re.finditer(pattern, content)
+                    for match in matches:
+                        line_num = content[:match.start()].count('\n') + 1
+                        findings.append({
+                            'type': 'Race Condition',
+                            'severity': 'HIGH',
+                            'file': filepath,
+                            'line': line_num,
+                            'description': description,
+                            'recommendation': 'Use database transactions or locks',
+                            'cwe': 'CWE-362'
+                        })
+                
+                # Check mass assignment
+                for pattern, description in mass_assignment_patterns.get(language, []):
+                    matches = re.finditer(pattern, content)
+                    for match in matches:
+                        line_num = content[:match.start()].count('\n') + 1
+                        findings.append({
+                            'type': 'Mass Assignment',
+                            'severity': 'MEDIUM',
+                            'file': filepath,
+                            'line': line_num,
+                            'description': description,
+                            'recommendation': 'Use explicit whitelist of allowed fields',
+                            'cwe': 'CWE-915'
+                        })
+                
+                # Check IDOR patterns (missing authorization)
+                if language == 'java':
+                    # Look for direct ID usage without ownership check
+                    idor_patterns = [
+                        r'findById\(.*?getId\(\)',
+                        r'getById\(.*?getParameter\(',
+                        r'delete\(.*?getPathVariable\('
+                    ]
+                    
+                    for pattern in idor_patterns:
+                        matches = re.finditer(pattern, content)
+                        for match in matches:
+                            line_num = content[:match.start()].count('\n') + 1
+                            # Check if there's authorization within 10 lines
+                            context_start = max(0, line_num - 10)
+                            context_end = min(len(lines), line_num + 10)
+                            context = '\n'.join(lines[context_start:context_end])
+                            
+                            if not re.search(r'(checkOwnership|verifyAccess|hasPermission|principal\.getId)', context):
+                                findings.append({
+                                    'type': 'IDOR (Insecure Direct Object Reference)',
+                                    'severity': 'HIGH',
+                                    'file': filepath,
+                                    'line': line_num,
+                                    'description': 'Direct ID usage without ownership verification',
+                                    'recommendation': 'Verify user owns the resource before access',
+                                    'cwe': 'CWE-639'
+                                })
+    
+    return findings
 ```
 
-## Troubleshooting
+### Phase 4: Vulnerability Validation with POC
 
-### False Positives
-
-**Issue**: AI reports vulnerabilities in test code or mock data
-
-**Solution**: Configure exclusion paths in `.dfyx_audit.yaml`:
-```yaml
-exclude_paths:
-  - "*/tests/*"
-  - "*/test_*.py"
-  - "*/mocks/*"
-  - "*_test.go"
-```
-
-### Missing Vulnerabilities
+```python
+def generate_
