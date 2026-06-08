@@ -101,6 +101,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentest-toolkit-pro-html](skills/pentest-toolkit-pro-html/) | [install](https://skills.sh/aradotso/security-skills/pentest-toolkit-pro-html) | [Cyber-Autopsie/PenTest-Toolkit-Pro](https://github.com/Cyber-Autopsie/PenTest-Toolkit-Pro) | 2026-06-07 |
 | [dfyx-code-security-review](skills/dfyx-code-security-review/) | [install](https://skills.sh/aradotso/security-skills/dfyx-code-security-review) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-07 |
 | [dfyx-code-security-auditor](skills/dfyx-code-security-auditor/) | [install](https://skills.sh/aradotso/security-skills/dfyx-code-security-auditor) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-07 |
+| [eastsword-dfyx-code-security-review](skills/eastsword-dfyx-code-security-review/) | [install](https://skills.sh/aradotso/security-skills/eastsword-dfyx-code-security-review) | [EastSword/skill-dfyx_code_security_review](https://github.com/EastSword/skill-dfyx_code_security_review) | 2026-06-08 |
 <!-- SKILL_INDEX -->
 
 ---
