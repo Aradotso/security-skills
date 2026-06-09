@@ -109,6 +109,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [ai-security-knowledge-base](skills/ai-security-knowledge-base/) | [install](https://skills.sh/aradotso/security-skills/ai-security-knowledge-base) | [GhostWolfLab/AI_Security_Top](https://github.com/GhostWolfLab/AI_Security_Top) | 2026-06-08 |
 | [iac-security-scan-skills](skills/iac-security-scan-skills/) | [install](https://skills.sh/aradotso/security-skills/iac-security-scan-skills) | [senaykt/iac-security-scan-skills](https://github.com/senaykt/iac-security-scan-skills) | 2026-06-09 |
 | [linux-pentester-commands](skills/linux-pentester-commands/) | [install](https://skills.sh/aradotso/security-skills/linux-pentester-commands) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-09 |
+| [linux-pentester-command-reference](skills/linux-pentester-command-reference/) | [install](https://skills.sh/aradotso/security-skills/linux-pentester-command-reference) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-09 |
 <!-- SKILL_INDEX -->
 
 ---
