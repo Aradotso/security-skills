@@ -113,6 +113,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [linux-pentester-practical-commands](skills/linux-pentester-practical-commands/) | [install](https://skills.sh/aradotso/security-skills/linux-pentester-practical-commands) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-09 |
 | [linux-pentesting-commands](skills/linux-pentesting-commands/) | [install](https://skills.sh/aradotso/security-skills/linux-pentesting-commands) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-09 |
 | [linux-pentester-notes](skills/linux-pentester-notes/) | [install](https://skills.sh/aradotso/security-skills/linux-pentester-notes) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-10 |
+| [linux-pentesting-command-reference](skills/linux-pentesting-command-reference/) | [install](https://skills.sh/aradotso/security-skills/linux-pentesting-command-reference) | [HIMANSHUSHARMA20/Linux-for-a-Pentester](https://github.com/HIMANSHUSHARMA20/Linux-for-a-Pentester) | 2026-06-10 |
 <!-- SKILL_INDEX -->
 
 ---
