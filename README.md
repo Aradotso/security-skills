@@ -122,6 +122,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [gandalf-llm-pentester](skills/gandalf-llm-pentester/) | [install](https://skills.sh/aradotso/security-skills/gandalf-llm-pentester) | [MrMoshkovitz/gandalf-llm-pentester](https://github.com/MrMoshkovitz/gandalf-llm-pentester) | 2026-06-12 |
 | [claude-pentest-framework](skills/claude-pentest-framework/) | [install](https://skills.sh/aradotso/security-skills/claude-pentest-framework) | [Stickman230/claude-pentest](https://github.com/Stickman230/claude-pentest) | 2026-06-12 |
 | [oscp-pentestcheatsheet-terminal](skills/oscp-pentestcheatsheet-terminal/) | [install](https://skills.sh/aradotso/security-skills/oscp-pentestcheatsheet-terminal) | [anshu19981/Pentestcheatsheet](https://github.com/anshu19981/Pentestcheatsheet) | 2026-06-12 |
+| [dalonso-security-repo](skills/dalonso-security-repo/) | [install](https://skills.sh/aradotso/security-skills/dalonso-security-repo) | [davidalonsod/Dalonso-Security-Repo](https://github.com/davidalonsod/Dalonso-Security-Repo) | 2026-06-12 |
 <!-- SKILL_INDEX -->
 
 ---
