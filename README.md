@@ -125,6 +125,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [dalonso-security-repo](skills/dalonso-security-repo/) | [install](https://skills.sh/aradotso/security-skills/dalonso-security-repo) | [davidalonsod/Dalonso-Security-Repo](https://github.com/davidalonsod/Dalonso-Security-Repo) | 2026-06-12 |
 | [drm-pentesting-toolkit](skills/drm-pentesting-toolkit/) | [install](https://skills.sh/aradotso/security-skills/drm-pentesting-toolkit) | [fairy-root/drm-pentesting-toolkit](https://github.com/fairy-root/drm-pentesting-toolkit) | 2026-06-12 |
 | [pentester-mcp-security-tools](skills/pentester-mcp-security-tools/) | [install](https://skills.sh/aradotso/security-skills/pentester-mcp-security-tools) | [halilkirazkaya/pentester-mcp](https://github.com/halilkirazkaya/pentester-mcp) | 2026-06-12 |
+| [h-pentest-ai-platform](skills/h-pentest-ai-platform/) | [install](https://skills.sh/aradotso/security-skills/h-pentest-ai-platform) | [hexian2001/H-Pentest](https://github.com/hexian2001/H-Pentest) | 2026-06-12 |
 <!-- SKILL_INDEX -->
 
 ---
