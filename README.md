@@ -119,6 +119,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [jellyfin-security-plugin](skills/jellyfin-security-plugin/) | [install](https://skills.sh/aradotso/security-skills/jellyfin-security-plugin) | [ZL154/JellyfinSecurity](https://github.com/ZL154/JellyfinSecurity) | 2026-06-12 |
 | [deepseek-pentest-ai-burp-extension](skills/deepseek-pentest-ai-burp-extension/) | [install](https://skills.sh/aradotso/security-skills/deepseek-pentest-ai-burp-extension) | [HernanRodriguez1/DeepSeek-Pentest-AI](https://github.com/HernanRodriguez1/DeepSeek-Pentest-AI) | 2026-06-12 |
 | [pentest-r1-autonomous-penetration-testing](skills/pentest-r1-autonomous-penetration-testing/) | [install](https://skills.sh/aradotso/security-skills/pentest-r1-autonomous-penetration-testing) | [KHenryAegis/Pentest-R1](https://github.com/KHenryAegis/Pentest-R1) | 2026-06-12 |
+| [gandalf-llm-pentester](skills/gandalf-llm-pentester/) | [install](https://skills.sh/aradotso/security-skills/gandalf-llm-pentester) | [MrMoshkovitz/gandalf-llm-pentester](https://github.com/MrMoshkovitz/gandalf-llm-pentester) | 2026-06-12 |
 <!-- SKILL_INDEX -->
 
 ---
