@@ -121,6 +121,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentest-r1-autonomous-penetration-testing](skills/pentest-r1-autonomous-penetration-testing/) | [install](https://skills.sh/aradotso/security-skills/pentest-r1-autonomous-penetration-testing) | [KHenryAegis/Pentest-R1](https://github.com/KHenryAegis/Pentest-R1) | 2026-06-12 |
 | [gandalf-llm-pentester](skills/gandalf-llm-pentester/) | [install](https://skills.sh/aradotso/security-skills/gandalf-llm-pentester) | [MrMoshkovitz/gandalf-llm-pentester](https://github.com/MrMoshkovitz/gandalf-llm-pentester) | 2026-06-12 |
 | [claude-pentest-framework](skills/claude-pentest-framework/) | [install](https://skills.sh/aradotso/security-skills/claude-pentest-framework) | [Stickman230/claude-pentest](https://github.com/Stickman230/claude-pentest) | 2026-06-12 |
+| [oscp-pentestcheatsheet-terminal](skills/oscp-pentestcheatsheet-terminal/) | [install](https://skills.sh/aradotso/security-skills/oscp-pentestcheatsheet-terminal) | [anshu19981/Pentestcheatsheet](https://github.com/anshu19981/Pentestcheatsheet) | 2026-06-12 |
 <!-- SKILL_INDEX -->
 
 ---
