@@ -1,874 +1,699 @@
 ---
 name: jellyfin-security-plugin
-description: Add comprehensive MFA (TOTP, passkeys, email OTP), OIDC/SSO, brute-force protection, impossible-travel detection, device pairing, and audit logging to Jellyfin servers
+description: Add native two-factor authentication, passkeys, SSO, brute-force protection, and audit logging to Jellyfin media servers via server-side plugin.
 triggers:
-  - "add two-factor authentication to jellyfin"
-  - "set up MFA for jellyfin server"
-  - "configure TOTP or passkeys in jellyfin"
-  - "enable OIDC SSO for jellyfin"
-  - "implement brute-force protection for jellyfin"
-  - "add device pairing to jellyfin"
-  - "configure jellyfin security hardening"
-  - "set up impossible travel detection"
+  - add two-factor authentication to jellyfin
+  - set up jellyfin totp or passkeys
+  - configure jellyfin sso with oidc
+  - protect jellyfin with brute force ip banning
+  - implement jellyfin device pairing for tv clients
+  - enable jellyfin lan bypass for local networks
+  - audit jellyfin login attempts and security events
+  - integrate jellyfin with authentik or authelia
 ---
 
 # Jellyfin Security Plugin
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-JellyfinSecurity is a comprehensive authentication and hardening plugin for Jellyfin servers. It adds native two-factor authentication (TOTP, passkeys, email OTP), OIDC/SSO sign-in, brute-force IP banning, impossible-travel detection, per-user IP allowlists, device pairing, trusted-browser cookies, step-up authentication, and full audit logging — all server-side, working with every Jellyfin client (web, mobile, TV, API integrations like Sonarr/Radarr).
+## What It Does
+
+JellyfinSecurity is a comprehensive authentication and hardening plugin for Jellyfin media servers (10.11+). It adds:
+
+- **Multi-factor authentication**: TOTP (Authy/Google Authenticator), passkeys (WebAuthn/FIDO2), email OTP, and recovery codes
+- **Single Sign-On**: OIDC provider integration (Authentik, Authelia, Keycloak, Pocket ID, etc.)
+- **Brute-force protection**: IP-based rate limiting and banning with configurable thresholds
+- **Device management**: TV device pairing via QR code, trusted browser tokens
+- **Network controls**: LAN bypass, per-user IP allowlist, impossible-travel detection
+- **Audit logging**: Full login/logout/config-change event tracking
+- **Step-up authentication**: Re-verify TOTP/passkey/IdP before sensitive admin actions
+
+Server-side enforcement works with **all** Jellyfin clients (web, Android, iOS, Roku, Fire TV, Kodi) and service integrations (Sonarr, Radarr, Tautulli).
+
+---
 
 ## Installation
 
-### Add the Plugin Repository
+### Via Jellyfin Admin Dashboard (Recommended)
 
-1. In Jellyfin Dashboard → **Plugins** → **Repositories**, add:
-   ```
-   https://raw.githubusercontent.com/ZL154/JellyfinSecurity/main/manifest.json
-   ```
+1. Open Jellyfin → **Admin Dashboard** → **Plugins** → **Repositories**
+2. Add repository:
+   - **Name**: `JellyfinSecurity`
+   - **URL**: `https://raw.githubusercontent.com/ZL154/JellyfinSecurity/main/manifest.json`
+3. Go to **Catalog** → search "Security" → Install
+4. Restart Jellyfin server
 
-2. Go to **Catalog**, find **Jellyfin Security**, click **Install**
-
-3. Restart Jellyfin server
-
-4. Navigate to **Dashboard** → **Plugins** → **Jellyfin Security** to configure
-
-### Manual Installation (Development)
+### Manual Installation
 
 ```bash
-# Clone and build
-git clone https://github.com/ZL154/JellyfinSecurity.git
-cd JellyfinSecurity
-dotnet build -c Release
+# Download latest release
+RELEASE_URL="https://github.com/ZL154/JellyfinSecurity/releases/latest/download/JellyfinSecurity.zip"
+PLUGIN_DIR="/var/lib/jellyfin/plugins/JellyfinSecurity"
 
-# Copy to Jellyfin plugins directory
-# Linux/Docker:
-cp bin/Release/net8.0/JellyfinSecurity.dll /var/lib/jellyfin/plugins/JellyfinSecurity/
-# Windows:
-# copy bin\Release\net8.0\JellyfinSecurity.dll %AppData%\Jellyfin\Server\plugins\JellyfinSecurity\
+mkdir -p "$PLUGIN_DIR"
+curl -L "$RELEASE_URL" -o /tmp/jellyfin-security.zip
+unzip /tmp/jellyfin-security.zip -d "$PLUGIN_DIR"
+chown -R jellyfin:jellyfin "$PLUGIN_DIR"
 
 # Restart Jellyfin
+systemctl restart jellyfin
 ```
 
-## Core Concepts
+Verify installation:
+```bash
+# Check plugin loaded
+journalctl -u jellyfin | grep "JellyfinSecurity"
+# Should see: "JellyfinSecurity v2.5.8 loaded"
+```
 
-### Authentication Methods
-
-The plugin supports five authentication methods:
-
-1. **TOTP (Time-based One-Time Password)** — standard authenticator apps (Authy, Google Authenticator, etc.)
-2. **Passkeys (WebAuthn/FIDO2)** — hardware keys (YubiKey) or platform authenticators (Face ID, Windows Hello)
-3. **Email OTP** — 8-digit codes sent via SMTP
-4. **Recovery Codes** — 10 single-use backup codes (PBKDF2-hashed)
-5. **OIDC/SSO** — external identity providers (Authentik, Authelia, Keycloak, etc.)
-
-### Enforcement Model
-
-- **Server-side middleware** intercepts all authentication requests before Jellyfin's core auth
-- Works with **all clients** (web UI, mobile apps, Jellyfin Media Player, Kodi, API clients)
-- No client modifications required
-
-### Bypass Rules (in precedence order)
-
-1. **LAN Bypass** — clients from configured LAN CIDRs skip MFA (optional, requires proper `X-Forwarded-For` handling)
-2. **Trusted Device Tokens** — encrypted browser cookies valid for 30 days (configurable)
-3. **TV Device Pairing** — admin-approved device GUIDs
-4. **API Key Bypass** — Sonarr/Radarr/etc. using Jellyfin API keys
-5. **Exempt User CIDRs** — per-user IP allowlists
+---
 
 ## Configuration
 
-### Basic Setup
+### Admin Dashboard Settings
 
-```csharp
-// Example: Programmatic configuration (rarely needed; use admin UI)
-using JellyfinSecurity.Configuration;
+Navigate to **Dashboard** → **Plugins** → **JellyfinSecurity** → **Settings**.
 
-var config = new PluginConfiguration
-{
-    EnableTwoFactor = true,
-    RequireTwoFactor = true,  // Force MFA for all users
-    TrustedDeviceDurationDays = 30,
-    
-    // LAN bypass (optional)
-    LanBypassEnabled = true,
-    LanCidrs = new[] { "192.168.1.0/24", "10.0.0.0/8" },
-    
-    // Brute-force protection
-    MaxLoginAttempts = 5,
-    LockoutDurationMinutes = 15,
-    
-    // Email OTP (requires SMTP config)
-    SmtpHost = "smtp.gmail.com",
-    SmtpPort = 587,
-    SmtpUsername = "alerts@example.com",
-    SmtpPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD"),
-    SmtpFromAddress = "jellyfin@example.com"
-};
+#### Core Authentication
+
+```yaml
+# Enable/disable 2FA methods
+TOTPEnabled: true               # TOTP (Authenticator apps)
+PasskeysEnabled: true           # WebAuthn/FIDO2 hardware keys
+EmailOTPEnabled: false          # Email one-time passwords
+RecoveryCodesEnabled: true      # Backup codes (auto-generated with TOTP)
+
+# OIDC/SSO providers
+OIDCProviders:
+  - Name: "Authentik"
+    ClientID: "jellyfin-client"
+    ClientSecret: "${OIDC_CLIENT_SECRET}"  # Use environment variable
+    Authority: "https://auth.example.com/application/o/jellyfin/"
+    Scopes: "openid profile email groups"
+    AllowPrivateEndpoints: true  # For LAN-only IdPs
 ```
 
-### OIDC/SSO Setup
+#### Brute-Force Protection
 
-The plugin supports multiple OIDC providers simultaneously:
+```yaml
+BruteForceEnabled: true
+MaxFailedAttempts: 5            # Attempts before temporary ban
+LockoutDuration: 900            # Seconds (15 minutes)
+PermanentBanThreshold: 20       # Failed attempts → permanent ban
+```
 
-```csharp
-// Configuration via admin UI → SSO Providers tab
-// Example provider JSON (Authentik):
+#### LAN Bypass
+
+```yaml
+LANBypassEnabled: true
+LANBypassCIDRs:                 # RFC1918 + local ranges
+  - "192.168.0.0/16"
+  - "10.0.0.0/24"               # Be specific to avoid SEC-H3 guard
+  - "172.16.0.0/12"
+  - "fd00::/8"                  # IPv6 ULA
+
+TrustedProxyCIDRs:              # Your reverse proxy IPs only
+  - "10.0.1.5/32"               # Nginx/Traefik container IP
+```
+
+**⚠️ Trusted Proxy Pitfall**: Do NOT set broad ranges like `10.0.0.0/8` in `TrustedProxyCIDRs` — the SEC-H3 guard will refuse LAN bypass for direct clients if their IP falls within a trusted-proxy range but no `X-Forwarded-For` header is present. Use `/32` (single IP) or tight `/24` subnets for your actual reverse proxy.
+
+#### Device Pairing (TV Clients)
+
+```yaml
+TVPairingEnabled: true
+PairingCodeExpiration: 300      # Seconds (5 minutes)
+```
+
+#### Step-Up Authentication
+
+```yaml
+StepUpLevel: AllConfigChanges   # Re-verify TOTP/passkey before:
+                                # - Plugin settings changes
+                                # - User permission changes
+                                # - IP allowlist modifications
+```
+
+---
+
+## Usage Patterns
+
+### End-User Enrollment (TOTP)
+
+After installing the plugin, users enroll via Jellyfin web UI:
+
+1. **User** → **Profile** → **Two-Factor Authentication**
+2. Click **Enable TOTP**
+3. Scan QR code with Authy/Google Authenticator
+4. Enter 6-digit code to confirm
+5. Save 8 recovery codes (required for account recovery)
+
+**No user code changes needed** — the plugin intercepts `/Users/AuthenticateByName` at the middleware level.
+
+### TV Device Pairing (Roku, Fire TV, etc.)
+
+For clients without keyboard input:
+
+```javascript
+// TV app requests pairing code
+POST /JellyfinSecurity/PairDevice
 {
-  "Name": "Authentik",
-  "ClientId": "jellyfin-client",
-  "ClientSecret": "${OIDC_CLIENT_SECRET}",  // Use env var
-  "Authority": "https://auth.example.com/application/o/jellyfin/",
-  "Scopes": ["openid", "profile", "email"],
-  "UsePkce": true,
-  "ClaimMappings": {
-    "preferred_username": "username",
-    "email": "email",
-    "name": "displayName"
-  }
+  "DeviceName": "Living Room Roku",
+  "DeviceId": "roku-device-12345"
 }
+
+// Response contains code + QR URL
+{
+  "pairingCode": "AB12-CD34",
+  "qrCodeUrl": "/JellyfinSecurity/PairDeviceQR?code=AB12-CD34",
+  "expiresAt": "2026-06-12T12:05:00Z"
+}
+
+// User approves via Admin Dashboard → Pending Pairs
+// TV polls for approval:
+GET /JellyfinSecurity/CheckPairingStatus?code=AB12-CD34
+
+// After approval, use returned token in X-Device-Token header
 ```
 
-**Key OIDC Features:**
-- Multiple providers (e.g., Authentik for admins, Google for users)
-- LAN-only IdP support (disable SSRF guard for private networks)
-- Step-up re-authentication for sensitive actions
-- Auto-linking or manual admin approval
+### Trusted Browser Token (Web Client)
 
-### Step-Up Authentication
+After successful 2FA login, the plugin sets a signed cookie:
 
-Require re-authentication for sensitive admin actions:
+```http
+Set-Cookie: JellyfinSecurity-TrustedDevice=<hmac-signed-token>; 
+            HttpOnly; Secure; SameSite=Strict; Max-Age=7776000
+```
+
+Subsequent logins from the same browser skip 2FA for 90 days (configurable). The token is bound to `User-Agent` + IP subnet (configurable prefix length).
+
+### OIDC Sign-In Flow
 
 ```csharp
-// StepUpLevel options (admin UI dropdown):
-// - Off: No step-up required
-// - AllConfigChanges: Plugin settings + user management
-// - DeleteActions: Above + user deletion
-// - PluginConfigOnly: Only plugin settings
+// Plugin auto-registers endpoints at startup
+// User clicks "Sign in with Authentik" button on login page
 
-// Example: Enforce TOTP for all config changes
-config.StepUpLevel = StepUpLevel.AllConfigChanges;
-config.SelfServiceStepUpMode = SelfServiceStepUpMode.Forced; // Users must verify even for profile changes
+// 1. Initiate OIDC flow
+GET /JellyfinSecurity/OIDC/Authorize?providerId=authentik
+
+// 2. User redirects to IdP, signs in, returns to callback
+GET /JellyfinSecurity/OIDC/Callback?code=...&state=...
+
+// 3. Plugin exchanges code for tokens, creates/links Jellyfin user
+// 4. Sets Jellyfin auth token cookie, redirects to /web/index.html
 ```
 
-### Impossible Travel Detection
-
-Automatically flag/block logins from suspicious geographic locations:
-
-```csharp
-config.ImpossibleTravelEnabled = true;
-config.ImpossibleTravelMode = ImpossibleTravelMode.Block;  // or LogOnly
-config.ImpossibleTravelThresholdKmPerHour = 800.0;  // ~500 mph
-config.MaxMindLicenseKey = Environment.GetEnvironmentVariable("MAXMIND_LICENSE_KEY");
-```
-
-The plugin downloads MaxMind GeoLite2 databases automatically and checks if login locations are physically impossible based on time deltas.
+**Userinfo claim mapping** (auto-merged):
+- `preferred_username` or `email` → Jellyfin username
+- `email` → Jellyfin email
+- `name` → Jellyfin display name
+- `groups` → Jellyfin user policies (if `SyncGroupsEnabled: true`)
 
 ### Per-User IP Allowlist
 
-```csharp
-// Example: Allow user 'alice' from specific IPs only
-// In admin UI → Users tab → Edit User → Exempt CIDRs:
-// 203.0.113.0/24
-// 2001:db8::/32
-
-// Programmatic (via plugin's UserDataManager):
-var userData = await userDataManager.GetUserDataAsync(userId);
-userData.ExemptCidrs = new[] { "203.0.113.0/24" };
-await userDataManager.SaveUserDataAsync(userData);
+```yaml
+# Admin Dashboard → JellyfinSecurity → Users → Edit User
+AllowedIPs:
+  - "203.0.113.0/24"    # Office network
+  - "198.51.100.42/32"  # Home static IP
 ```
+
+User cannot authenticate from any IP outside this list. Leave empty to disable IP restrictions for that user.
+
+### Programmatic API Access (Sonarr, Radarr, etc.)
+
+**Option 1: API Key Bypass** (recommended for service integrations)
+
+```yaml
+# Admin → JellyfinSecurity → Settings
+APIKeyBypassEnabled: true
+```
+
+Services using `X-Emby-Token` header are exempt from 2FA. Generate API key in Jellyfin **Dashboard** → **API Keys**.
+
+```bash
+curl -H "X-Emby-Token: ${JELLYFIN_API_KEY}" \
+     https://jellyfin.example.com/Users/Me
+```
+
+**Option 2: Device Token**
+
+Pair device once, then include token in every request:
+
+```bash
+# Pair device (one-time)
+curl -X POST https://jellyfin.example.com/JellyfinSecurity/PairDevice \
+  -H "Content-Type: application/json" \
+  -d '{"DeviceName":"Sonarr","DeviceId":"sonarr-instance-1"}'
+
+# Approve pairing via Admin UI, retrieve token from response
+
+# Use token in subsequent requests
+curl -H "X-Device-Token: ${DEVICE_TOKEN}" \
+     -H "X-Emby-Token: ${JELLYFIN_API_KEY}" \
+     https://jellyfin.example.com/Library/Movies
+```
+
+---
 
 ## Code Examples
 
-### Enrolling TOTP (C# Plugin Context)
+### Custom Middleware Integration (C#)
+
+If you're building a **separate Jellyfin plugin** that needs to hook into JellyfinSecurity's verified-session state:
 
 ```csharp
-using JellyfinSecurity.Totp;
-using JellyfinSecurity.Data;
+using JellyfinSecurity.Services;
+using Microsoft.AspNetCore.Http;
 
-public async Task<TotpEnrollmentResult> EnrollUserTotp(Guid userId, string username)
+public class CustomAuthMiddleware
 {
-    var totpManager = new TotpManager();
-    var userDataManager = GetUserDataManager(); // Plugin service
-    
-    // Generate secret
-    var secret = totpManager.GenerateSecret();
-    var qrCodeUri = totpManager.GetQrCodeUri(username, secret, "Jellyfin");
-    
-    // Store pending enrollment (not active until verified)
-    var userData = await userDataManager.GetUserDataAsync(userId);
-    userData.TotpSecretPending = secret;
-    await userDataManager.SaveUserDataAsync(userData);
-    
-    return new TotpEnrollmentResult
+    private readonly RequestDelegate _next;
+    private readonly ISessionVerifier _sessionVerifier;
+
+    public CustomAuthMiddleware(
+        RequestDelegate next,
+        ISessionVerifier sessionVerifier)
     {
-        Secret = secret,
-        QrCodeUri = qrCodeUri,
-        ManualEntryKey = FormatSecretForDisplay(secret)
-    };
-}
-
-public async Task<bool> VerifyAndActivateTotp(Guid userId, string code)
-{
-    var totpManager = new TotpManager();
-    var userDataManager = GetUserDataManager();
-    
-    var userData = await userDataManager.GetUserDataAsync(userId);
-    if (string.IsNullOrEmpty(userData.TotpSecretPending))
-        return false;
-    
-    // Verify code against pending secret
-    if (!totpManager.ValidateCode(userData.TotpSecretPending, code))
-        return false;
-    
-    // Activate TOTP
-    userData.TotpSecret = userData.TotpSecretPending;
-    userData.TotpSecretPending = null;
-    userData.TotpEnabled = true;
-    await userDataManager.SaveUserDataAsync(userData);
-    
-    return true;
-}
-```
-
-### Passkey Registration (WebAuthn)
-
-```csharp
-using Fido2NetLib;
-using Fido2NetLib.Objects;
-
-public async Task<CredentialCreateOptions> StartPasskeyRegistration(Guid userId, string username)
-{
-    var fido2 = GetFido2Instance(); // Plugin's Fido2 singleton
-    var userDataManager = GetUserDataManager();
-    
-    var userData = await userDataManager.GetUserDataAsync(userId);
-    var existingKeys = userData.WebAuthnCredentials ?? new List<StoredCredential>();
-    
-    var fidoUser = new Fido2User
-    {
-        Id = userId.ToByteArray(),
-        Name = username,
-        DisplayName = username
-    };
-    
-    var options = fido2.RequestNewCredential(
-        fidoUser,
-        existingKeys.Select(c => new PublicKeyCredentialDescriptor(c.DescriptorId)).ToList(),
-        AuthenticatorSelection.Default,
-        AttestationConveyancePreference.None
-    );
-    
-    // Store challenge for verification
-    await StoreChallengeAsync(userId, options.Challenge);
-    
-    return options;
-}
-
-public async Task<bool> CompletePasskeyRegistration(Guid userId, AuthenticatorAttestationRawResponse attestation)
-{
-    var fido2 = GetFido2Instance();
-    var userDataManager = GetUserDataManager();
-    
-    var challenge = await RetrieveChallengeAsync(userId);
-    var options = /* reconstruct CredentialCreateOptions from challenge */;
-    
-    var result = await fido2.MakeNewCredentialAsync(
-        attestation,
-        options,
-        async (args, cancellationToken) => true // Credential ID uniqueness check
-    );
-    
-    if (result.Status != "ok")
-        return false;
-    
-    // Store credential
-    var userData = await userDataManager.GetUserDataAsync(userId);
-    userData.WebAuthnCredentials ??= new List<StoredCredential>();
-    userData.WebAuthnCredentials.Add(new StoredCredential
-    {
-        DescriptorId = result.Result.CredentialId,
-        PublicKey = result.Result.PublicKey,
-        SignCount = result.Result.Counter,
-        CredType = result.Result.CredType,
-        AaGuid = result.Result.Aaguid,
-        UserHandle = result.Result.User.Id,
-        CreatedAt = DateTime.UtcNow
-    });
-    userData.PasskeysEnabled = true;
-    await userDataManager.SaveUserDataAsync(userData);
-    
-    return true;
-}
-```
-
-### Email OTP
-
-```csharp
-using JellyfinSecurity.Email;
-
-public async Task<bool> SendEmailOtp(Guid userId, string email)
-{
-    var otpManager = GetOtpManager();
-    var emailSender = GetEmailSender(); // Plugin's SMTP service
-    
-    // Generate 8-digit code
-    var code = otpManager.GenerateEmailOtp();
-    var expiresAt = DateTime.UtcNow.AddMinutes(10);
-    
-    // Store code (hashed)
-    await otpManager.StoreEmailOtpAsync(userId, code, expiresAt);
-    
-    // Send email
-    var subject = "Your Jellyfin Login Code";
-    var body = $"Your verification code is: {code}\n\nValid for 10 minutes.";
-    
-    return await emailSender.SendEmailAsync(email, subject, body);
-}
-
-public async Task<bool> VerifyEmailOtp(Guid userId, string code)
-{
-    var otpManager = GetOtpManager();
-    return await otpManager.ValidateEmailOtpAsync(userId, code);
-}
-```
-
-### Checking Authentication Requirements
-
-```csharp
-using JellyfinSecurity.Middleware;
-
-public async Task<AuthRequirement> GetAuthRequirementsForUser(Guid userId, string remoteIp)
-{
-    var config = GetPluginConfiguration();
-    var userDataManager = GetUserDataManager();
-    var deviceManager = GetDeviceManager();
-    
-    // Check bypass rules
-    if (config.LanBypassEnabled && IsLanIp(remoteIp, config.LanCidrs))
-        return AuthRequirement.None;
-    
-    var userData = await userDataManager.GetUserDataAsync(userId);
-    
-    // Check per-user IP allowlist
-    if (userData.ExemptCidrs?.Any() == true && MatchesCidr(remoteIp, userData.ExemptCidrs))
-        return AuthRequirement.None;
-    
-    // Check trusted device token (from cookie)
-    var deviceToken = GetDeviceTokenFromRequest();
-    if (!string.IsNullOrEmpty(deviceToken) && await deviceManager.IsDeviceTrustedAsync(userId, deviceToken))
-        return AuthRequirement.None;
-    
-    // Check TV pairing
-    var deviceId = GetDeviceIdFromRequest();
-    if (!string.IsNullOrEmpty(deviceId) && await deviceManager.IsDevicePairedAsync(userId, deviceId))
-        return AuthRequirement.None;
-    
-    // Determine required method
-    if (userData.TotpEnabled)
-        return AuthRequirement.Totp;
-    if (userData.PasskeysEnabled)
-        return AuthRequirement.Passkey;
-    if (userData.EmailOtpEnabled)
-        return AuthRequirement.EmailOtp;
-    
-    return config.RequireTwoFactor ? AuthRequirement.MustEnroll : AuthRequirement.None;
-}
-```
-
-### Brute-Force Protection
-
-```csharp
-using JellyfinSecurity.BruteForce;
-
-public async Task<bool> CheckAndRecordLoginAttempt(string username, string remoteIp, bool success)
-{
-    var bruteForceManager = GetBruteForceManager();
-    var config = GetPluginConfiguration();
-    
-    if (success)
-    {
-        await bruteForceManager.ClearAttemptsAsync(username, remoteIp);
-        return true;
+        _next = next;
+        _sessionVerifier = sessionVerifier;
     }
-    
-    // Record failure
-    var attempts = await bruteForceManager.RecordFailedAttemptAsync(username, remoteIp);
-    
-    if (attempts >= config.MaxLoginAttempts)
+
+    public async Task InvokeAsync(HttpContext context)
     {
-        // Lock out
-        await bruteForceManager.LockoutAsync(
-            username,
-            remoteIp,
-            TimeSpan.FromMinutes(config.LockoutDurationMinutes)
-        );
+        var authToken = context.Request.Headers["X-Emby-Token"].FirstOrDefault();
         
-        // Log audit event
-        await LogAuditEventAsync(new AuditEvent
+        if (string.IsNullOrEmpty(authToken))
         {
-            EventType = "BruteForceLockout",
-            Username = username,
-            IpAddress = remoteIp,
-            Timestamp = DateTime.UtcNow,
-            Details = $"Locked out after {attempts} failed attempts"
-        });
-        
-        return false;
-    }
-    
-    return true; // Not locked out yet
-}
-
-public async Task<bool> IsIpLockedOut(string remoteIp)
-{
-    var bruteForceManager = GetBruteForceManager();
-    return await bruteForceManager.IsLockedOutAsync(remoteIp);
-}
-```
-
-### Device Pairing (TV Clients)
-
-```csharp
-using JellyfinSecurity.DevicePairing;
-
-public async Task<PairingRequest> RequestDevicePairing(Guid userId, string deviceId, string deviceName)
-{
-    var pairingManager = GetDevicePairingManager();
-    
-    var request = new PairingRequest
-    {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        DeviceId = deviceId,
-        DeviceName = deviceName,
-        RequestedAt = DateTime.UtcNow,
-        Status = PairingStatus.Pending
-    };
-    
-    await pairingManager.SavePairingRequestAsync(request);
-    
-    // Notify admins (email/webhook/etc.)
-    await NotifyAdminsOfPairingRequestAsync(request);
-    
-    return request;
-}
-
-public async Task<bool> ApprovePairingRequest(Guid requestId, Guid adminUserId)
-{
-    var pairingManager = GetDevicePairingManager();
-    
-    var request = await pairingManager.GetPairingRequestAsync(requestId);
-    if (request == null || request.Status != PairingStatus.Pending)
-        return false;
-    
-    request.Status = PairingStatus.Approved;
-    request.ApprovedBy = adminUserId;
-    request.ApprovedAt = DateTime.UtcNow;
-    
-    await pairingManager.SavePairingRequestAsync(request);
-    
-    // Add to paired devices
-    await pairingManager.AddPairedDeviceAsync(request.UserId, request.DeviceId);
-    
-    // Log audit
-    await LogAuditEventAsync(new AuditEvent
-    {
-        EventType = "DevicePaired",
-        UserId = request.UserId,
-        AdminUserId = adminUserId,
-        Details = $"Device {request.DeviceName} ({request.DeviceId}) approved"
-    });
-    
-    return true;
-}
-```
-
-## Common Patterns
-
-### Middleware Integration
-
-The plugin uses ASP.NET Core middleware to intercept authentication:
-
-```csharp
-// Simplified middleware flow (internal to plugin)
-public class TwoFactorAuthMiddleware
-{
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-    {
-        // Skip non-auth endpoints
-        if (!IsAuthenticationEndpoint(context.Request.Path))
-        {
-            await next(context);
+            context.Response.StatusCode = 401;
             return;
         }
-        
-        // Check bypass rules
-        var remoteIp = GetRealIpAddress(context);
-        if (ShouldBypass(context, remoteIp))
-        {
-            await next(context);
-            return;
-        }
-        
-        // Require 2FA
-        var userId = GetUserIdFromRequest(context);
-        if (!await Is2FASatisfiedAsync(userId, context))
+
+        // Check if this token passed 2FA verification
+        if (!_sessionVerifier.IsVerified(authToken))
         {
             context.Response.StatusCode = 403;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                Error = "TwoFactorRequired",
-                Message = "Two-factor authentication is required"
-            });
+            await context.Response.WriteAsync("2FA verification required");
             return;
         }
-        
-        await next(context);
+
+        await _next(context);
     }
 }
 ```
 
-### Trusted Device Cookies
+### Audit Log Query (C#)
 
 ```csharp
-// Setting trusted device cookie (internal to plugin)
-public void SetTrustedDeviceCookie(HttpContext context, Guid userId)
+using JellyfinSecurity.Data;
+using JellyfinSecurity.Models;
+
+public class AuditLogService
 {
-    var token = GenerateSecureToken(); // 32-byte random + HMAC
-    var encrypted = EncryptToken(token, userId); // AES-GCM with AAD
-    
-    context.Response.Cookies.Append("JellyfinTrustedDevice", encrypted, new CookieOptions
+    private readonly IAuditLogStore _auditLog;
+
+    public async Task<List<AuditEvent>> GetFailedLoginsAsync(
+        DateTime since,
+        int limit = 100)
     {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.Lax,
-        Expires = DateTimeOffset.UtcNow.AddDays(30),
-        Path = "/"
-    });
-    
-    // Store token hash server-side
-    await StoreDeviceTokenAsync(userId, HashToken(token));
+        return await _auditLog.QueryAsync(
+            eventType: AuditEventType.LoginFailed,
+            startDate: since,
+            limit: limit
+        );
+    }
+
+    public async Task<List<AuditEvent>> GetUserActionsAsync(Guid userId)
+    {
+        return await _auditLog.QueryByUserAsync(userId);
+    }
 }
 ```
 
-### Audit Logging
+### Email OTP Service Configuration (C#)
 
 ```csharp
-using JellyfinSecurity.Audit;
+using JellyfinSecurity.Configuration;
 
-public async Task LogSecurityEvent(AuditEventType eventType, Guid? userId, string details)
+var smtpConfig = new EmailOTPConfiguration
 {
-    var auditLogger = GetAuditLogger();
-    
-    await auditLogger.LogAsync(new AuditEvent
-    {
-        EventType = eventType.ToString(),
-        UserId = userId,
-        Timestamp = DateTime.UtcNow,
-        IpAddress = GetCurrentRequestIp(),
-        UserAgent = GetCurrentUserAgent(),
-        Details = details,
-        Success = true
-    });
-}
-
-// Example: Log TOTP verification
-await LogSecurityEvent(
-    AuditEventType.TotpVerified,
-    userId,
-    "User verified TOTP code successfully"
-);
-
-// Query audit log
-var events = await auditLogger.GetEventsAsync(
-    userId: userId,
-    startDate: DateTime.UtcNow.AddDays(-7),
-    eventTypes: new[] { "TotpVerified", "PasskeyUsed", "BruteForceLockout" }
-);
+    Enabled = true,
+    SMTPHost = "smtp.gmail.com",
+    SMTPPort = 587,
+    UseTLS = true,
+    Username = "noreply@example.com",
+    Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD"),
+    FromAddress = "noreply@example.com",
+    FromName = "Jellyfin Security",
+    CodeExpiration = 300  // 5 minutes
+};
 ```
+
+### HIBP Password Check (C#)
+
+The plugin includes k-anonymity HIBP integration for password breach detection:
+
+```csharp
+using JellyfinSecurity.Services;
+
+public class PasswordValidator
+{
+    private readonly IHIBPService _hibp;
+
+    public async Task<bool> IsPasswordCompromisedAsync(string password)
+    {
+        // Sends only first 5 chars of SHA-1 hash to HIBP
+        // (k-anonymity model — password never leaves server in plaintext)
+        return await _hibp.IsPasswordPwnedAsync(password);
+    }
+}
+```
+
+---
+
+## Common Workflows
+
+### Scenario: User Locked Out (Forgot TOTP Device)
+
+**Admin recovery via Dashboard**:
+
+1. **Dashboard** → **JellyfinSecurity** → **Users**
+2. Select locked-out user → **Reset 2FA**
+3. User can log in with password only (2FA disabled)
+4. User re-enrolls TOTP from profile page
+
+**User self-recovery** (if recovery codes saved):
+
+1. Login page → **Use Recovery Code**
+2. Enter one of the 8 saved codes (single-use)
+3. After login, user can disable TOTP or generate new QR
+
+### Scenario: Impossible Travel Alert
+
+```yaml
+# Admin → Settings
+ImpossibleTravelEnabled: true
+ImpossibleTravelThreshold: 500  # km/hour (flags physically impossible logins)
+```
+
+When detected:
+1. Login blocked automatically
+2. Admin email notification sent (if `AdminEmailAlerts: true`)
+3. Audit log entry: `AuditEventType.ImpossibleTravel`
+4. Admin must manually unban IP via **Dashboard** → **Banned IPs**
+
+### Scenario: SSO-Only Deployment (Hide Built-In Login)
+
+```yaml
+# Admin → Settings
+ShowBuiltIn2FAButton: false
+ShowBuiltInPasskeyButton: false
+
+OIDCProviders:
+  - Name: "Corporate SSO"
+    ClientID: "${OIDC_CLIENT_ID}"
+    ClientSecret: "${OIDC_CLIENT_SECRET}"
+    Authority: "https://sso.corp.example.com"
+```
+
+Login page shows only **"Sign in with Corporate SSO"** button.
+
+---
 
 ## Troubleshooting
 
 ### LAN Bypass Not Working
 
-**Problem:** Users on local network still prompted for 2FA
+**Symptom**: Local clients (192.168.x.x) still prompted for 2FA despite `LANBypassEnabled: true`.
 
-**Solutions:**
-1. Check `X-Forwarded-For` header is being passed by reverse proxy:
+**Diagnosis**:
+```bash
+# Check Jellyfin logs for SEC-H3 guard message
+journalctl -u jellyfin | grep "SEC-H3"
+
+# Example output:
+# "SEC-H3: Client IP 192.168.1.100 is within trusted proxy range 192.168.0.0/16 
+#  but no X-Forwarded-For header present — refusing LAN bypass"
+```
+
+**Fix**:
+1. If behind reverse proxy, ensure `X-Forwarded-For` header is set:
    ```nginx
    # Nginx
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   ```
+   ```yaml
+   # Traefik (dynamic config)
+   http:
+     middlewares:
+       jellyfin-headers:
+         headers:
+           customRequestHeaders:
+             X-Forwarded-For: ""  # Traefik auto-populates
+   ```
+
+2. If **direct** LAN access (no proxy), tighten `TrustedProxyCIDRs`:
+   ```yaml
+   # BEFORE (too broad):
+   TrustedProxyCIDRs:
+     - "192.168.0.0/16"  # Includes LAN clients!
    
-   # Caddy
-   reverse_proxy jellyfin:8096 {
-       header_up X-Forwarded-For {remote_host}
-   }
+   # AFTER (proxy IP only):
+   TrustedProxyCIDRs:
+     - "192.168.1.5/32"  # Nginx container IP
    ```
-
-2. Add proxy IP to **Trusted Proxy CIDRs** (Admin UI → Network tab)
-   - ⚠️ **Do not use broad ranges** (e.g., `10.0.0.0/8`) — use specific proxy IPs like `172.17.0.1/32`
-   - The SEC-H3 guard refuses LAN bypass if XFF header is missing/untrusted
-
-3. Verify LAN CIDRs match your network:
-   ```csharp
-   // Check logs for CIDR match failures
-   // Admin UI → Plugins → Jellyfin Security → LAN CIDRs
-   // Example: 192.168.1.0/24, 10.0.50.0/24
-   ```
-
-### OIDC Redirect URI Mismatch
-
-**Problem:** `redirect_uri_mismatch` error after OIDC login
-
-**Solutions:**
-1. Check redirect URI in provider config matches:
-   ```
-   https://jellyfin.example.com/sso/callback/{providerId}
-   ```
-
-2. For reverse proxies, ensure `X-Forwarded-Proto` and `X-Forwarded-Host` are set:
-   ```nginx
-   proxy_set_header X-Forwarded-Proto $scheme;
-   proxy_set_header X-Forwarded-Host $host;
-   ```
-
-3. For LAN-only IdPs, enable **Private/LAN IdP** toggle in provider settings
-
-### TOTP Codes Not Accepting
-
-**Problem:** Valid TOTP codes rejected
-
-**Solutions:**
-1. Check server time sync:
-   ```bash
-   # Linux
-   timedatectl status
-   ntpq -p
-   
-   # Sync if needed
-   sudo ntpdate -s time.nist.gov
-   ```
-
-2. Verify authenticator app time is correct (most apps sync automatically)
-
-3. Check time-skew tolerance in logs (plugin allows ±1 time step = 30 seconds)
-
-### Trusted Device Cookies Not Persisting
-
-**Problem:** Users re-prompted for 2FA on every login
-
-**Solutions:**
-1. Verify `Secure` cookie flag matches your deployment:
-   - HTTPS required if `Secure=true` (default)
-   - For HTTP testing, temporarily disable in plugin config
-
-2. Check browser cookie settings (third-party cookie blocking can interfere)
-
-3. Verify cookie domain/path in browser DevTools → Application → Cookies
-
-### Email OTP Not Sending
-
-**Problem:** No emails received for OTP codes
-
-**Solutions:**
-1. Test SMTP settings:
-   ```csharp
-   // Admin UI → Email tab → Send Test Email
-   ```
-
-2. Check common SMTP ports:
-   - **587** (STARTTLS) — most common
-   - **465** (implicit TLS) — requires `SmtpUseSsl=true`
-   - **25** (plain) — often blocked by ISPs
-
-3. For Gmail/Google Workspace:
-   - Use App Password (not account password)
-   - Enable "Less secure app access" or use OAuth2
-
-4. Check spam folder and firewall rules
-
-### Impossible Travel False Positives
-
-**Problem:** Legitimate logins blocked as impossible travel
-
-**Solutions:**
-1. Adjust threshold (Admin UI → Impossible Travel tab):
-   ```csharp
-   config.ImpossibleTravelThresholdKmPerHour = 1000.0; // More permissive
-   ```
-
-2. Use `LogOnly` mode initially to tune threshold:
-   ```csharp
-   config.ImpossibleTravelMode = ImpossibleTravelMode.LogOnly;
-   ```
-
-3. Add VPN/proxy IPs to user's Exempt CIDRs
-
-4. Check MaxMind database updates (plugin auto-updates weekly)
 
 ### Step-Up Modal Not Appearing
 
-**Problem:** Admin UI changes save without prompting for re-auth
+**Symptom**: Admin clicks **Save Settings** but nothing happens (v2.5.7 and earlier).
 
-**Solutions:**
-1. Verify `StepUpLevel` is set (Admin UI → Security tab):
-   ```csharp
-   config.StepUpLevel = StepUpLevel.AllConfigChanges;
-   ```
+**Fix**: Upgrade to v2.5.8+. The admin UI now uses step-up-aware fetch wrapper:
 
-2. Ensure user has enrolled at least one 2FA method (TOTP/passkey/recovery)
-
-3. Check browser console for JavaScript errors blocking modal
-
-4. For OIDC-only users, verify `SsoLink` is stored (step-up uses IdP re-auth)
-
-### User Lockout Recovery
-
-**Problem:** Admin locked out after misconfiguration
-
-**Solutions:**
-1. **Disable plugin temporarily:**
-   ```bash
-   # Move plugin DLL out of plugins folder
-   mv /var/lib/jellyfin/plugins/JellyfinSecurity /tmp/
-   systemctl restart jellyfin
-   ```
-
-2. **Use recovery codes** (if enrolled):
-   - Each user gets 10 single-use codes during TOTP/passkey enrollment
-   - Codes are PBKDF2-hashed server-side
-
-3. **Manual database edit** (last resort):
-   ```bash
-   # Edit user data file
-   nano /var/lib/jellyfin/plugins/JellyfinSecurity_[version]/userdata/{userId}.json
-   
-   # Set TotpEnabled, PasskeysEnabled, EmailOtpEnabled to false
-   # Or delete entire file to reset user's plugin data
-   ```
-
-4. **LAN bypass** (if enabled):
-   - Access Jellyfin from LAN IP to skip 2FA
-
-### Device Pairing Not Available
-
-**Problem:** TV client pairing option missing
-
-**Solutions:**
-1. Verify TV pairing enabled (Admin UI → Device Pairing tab)
-
-2. Ensure client sends `X-Emby-Authorization` header with `DeviceId`
-
-3. Check pending pairing requests in admin UI → Pairing Requests tab
-
-4. Some older clients don't expose device ID — use API key bypass instead
-
-## API Reference
-
-### REST Endpoints (Plugin-Added)
-
-```http
-### Enroll TOTP
-POST /api/security/totp/enroll
-Authorization: MediaBrowser Token="{JELLYFIN_TOKEN}"
-Content-Type: application/json
-
-{
-  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```javascript
+// Fixed in v2.5.8 — PluginConfigPage.js
+async function saveConfiguration() {
+    await stepUpAwareFetch('/JellyfinSecurity/Configuration', {
+        method: 'POST',
+        body: JSON.stringify(config)
+    });
 }
-
-### Verify TOTP
-POST /api/security/totp/verify
-Content-Type: application/json
-
-{
-  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "code": "123456"
-}
-
-### Start Passkey Registration
-POST /api/security/passkey/register/start
-Authorization: MediaBrowser Token="{JELLYFIN_TOKEN}"
-
-### Complete Passkey Registration
-POST /api/security/passkey/register/complete
-Authorization: MediaBrowser Token="{JELLYFIN_TOKEN}"
-Content-Type: application/json
-
-{
-  "attestationResponse": { /* WebAuthn credential */ }
-}
-
-### Request Device Pairing
-POST /api/security/pairing/request
-Content-Type: application/json
-
-{
-  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "deviceId": "tv-living-room-abc123",
-  "deviceName": "Samsung TV (Living Room)"
-}
-
-### Get Audit Log
-GET /api/security/audit?userId={userId}&startDate={iso8601}&eventType={type}
-Authorization: MediaBrowser Token="{JELLYFIN_TOKEN}"
 ```
+
+### OIDC Redirect URI Mismatch
+
+**Symptom**: IdP returns `invalid_redirect_uri` error.
+
+**Diagnosis**:
+```bash
+# Check Jellyfin base URL
+curl -s http://localhost:8096/System/Configuration | jq -r '.BaseUrl'
+```
+
+**Fix**:
+1. Ensure `BaseUrl` matches public-facing URL in Jellyfin **Dashboard** → **Networking**:
+   ```yaml
+   BaseUrl: "https://jellyfin.example.com"  # Must include https:// if behind SSL proxy
+   ```
+
+2. Register exact redirect URI in IdP:
+   ```
+   https://jellyfin.example.com/JellyfinSecurity/OIDC/Callback
+   ```
+
+3. If using Docker + reverse proxy, verify `X-Forwarded-Proto` header:
+   ```nginx
+   proxy_set_header X-Forwarded-Proto $scheme;
+   ```
+
+### Device Token Expired After Server Restart
+
+**Symptom**: All TV clients require re-pairing after `docker restart jellyfin` (v2.5.6 and earlier).
+
+**Fix**: Upgrade to v2.5.7+. Verified tokens are now persisted to `verified-tokens.json`:
+
+```bash
+# Check persistence file exists
+ls -lh /config/data/jellyfinsecurity/verified-tokens.json
+
+# Should see entries like:
+# {"TokenHash":"sha256:abcd1234...", "VerifiedAt":"2026-06-12T10:00:00Z"}
+```
+
+### TOTP Code Rejected (Time Sync Issue)
+
+**Symptom**: Valid TOTP code from Authy/Google Authenticator shows "Invalid code."
+
+**Diagnosis**:
+```bash
+# Check server time
+timedatectl
+
+# Check time skew tolerance (default ±1 step = 60 seconds)
+journalctl -u jellyfin | grep "TOTP time skew"
+```
+
+**Fix**:
+1. Enable NTP on Jellyfin server:
+   ```bash
+   timedatectl set-ntp true
+   ```
+
+2. Increase skew window (admin settings):
+   ```yaml
+   TOTPTimeSkew: 2  # Allow ±2 steps (120 seconds)
+   ```
+
+### High CPU Usage from Audit Log
+
+**Symptom**: `jellyfin` process consuming high CPU after enabling audit logging.
+
+**Fix**:
+1. Enable log rotation:
+   ```yaml
+   AuditLogEnabled: true
+   AuditLogRotation: true
+   AuditLogMaxSize: 104857600  # 100 MB
+   AuditLogMaxAge: 30          # Days
+   ```
+
+2. Exclude high-frequency events:
+   ```yaml
+   AuditLogExcludedEvents:
+     - "HeartbeatReceived"
+     - "SessionActivity"
+   ```
+
+---
 
 ## Security Considerations
 
-- **TOTP secrets** are stored encrypted at rest using AES-256-GCM
-- **Passkey credentials** use FIDO2 attestation; private keys never leave device
-- **Recovery codes** are PBKDF2-hashed (100k iterations) before storage
-- **Trusted device tokens** are HMAC-signed and encrypted with per-user keys
-- **Email OTPs** are SHA-256 hashed server-side
-- **OIDC state/nonce** parameters prevent CSRF and replay attacks
-- **LAN bypass requires X-Forwarded-For validation** to prevent spoofing
-- **Step-up challenges expire after 5 minutes** and are single-use
+### What This Plugin Defends Against
 
-### Threat Model
+- ✅ Credential stuffing (brute-force IP banning)
+- ✅ Phishing (TOTP/passkeys immune to credential reuse)
+- ✅ Unauthorized LAN access (IP allowlist, impossible travel)
+- ✅ Compromised passwords (HIBP integration)
+- ✅ Session hijacking (token binding to User-Agent + IP)
+- ✅ Privilege escalation (step-up auth for admin actions)
 
-**Defends against:**
-- Credential stuffing / brute-force (rate limiting + lockout)
-- Session hijacking (impossible travel detection)
-- Unauthorized API access (requires MFA even with valid password)
-- Phishing (passkeys are origin-bound)
-- Stolen passwords (2FA required)
+### What This Plugin Does NOT Defend Against
 
-**Does NOT defend against:**
-- Compromised Jellyfin server (plugin runs in-process)
-- Malicious Jellyfin clients (no client-side enforcement)
-- Supply chain attacks on dependencies (use CodeQL + Dependabot)
-- Physical device theft with unlocked authenticator app
+- ❌ Server-side vulnerabilities in Jellyfin core (keep Jellyfin updated)
+- ❌ Client-side XSS (use Content-Security-Policy headers in reverse proxy)
+- ❌ TLS/certificate issues (configure reverse proxy with valid certs)
+- ❌ Physical access to server (encrypt `/config` volume)
+- ❌ Supply-chain attacks on plugin dependencies (verify release SHA-256)
 
-## Environment Variables
+### Recommended Deployment Hardening
 
-```bash
-# SMTP password (for email OTP)
-SMTP_PASSWORD=your-smtp-password
+```nginx
+# Nginx reverse proxy config
+server {
+    listen 443 ssl http2;
+    server_name jellyfin.example.com;
 
-# OIDC client secrets (if using SSO)
-OIDC_CLIENT_SECRET=your-oidc-client-secret
+    ssl_certificate /etc/letsencrypt/live/jellyfin.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jellyfin.example.com/privkey.pem;
 
-# MaxMind license key (for impossible travel detection)
-MAXMIND_LICENSE_KEY=your-maxmind-key
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
 
-# Example Docker Compose
-version: '3.8'
+    # Pass real client IP
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    location / {
+        proxy_pass http://jellyfin:8096;
+    }
+}
+```
+
+```yaml
+# Docker Compose with read-only filesystem
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
-    environment:
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
-      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
     volumes:
-      - /var/lib/jellyfin:/config
+      - /path/to/config:/config  # Must be writable for plugin data
+      - /path/to/media:/media:ro
+    environment:
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.example.com
 ```
 
-## Development
+---
 
-### Running Tests
+## Testing
+
+The plugin includes 254 xUnit tests covering security-critical paths:
 
 ```bash
-dotnet test --configuration Release --logger "console;verb
+# Run full test suite
+git clone https://github.com/ZL154/JellyfinSecurity.git
+cd JellyfinSecurity
+dotnet test --logger "console;verbosity=detailed"
+
+# Run specific test categories
+dotnet test --filter "Category=Crypto"       # TOTP, passkey, cookie HMAC
+dotnet test --filter "Category=Middleware"   # Step-up, LAN bypass, brute-force
+dotnet test --filter "Category=OIDC"         # SSO flows, token exchange
+```
+
+Key test coverage:
+- TOTP replay protection (time-step validation)
+- Recovery code PBKDF2 hashing (100k iterations)
+- Trusted browser token HMAC verification
+- CIDR parser edge cases (IPv6, /0, /128)
+- X-Forwarded-For trust-walk (multi-proxy chains)
+- AES-GCM v2 authenticated encryption
+- HIBP k-anonymity hashing (SHA-1 prefix)
+- Step-up challenge consumption (single-use tokens)
+
+---
+
+## API Reference
+
+### Public Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/JellyfinSecurity/OIDC/Authorize` | GET | Initiate OIDC flow |
+| `/JellyfinSecurity/OIDC/Callback` | GET | OIDC redirect callback |
+| `/JellyfinSecurity/PairDevice` | POST | Request TV pairing code |
+| `/JellyfinSecurity/CheckPairingStatus` | GET | Poll for pairing approval |
+| `/JellyfinSecurity/VerifyTOTP` | POST | Submit TOTP code |
+| `/JellyfinSecurity/VerifyPasskey` | POST | Complete WebAuthn ceremony |
+| `/JellyfinSecurity/SendEmailOTP` | POST | Request email OTP |
+
+### Admin-Only Endpoints (Require Step-Up if Enabled)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/JellyfinSecurity/Configuration` | GET/POST | Plugin settings |
+| `/JellyfinSecurity/Users` | GET | List users with 2FA status |
+| `/JellyfinSecurity/Users/{id}` | GET/PUT | User-specific config |
+| `/JellyfinSecurity/Users/{id}/ResetTOTP` | POST | Disable user's 2FA |
+| `/JellyfinSecurity/PendingPairs` | GET | List awaiting approval |
+| `/JellyfinSecurity/ApprovePair` | POST | Approve TV pairing |
+| `/JellyfinSecurity/DenyPair` | POST | Reject TV pairing |
+| `/JellyfinSecurity/AuditLog` | GET | Query security events |
+
+---
+
+## Further Resources
+
+- **GitHub Repository**: https://github.com/ZL154/JellyfinSecurity
+- **Security Policy**: [SECURITY.md](https://github.com/ZL154/JellyfinSecurity/blob/main/SECURITY.md)
+- **OpenSSF Scorecard**: https://securityscorecards.dev/viewer/?uri=github.com/ZL154/JellyfinSecurity
+- **Jellyfin Plugin Portal**: https://jellyfin.org/plugins/
+- **TOTP RFC 6238**: https://datatracker.ietf.org/doc/html/rfc6238
+- **WebAuthn Spec**: https://www.w3.org/TR/webauthn-2/
+
+For security issues, email the maintainer directly (see SECURITY.md) or file a private advisory via GitHub Security.
