@@ -117,6 +117,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [microsoft-security-skills-plugin](skills/microsoft-security-skills-plugin/) | [install](https://skills.sh/aradotso/security-skills/microsoft-security-skills-plugin) | [vinayaklatthe/microsoft-security-skills](https://github.com/vinayaklatthe/microsoft-security-skills) | 2026-06-11 |
 | [solana-security-standard](skills/solana-security-standard/) | [install](https://skills.sh/aradotso/security-skills/solana-security-standard) | [Copenhagen0x/solana-security-standard](https://github.com/Copenhagen0x/solana-security-standard) | 2026-06-12 |
 | [jellyfin-security-plugin](skills/jellyfin-security-plugin/) | [install](https://skills.sh/aradotso/security-skills/jellyfin-security-plugin) | [ZL154/JellyfinSecurity](https://github.com/ZL154/JellyfinSecurity) | 2026-06-12 |
+| [deepseek-pentest-ai-burp-extension](skills/deepseek-pentest-ai-burp-extension/) | [install](https://skills.sh/aradotso/security-skills/deepseek-pentest-ai-burp-extension) | [HernanRodriguez1/DeepSeek-Pentest-AI](https://github.com/HernanRodriguez1/DeepSeek-Pentest-AI) | 2026-06-12 |
 <!-- SKILL_INDEX -->
 
 ---
