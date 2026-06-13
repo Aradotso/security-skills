@@ -129,6 +129,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [skill-security-scanner](skills/skill-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/skill-security-scanner) | [huifer/skill-security-scan](https://github.com/huifer/skill-security-scan) | 2026-06-12 |
 | [awesome-ai-security-reference](skills/awesome-ai-security-reference/) | [install](https://skills.sh/aradotso/security-skills/awesome-ai-security-reference) | [muellerberndt/awesome-ai-security](https://github.com/muellerberndt/awesome-ai-security) | 2026-06-13 |
 | [websecurityacademy-solutions](skills/websecurityacademy-solutions/) | [install](https://skills.sh/aradotso/security-skills/websecurityacademy-solutions) | [ntrunr/WebSecurityAcademy](https://github.com/ntrunr/WebSecurityAcademy) | 2026-06-13 |
+| [ai2pentesttool-installer](skills/ai2pentesttool-installer/) | [install](https://skills.sh/aradotso/security-skills/ai2pentesttool-installer) | [penligent/AI2PentestTool](https://github.com/penligent/AI2PentestTool) | 2026-06-13 |
 <!-- SKILL_INDEX -->
 
 ---
