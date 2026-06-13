@@ -133,6 +133,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [awesome-pentest-tools-catalog](skills/awesome-pentest-tools-catalog/) | [install](https://skills.sh/aradotso/security-skills/awesome-pentest-tools-catalog) | [sangnigege/Awesome_Pentest_Tools](https://github.com/sangnigege/Awesome_Pentest_Tools) | 2026-06-13 |
 | [agent-security-scanner-mcp](skills/agent-security-scanner-mcp/) | [install](https://skills.sh/aradotso/security-skills/agent-security-scanner-mcp) | [sinewaveai/agent-security-scanner-mcp](https://github.com/sinewaveai/agent-security-scanner-mcp) | 2026-06-13 |
 | [pentest-ai-killer-automation](skills/pentest-ai-killer-automation/) | [install](https://skills.sh/aradotso/security-skills/pentest-ai-killer-automation) | [vietjovi/pentest-ai-killer](https://github.com/vietjovi/pentest-ai-killer) | 2026-06-13 |
+| [supabase-pentest-skills](skills/supabase-pentest-skills/) | [install](https://skills.sh/aradotso/security-skills/supabase-pentest-skills) | [yoanbernabeu/supabase-pentest-skills](https://github.com/yoanbernabeu/supabase-pentest-skills) | 2026-06-13 |
 <!-- SKILL_INDEX -->
 
 ---
