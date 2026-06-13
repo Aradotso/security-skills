@@ -127,6 +127,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentester-mcp-security-tools](skills/pentester-mcp-security-tools/) | [install](https://skills.sh/aradotso/security-skills/pentester-mcp-security-tools) | [halilkirazkaya/pentester-mcp](https://github.com/halilkirazkaya/pentester-mcp) | 2026-06-12 |
 | [h-pentest-ai-platform](skills/h-pentest-ai-platform/) | [install](https://skills.sh/aradotso/security-skills/h-pentest-ai-platform) | [hexian2001/H-Pentest](https://github.com/hexian2001/H-Pentest) | 2026-06-12 |
 | [skill-security-scanner](skills/skill-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/skill-security-scanner) | [huifer/skill-security-scan](https://github.com/huifer/skill-security-scan) | 2026-06-12 |
+| [awesome-ai-security-reference](skills/awesome-ai-security-reference/) | [install](https://skills.sh/aradotso/security-skills/awesome-ai-security-reference) | [muellerberndt/awesome-ai-security](https://github.com/muellerberndt/awesome-ai-security) | 2026-06-13 |
 <!-- SKILL_INDEX -->
 
 ---
