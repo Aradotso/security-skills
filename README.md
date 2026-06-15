@@ -134,6 +134,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [agent-security-scanner-mcp](skills/agent-security-scanner-mcp/) | [install](https://skills.sh/aradotso/security-skills/agent-security-scanner-mcp) | [sinewaveai/agent-security-scanner-mcp](https://github.com/sinewaveai/agent-security-scanner-mcp) | 2026-06-13 |
 | [pentest-ai-killer-automation](skills/pentest-ai-killer-automation/) | [install](https://skills.sh/aradotso/security-skills/pentest-ai-killer-automation) | [vietjovi/pentest-ai-killer](https://github.com/vietjovi/pentest-ai-killer) | 2026-06-13 |
 | [supabase-pentest-skills](skills/supabase-pentest-skills/) | [install](https://skills.sh/aradotso/security-skills/supabase-pentest-skills) | [yoanbernabeu/supabase-pentest-skills](https://github.com/yoanbernabeu/supabase-pentest-skills) | 2026-06-13 |
+| [symfony-security-auditor](skills/symfony-security-auditor/) | [install](https://skills.sh/aradotso/security-skills/symfony-security-auditor) | [vinceAmstoutz/symfony-security-auditor](https://github.com/vinceAmstoutz/symfony-security-auditor) | 2026-06-15 |
 <!-- SKILL_INDEX -->
 
 ---
