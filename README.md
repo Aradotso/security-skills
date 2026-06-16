@@ -136,6 +136,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [supabase-pentest-skills](skills/supabase-pentest-skills/) | [install](https://skills.sh/aradotso/security-skills/supabase-pentest-skills) | [yoanbernabeu/supabase-pentest-skills](https://github.com/yoanbernabeu/supabase-pentest-skills) | 2026-06-13 |
 | [symfony-security-auditor](skills/symfony-security-auditor/) | [install](https://skills.sh/aradotso/security-skills/symfony-security-auditor) | [vinceAmstoutz/symfony-security-auditor](https://github.com/vinceAmstoutz/symfony-security-auditor) | 2026-06-15 |
 | [goplus-security-token-scanner](skills/goplus-security-token-scanner/) | [install](https://skills.sh/aradotso/security-skills/goplus-security-token-scanner) | [BrewerDifferentiate/GoPlus-Security-Token-Scanner-Enterprise-Pro](https://github.com/BrewerDifferentiate/GoPlus-Security-Token-Scanner-Enterprise-Pro) | 2026-06-16 |
+| [android-studio-pentest-environment](skills/android-studio-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-studio-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 <!-- SKILL_INDEX -->
 
 ---
