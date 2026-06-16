@@ -138,6 +138,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [goplus-security-token-scanner](skills/goplus-security-token-scanner/) | [install](https://skills.sh/aradotso/security-skills/goplus-security-token-scanner) | [BrewerDifferentiate/GoPlus-Security-Token-Scanner-Enterprise-Pro](https://github.com/BrewerDifferentiate/GoPlus-Security-Token-Scanner-Enterprise-Pro) | 2026-06-16 |
 | [android-studio-pentest-environment](skills/android-studio-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-studio-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 | [androidstudio-app-pentest-environment](skills/androidstudio-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/androidstudio-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
+| [android-app-pentest-environment](skills/android-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 <!-- SKILL_INDEX -->
 
 ---
