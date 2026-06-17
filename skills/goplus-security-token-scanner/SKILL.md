@@ -1,415 +1,473 @@
 ---
 name: goplus-security-token-scanner
-description: GoPlus Security token scanner for detecting malicious tokens, phishing contracts, and blockchain security threats on multiple chains
+description: Use GoPlus Security API to scan tokens, addresses, and NFTs for security threats and malicious contracts
 triggers:
-  - scan this token for security issues
+  - scan this token address for security issues
   - check if this contract is safe with goplus
-  - analyze token security and honeypot risks
-  - verify smart contract security with goplus
-  - detect phishing or malicious token behavior
+  - analyze this wallet address for risks
+  - verify nft contract security
+  - detect phishing or malicious smart contracts
   - run goplus security scan on this address
-  - check token approval risks and security
-  - validate blockchain contract safety
+  - check token approval risks
+  - validate contract security with goplus
 ---
 
 # GoPlus Security Token Scanner
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-GoPlus Security is a comprehensive blockchain security scanner that analyzes tokens, smart contracts, and addresses across multiple chains for security threats including honeypots, phishing contracts, malicious behavior, and risky approvals.
+## Overview
 
-## What It Does
+GoPlus Security provides comprehensive blockchain security scanning services for tokens, smart contracts, NFTs, and wallet addresses across multiple chains. This tool helps detect malicious contracts, honeypots, phishing attempts, and other security risks in Web3 applications.
 
-- **Token Security Analysis**: Scans tokens for honeypot behavior, high taxes, locked liquidity, and ownership risks
-- **Contract Detection**: Identifies phishing contracts and malicious smart contracts
-- **Multi-Chain Support**: Works across Ethereum, BSC, Polygon, Avalanche, Arbitrum, Optimism, and other EVM chains
-- **Address Risk Assessment**: Evaluates wallet addresses for malicious activity
-- **Approval Risk Detection**: Identifies risky token approvals and unlimited allowances
-- **NFT Security**: Checks NFT contracts for security issues
+Key capabilities:
+- Token security analysis (honeypot detection, trading simulation)
+- Smart contract vulnerability scanning
+- NFT contract security verification
+- Malicious address detection
+- dApp security auditing
+- Approval security checking
 
 ## Installation
 
-### Windows Pro Build
+### API Access
 
-Download and install the premium Windows build:
+GoPlus Security operates as a REST API service. No local installation required for basic usage.
 
 ```bash
-# Download from official release
-# Extract the executable
-# Run GoPlus-Security-Scanner.exe
+# Set your API key (if using premium features)
+export GOPLUS_API_KEY="your_api_key_here"
 ```
 
-### API Integration (Recommended)
-
-For programmatic access, use the GoPlus Security API:
+### SDK Integration (JavaScript/TypeScript)
 
 ```bash
-npm install @goplus/security-api
-# or
+npm install @goplus/sdk-node
+```
+
+### SDK Integration (Python)
+
+```bash
 pip install goplus-security
 ```
 
-## API Usage
+## Core API Endpoints
 
-### JavaScript/Node.js
+Base URL: `https://api.gopluslabs.io/api/v1`
+
+### Token Security
+
+**Endpoint:** `/token_security/{chain_id}`
+
+Supported chains: eth (1), bsc (56), polygon (137), arbitrum (42161), optimism (10), avalanche (43114), fantom (250), etc.
+
+### Address Security
+
+**Endpoint:** `/address_security/{address}`
+
+### NFT Security
+
+**Endpoint:** `/nft_security/{chain_id}`
+
+### Approval Security
+
+**Endpoint:** `/approval_security/{chain_id}`
+
+## Usage Examples
+
+### JavaScript/TypeScript
 
 ```javascript
-const GoPlusAPI = require('@goplus/security-api');
+import axios from 'axios';
 
-// Initialize with API endpoint (no key required for public endpoint)
-const goplus = new GoPlusAPI({
-  baseURL: 'https://api.gopluslabs.io'
-});
+const GOPLUS_BASE_URL = 'https://api.gopluslabs.io/api/v1';
+const API_KEY = process.env.GOPLUS_API_KEY;
 
 // Scan token security
-async function scanToken(chainId, contractAddress) {
+async function scanToken(chainId, tokenAddress) {
+  const url = `${GOPLUS_BASE_URL}/token_security/${chainId}`;
+  const params = {
+    contract_addresses: tokenAddress
+  };
+  
+  const headers = API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {};
+  
   try {
-    const result = await goplus.tokenSecurity({
-      chain_id: chainId,
-      contract_addresses: [contractAddress]
-    });
-    
-    console.log('Token Security Report:', result);
-    
-    // Check for critical issues
-    if (result[contractAddress]) {
-      const token = result[contractAddress];
-      
-      if (token.is_honeypot === '1') {
-        console.error('⚠️ HONEYPOT DETECTED');
-      }
-      
-      if (parseInt(token.buy_tax) > 10 || parseInt(token.sell_tax) > 10) {
-        console.warn('⚠️ HIGH TAX WARNING');
-      }
-      
-      if (token.is_open_source === '0') {
-        console.warn('⚠️ Contract not open source');
-      }
-      
-      if (token.is_proxy === '1') {
-        console.warn('⚠️ Proxy contract - owner can change logic');
-      }
-    }
-    
-    return result;
+    const response = await axios.get(url, { params, headers });
+    return response.data;
   } catch (error) {
-    console.error('Scan failed:', error);
+    console.error('Error scanning token:', error.message);
+    throw error;
   }
 }
 
-// Check for phishing contracts
-async function checkPhishing(chainId, address) {
-  const result = await goplus.phishingSite({
-    url: address
-  });
+// Check address for malicious activity
+async function checkAddress(address) {
+  const url = `${GOPLUS_BASE_URL}/address_security/${address}`;
+  const headers = API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {};
   
-  if (result.phishing_site === '1') {
-    console.error('🚨 PHISHING CONTRACT DETECTED');
+  try {
+    const response = await axios.get(url, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error checking address:', error.message);
+    throw error;
   }
-  
-  return result;
 }
 
-// Address security check
-async function checkAddress(chainId, address) {
-  const result = await goplus.addressSecurity({
-    chain_id: chainId,
-    address: address
-  });
+// Scan NFT contract
+async function scanNFT(chainId, contractAddress) {
+  const url = `${GOPLUS_BASE_URL}/nft_security/${chainId}`;
+  const params = {
+    contract_addresses: contractAddress
+  };
   
-  console.log('Address Security:', result);
+  const headers = API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {};
   
-  if (result.malicious_address === '1') {
-    console.error('🚨 MALICIOUS ADDRESS');
+  try {
+    const response = await axios.get(url, { params, headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error scanning NFT:', error.message);
+    throw error;
   }
-  
-  return result;
 }
 
-// Example: Scan Ethereum token
-scanToken('1', '0x1234567890abcdef1234567890abcdef12345678');
+// Usage example
+(async () => {
+  const tokenResult = await scanToken('1', '0x...');
+  console.log('Token Security:', tokenResult);
+  
+  const addressResult = await checkAddress('0x...');
+  console.log('Address Security:', addressResult);
+})();
 ```
 
 ### Python
 
 ```python
-import requests
 import os
+import requests
 
-class GoPlusSecurity:
-    def __init__(self):
-        self.base_url = "https://api.gopluslabs.io/api/v1"
+GOPLUS_BASE_URL = 'https://api.gopluslabs.io/api/v1'
+API_KEY = os.getenv('GOPLUS_API_KEY')
+
+def scan_token(chain_id, token_address):
+    """Scan token for security issues"""
+    url = f'{GOPLUS_BASE_URL}/token_security/{chain_id}'
+    params = {'contract_addresses': token_address}
+    headers = {'Authorization': f'Bearer {API_KEY}'} if API_KEY else {}
     
-    def token_security(self, chain_id, contract_addresses):
-        """Scan token for security issues"""
-        url = f"{self.base_url}/token_security/{chain_id}"
-        params = {"contract_addresses": ",".join(contract_addresses)}
-        
-        response = requests.get(url, params=params)
-        return response.json()
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def check_address(address):
+    """Check if address is malicious"""
+    url = f'{GOPLUS_BASE_URL}/address_security/{address}'
+    headers = {'Authorization': f'Bearer {API_KEY}'} if API_KEY else {}
     
-    def address_security(self, chain_id, address):
-        """Check address for malicious activity"""
-        url = f"{self.base_url}/address_security"
-        params = {
-            "chain_id": chain_id,
-            "address": address
-        }
-        
-        response = requests.get(url, params=params)
-        return response.json()
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def scan_nft(chain_id, contract_address):
+    """Scan NFT contract for security issues"""
+    url = f'{GOPLUS_BASE_URL}/nft_security/{chain_id}'
+    params = {'contract_addresses': contract_address}
+    headers = {'Authorization': f'Bearer {API_KEY}'} if API_KEY else {}
     
-    def approval_security(self, chain_id, contract_addresses):
-        """Check approval risks"""
-        url = f"{self.base_url}/approval_security/{chain_id}"
-        params = {"contract_addresses": ",".join(contract_addresses)}
-        
-        response = requests.get(url, params=params)
-        return response.json()
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+def check_approvals(chain_id, addresses):
+    """Check token approvals for security risks"""
+    url = f'{GOPLUS_BASE_URL}/approval_security/{chain_id}'
+    params = {'addresses': addresses}
+    headers = {'Authorization': f'Bearer {API_KEY}'} if API_KEY else {}
     
-    def analyze_token(self, chain_id, contract_address):
-        """Complete token analysis with risk scoring"""
-        result = self.token_security(chain_id, [contract_address])
-        
-        if result["code"] != 1:
-            return {"error": result.get("message")}
-        
-        token_data = result["result"].get(contract_address.lower())
-        if not token_data:
-            return {"error": "Token not found"}
-        
-        # Calculate risk score
-        risk_score = 0
-        warnings = []
-        
-        if token_data.get("is_honeypot") == "1":
-            risk_score += 100
-            warnings.append("CRITICAL: Honeypot detected")
-        
-        if token_data.get("is_open_source") == "0":
-            risk_score += 20
-            warnings.append("Contract not verified")
-        
-        buy_tax = int(token_data.get("buy_tax", 0))
-        sell_tax = int(token_data.get("sell_tax", 0))
-        
-        if buy_tax > 10 or sell_tax > 10:
-            risk_score += 30
-            warnings.append(f"High tax: Buy {buy_tax}%, Sell {sell_tax}%")
-        
-        if token_data.get("is_proxy") == "1":
-            risk_score += 15
-            warnings.append("Proxy contract - upgradeable")
-        
-        if token_data.get("can_take_back_ownership") == "1":
-            risk_score += 25
-            warnings.append("Owner can reclaim ownership")
-        
-        if token_data.get("owner_change_balance") == "1":
-            risk_score += 40
-            warnings.append("Owner can change balances")
-        
-        return {
-            "risk_score": risk_score,
-            "risk_level": "HIGH" if risk_score > 50 else "MEDIUM" if risk_score > 20 else "LOW",
-            "warnings": warnings,
-            "data": token_data
-        }
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
+    return response.json()
 
 # Usage
-scanner = GoPlusSecurity()
-
-# Scan Ethereum token
-result = scanner.analyze_token("1", "0x1234567890abcdef1234567890abcdef12345678")
-print(f"Risk Level: {result['risk_level']}")
-print(f"Risk Score: {result['risk_score']}")
-for warning in result['warnings']:
-    print(f"⚠️ {warning}")
+if __name__ == '__main__':
+    result = scan_token('1', '0x...')
+    print('Token Security:', result)
 ```
 
-## Chain IDs
+### cURL
 
-| Chain | ID |
-|-------|-----|
-| Ethereum | 1 |
-| BSC | 56 |
-| Polygon | 137 |
-| Avalanche | 43114 |
-| Arbitrum | 42161 |
-| Optimism | 10 |
-| Fantom | 250 |
-| Cronos | 25 |
+```bash
+# Scan token on Ethereum
+curl "https://api.gopluslabs.io/api/v1/token_security/1?contract_addresses=0x..."
 
-## Key Security Indicators
+# Check address security
+curl "https://api.gopluslabs.io/api/v1/address_security/0x..."
 
-### Token Security Fields
+# Scan NFT on BSC
+curl "https://api.gopluslabs.io/api/v1/nft_security/56?contract_addresses=0x..."
+```
+
+## Response Interpretation
+
+### Token Security Response
 
 ```javascript
 {
-  "is_honeypot": "0",           // "1" = honeypot detected
-  "honeypot_with_same_creator": "0",
-  "is_open_source": "1",        // "0" = not verified
-  "is_proxy": "0",              // "1" = upgradeable contract
-  "is_mintable": "0",           // "1" = can mint new tokens
-  "owner_change_balance": "0",  // "1" = owner can modify balances
-  "can_take_back_ownership": "0",
-  "buy_tax": "0",               // Buy tax percentage
-  "sell_tax": "0",              // Sell tax percentage
-  "slippage_modifiable": "0",
-  "is_blacklisted": "0",
-  "is_whitelisted": "0",
-  "holder_count": "1000",
-  "lp_holder_count": "10",
-  "lp_total_supply": "100000",
-  "is_true_token": "1",
-  "is_airdrop_scam": "0"
+  "code": 1,
+  "message": "OK",
+  "result": {
+    "0x...": {
+      "is_open_source": "1",
+      "is_proxy": "0",
+      "is_honeypot": "0",
+      "honeypot_with_same_creator": "0",
+      "is_blacklisted": "0",
+      "is_whitelisted": "0",
+      "is_mintable": "0",
+      "can_take_back_ownership": "0",
+      "owner_change_balance": "0",
+      "hidden_owner": "0",
+      "selfdestruct": "0",
+      "external_call": "0",
+      "buy_tax": "0.05",
+      "sell_tax": "0.05",
+      "trading_cooldown": "0",
+      "transfer_pausable": "0",
+      "holder_count": "1234",
+      "total_supply": "1000000000",
+      "creator_address": "0x...",
+      "creator_balance": "100000",
+      "creator_percent": "0.01"
+    }
+  }
 }
 ```
 
+### Key Risk Indicators
+
+- `is_honeypot: "1"` - Cannot sell after buying
+- `is_blacklisted: "1"` - Known malicious contract
+- `can_take_back_ownership: "1"` - Owner can reclaim control
+- `hidden_owner: "1"` - Ownership obfuscated
+- `selfdestruct: "1"` - Contract can be destroyed
+- High `buy_tax` or `sell_tax` (>10%) - Potential rug pull
+- `transfer_pausable: "1"` - Trading can be paused
+
 ## Common Patterns
 
-### Pre-Transaction Security Check
+### Security Dashboard
 
 ```javascript
-async function safeTokenSwap(tokenAddress, chainId) {
-  const goplus = new GoPlusAPI({ baseURL: 'https://api.gopluslabs.io' });
+async function getSecurityScore(chainId, tokenAddress) {
+  const result = await scanToken(chainId, tokenAddress);
+  const data = result.result[tokenAddress.toLowerCase()];
   
-  // Security check before swap
-  const security = await goplus.tokenSecurity({
-    chain_id: chainId,
-    contract_addresses: [tokenAddress]
-  });
+  let score = 100;
+  let risks = [];
   
-  const token = security[tokenAddress];
-  
-  // Block dangerous tokens
-  if (token.is_honeypot === '1') {
-    throw new Error('BLOCKED: Honeypot detected');
+  if (data.is_honeypot === '1') {
+    score -= 50;
+    risks.push('CRITICAL: Honeypot detected');
   }
   
-  if (token.owner_change_balance === '1') {
-    throw new Error('BLOCKED: Owner can modify balances');
+  if (data.is_blacklisted === '1') {
+    score -= 40;
+    risks.push('CRITICAL: Blacklisted contract');
   }
   
-  // Warn about risks
-  const warnings = [];
-  if (parseInt(token.sell_tax) > 10) {
-    warnings.push(`High sell tax: ${token.sell_tax}%`);
+  if (data.hidden_owner === '1') {
+    score -= 20;
+    risks.push('HIGH: Hidden owner');
   }
   
-  if (token.is_proxy === '1') {
-    warnings.push('Contract is upgradeable');
+  if (data.can_take_back_ownership === '1') {
+    score -= 15;
+    risks.push('HIGH: Can take back ownership');
+  }
+  
+  if (parseFloat(data.buy_tax) > 0.1 || parseFloat(data.sell_tax) > 0.1) {
+    score -= 15;
+    risks.push('MEDIUM: High tax rates');
+  }
+  
+  if (data.is_mintable === '1') {
+    score -= 10;
+    risks.push('MEDIUM: Mintable token');
   }
   
   return {
-    safe: warnings.length === 0,
-    warnings: warnings,
-    proceed_with_caution: warnings.length > 0
+    score: Math.max(score, 0),
+    risks,
+    data
   };
 }
 ```
 
-### Batch Token Scanner
+### Batch Scanning
+
+```javascript
+async function scanMultipleTokens(chainId, addresses) {
+  const url = `${GOPLUS_BASE_URL}/token_security/${chainId}`;
+  const params = {
+    contract_addresses: addresses.join(',')
+  };
+  
+  const headers = API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {};
+  const response = await axios.get(url, { params, headers });
+  
+  return response.data;
+}
+
+// Scan up to 50 tokens at once
+const results = await scanMultipleTokens('1', [
+  '0xtoken1...',
+  '0xtoken2...',
+  '0xtoken3...'
+]);
+```
+
+### Wallet Protection
 
 ```python
-def batch_scan_tokens(chain_id, token_list):
-    """Scan multiple tokens efficiently"""
-    scanner = GoPlusSecurity()
-    results = {}
+def check_wallet_safety(chain_id, wallet_address):
+    """Check wallet and its approvals for security issues"""
     
-    # API supports up to 50 addresses per call
-    batch_size = 50
+    # Check address reputation
+    address_result = check_address(wallet_address)
     
-    for i in range(0, len(token_list), batch_size):
-        batch = token_list[i:i+batch_size]
-        response = scanner.token_security(chain_id, batch)
-        
-        if response["code"] == 1:
-            for address, data in response["result"].items():
-                # Flag high-risk tokens
-                is_risky = (
-                    data.get("is_honeypot") == "1" or
-                    int(data.get("buy_tax", 0)) > 10 or
-                    int(data.get("sell_tax", 0)) > 10 or
-                    data.get("owner_change_balance") == "1"
-                )
-                
-                results[address] = {
-                    "safe": not is_risky,
-                    "data": data
-                }
+    # Check token approvals
+    approval_result = check_approvals(chain_id, wallet_address)
     
-    return results
+    dangerous_approvals = []
+    if approval_result['code'] == 1:
+        for approval in approval_result.get('result', []):
+            if approval.get('is_malicious') == '1':
+                dangerous_approvals.append(approval)
+    
+    return {
+        'is_malicious': address_result.get('result', {}).get('is_malicious'),
+        'dangerous_approvals': dangerous_approvals,
+        'recommendation': 'Revoke approvals' if dangerous_approvals else 'Safe'
+    }
+```
+
+## Configuration
+
+### Chain IDs
+
+```javascript
+const CHAIN_IDS = {
+  ethereum: '1',
+  bsc: '56',
+  polygon: '137',
+  avalanche: '43114',
+  fantom: '250',
+  arbitrum: '42161',
+  optimism: '10',
+  cronos: '25',
+  moonbeam: '1284'
+};
+```
+
+### Rate Limiting
+
+Free tier: 100 requests/day per IP
+Premium tier: Higher limits with API key
+
+```javascript
+// Implement rate limiting
+const rateLimit = require('axios-rate-limit');
+const http = rateLimit(axios.create(), {
+  maxRequests: 2,
+  perMilliseconds: 1000
+});
 ```
 
 ## Troubleshooting
 
-### Rate Limiting
+### Invalid Chain ID
+Ensure you're using the correct numeric chain ID, not the chain name.
 
-The public API has rate limits. Handle accordingly:
+### Empty Results
+Token may be too new or not yet indexed. Wait a few minutes and retry.
+
+### 429 Too Many Requests
+You've exceeded rate limits. Implement exponential backoff or upgrade to premium.
 
 ```javascript
-async function scanWithRetry(chainId, address, maxRetries = 3) {
+async function retryWithBackoff(fn, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await goplus.tokenSecurity({
-        chain_id: chainId,
-        contract_addresses: [address]
-      });
+      return await fn();
     } catch (error) {
-      if (error.response?.status === 429) {
-        // Rate limited - wait and retry
-        await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
-        continue;
+      if (error.response?.status === 429 && i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      } else {
+        throw error;
       }
-      throw error;
     }
   }
-  throw new Error('Max retries exceeded');
 }
 ```
 
-### Invalid Contract Address
-
-Always validate and normalize addresses:
+### Contract Address Validation
 
 ```javascript
-const Web3 = require('web3');
-
-function validateAndNormalizeAddress(address) {
-  if (!Web3.utils.isAddress(address)) {
-    throw new Error('Invalid address format');
-  }
-  return address.toLowerCase();
+function isValidAddress(address) {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
-```
-
-### No Data Returned
-
-Some tokens may not have data yet:
-
-```python
-def safe_scan(chain_id, address):
-    scanner = GoPlusSecurity()
-    result = scanner.token_security(chain_id, [address])
-    
-    if result["code"] != 1:
-        return {"error": "API error", "message": result.get("message")}
-    
-    token_data = result["result"].get(address.lower())
-    
-    if not token_data:
-        return {"error": "no_data", "message": "Token not indexed yet"}
-    
-    return {"success": True, "data": token_data}
 ```
 
 ## Security Best Practices
 
-1. **Always scan before trading** - Run security checks before any token transactions
-2. **Check multiple indicators** - Don't rely on a single flag
-3. **Set risk thresholds** - Define acceptable risk levels for your use case
-4. **Monitor tax changes** - Some contracts can modify taxes after deployment
-5. **Verify liquidity locks** - Check if liquidity is locked and for how long
-6. **Cross-reference sources** - Use multiple security tools for critical decisions
+1. **Never trust a single indicator** - Check multiple security flags
+2. **Cache results** - Token security doesn't change frequently
+3. **Monitor approval security** - Regularly check wallet approvals
+4. **Combine with other tools** - Use alongside other security scanners
+5. **Verify source** - Always check contract source code on block explorers
+
+## Integration Example
+
+```javascript
+class TokenSecurityChecker {
+  constructor(apiKey = null) {
+    this.apiKey = apiKey;
+    this.baseUrl = 'https://api.gopluslabs.io/api/v1';
+  }
+  
+  async checkTokenSafety(chainId, tokenAddress) {
+    const result = await this.scanToken(chainId, tokenAddress);
+    const data = result.result[tokenAddress.toLowerCase()];
+    
+    const criticalIssues = [
+      data.is_honeypot === '1',
+      data.is_blacklisted === '1',
+      data.hidden_owner === '1'
+    ].filter(Boolean).length;
+    
+    return {
+      isSafe: criticalIssues === 0,
+      criticalIssues,
+      data
+    };
+  }
+  
+  async scanToken(chainId, tokenAddress) {
+    const url = `${this.baseUrl}/token_security/${chainId}`;
+    const headers = this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {};
+    const response = await axios.get(url, {
+      params: { contract_addresses: tokenAddress },
+      headers
+    });
+    return response.data;
+  }
+}
+
+// Usage
+const checker = new TokenSecurityChecker(process.env.GOPLUS_API_KEY);
+const safety = await checker.checkTokenSafety('1', '0x...');
+console.log(safety.isSafe ? 'Token appears safe' : 'WARNING: Security issues detected');
+```
