@@ -139,6 +139,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [android-studio-pentest-environment](skills/android-studio-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-studio-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 | [androidstudio-app-pentest-environment](skills/androidstudio-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/androidstudio-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 | [android-app-pentest-environment](skills/android-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
+| [android-pentest-environment-setup](skills/android-pentest-environment-setup/) | [install](https://skills.sh/aradotso/security-skills/android-pentest-environment-setup) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-17 |
 <!-- SKILL_INDEX -->
 
 ---
