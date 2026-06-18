@@ -140,6 +140,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [androidstudio-app-pentest-environment](skills/androidstudio-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/androidstudio-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 | [android-app-pentest-environment](skills/android-app-pentest-environment/) | [install](https://skills.sh/aradotso/security-skills/android-app-pentest-environment) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-16 |
 | [android-pentest-environment-setup](skills/android-pentest-environment-setup/) | [install](https://skills.sh/aradotso/security-skills/android-pentest-environment-setup) | [d0ctorsec/AndroidStudioAppPentestEnvironmentSetup](https://github.com/d0ctorsec/AndroidStudioAppPentestEnvironmentSetup) | 2026-06-17 |
+| [spoof-suite-hardware-identity](skills/spoof-suite-hardware-identity/) | [install](https://skills.sh/aradotso/security-skills/spoof-suite-hardware-identity) | [Shantanu-U69/Spoof-Suite-Security](https://github.com/Shantanu-U69/Spoof-Suite-Security) | 2026-06-18 |
 <!-- SKILL_INDEX -->
 
 ---
