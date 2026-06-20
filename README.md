@@ -148,6 +148,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentesting-checklist-guide](skills/pentesting-checklist-guide/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-guide) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 | [pentesting-checklist-security-assessment](skills/pentesting-checklist-security-assessment/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-security-assessment) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 | [pentesting-checklist-platform](skills/pentesting-checklist-platform/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-platform) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
+| [pentesting-checklist-usage](skills/pentesting-checklist-usage/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-usage) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 <!-- SKILL_INDEX -->
 
 ---
