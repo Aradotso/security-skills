@@ -146,6 +146,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [cloudflare-security-audit-skill](skills/cloudflare-security-audit-skill/) | [install](https://skills.sh/aradotso/security-skills/cloudflare-security-audit-skill) | [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | 2026-06-20 |
 | [pentesting-checklist-interactive](skills/pentesting-checklist-interactive/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-interactive) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 | [pentesting-checklist-guide](skills/pentesting-checklist-guide/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-guide) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
+| [pentesting-checklist-security-assessment](skills/pentesting-checklist-security-assessment/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-security-assessment) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 <!-- SKILL_INDEX -->
 
 ---
