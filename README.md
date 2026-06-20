@@ -143,6 +143,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [spoof-suite-hardware-identity](skills/spoof-suite-hardware-identity/) | [install](https://skills.sh/aradotso/security-skills/spoof-suite-hardware-identity) | [Shantanu-U69/Spoof-Suite-Security](https://github.com/Shantanu-U69/Spoof-Suite-Security) | 2026-06-18 |
 | [hardware-hardspoof-spoofing-toolkit](skills/hardware-hardspoof-spoofing-toolkit/) | [install](https://skills.sh/aradotso/security-skills/hardware-hardspoof-spoofing-toolkit) | [Shantanu-U69/Spoof-Suite-Security](https://github.com/Shantanu-U69/Spoof-Suite-Security) | 2026-06-18 |
 | [bitdefender-total-security-workflow](skills/bitdefender-total-security-workflow/) | [install](https://skills.sh/aradotso/security-skills/bitdefender-total-security-workflow) | [Forwardmetier57/Bitdefender-Total-Security-2026](https://github.com/Forwardmetier57/Bitdefender-Total-Security-2026) | 2026-06-18 |
+| [cloudflare-security-audit-skill](skills/cloudflare-security-audit-skill/) | [install](https://skills.sh/aradotso/security-skills/cloudflare-security-audit-skill) | [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | 2026-06-20 |
 <!-- SKILL_INDEX -->
 
 ---
