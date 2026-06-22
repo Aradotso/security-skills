@@ -150,6 +150,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentesting-checklist-platform](skills/pentesting-checklist-platform/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-platform) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 | [pentesting-checklist-usage](skills/pentesting-checklist-usage/) | [install](https://skills.sh/aradotso/security-skills/pentesting-checklist-usage) | [m14r41/PentestingChecklist](https://github.com/m14r41/PentestingChecklist) | 2026-06-20 |
 | [spoof-suite-security-hardware](skills/spoof-suite-security-hardware/) | [install](https://skills.sh/aradotso/security-skills/spoof-suite-security-hardware) | [Shantanu-U69/Spoof-Suite-Security](https://github.com/Shantanu-U69/Spoof-Suite-Security) | 2026-06-20 |
+| [claude-code-cybersecurity-skill](skills/claude-code-cybersecurity-skill/) | [install](https://skills.sh/aradotso/security-skills/claude-code-cybersecurity-skill) | [Masriyan/Claude-Code-CyberSecurity-Skill](https://github.com/Masriyan/Claude-Code-CyberSecurity-Skill) | 2026-06-22 |
 <!-- SKILL_INDEX -->
 
 ---
