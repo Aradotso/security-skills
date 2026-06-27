@@ -1,63 +1,68 @@
 ---
 name: octoguard-openclaw-security-supervision
-description: Security governance and audit system for OpenClaw AI agents with policy-based interception, token monitoring, and alert notifications
+description: Security governance and audit system for OpenClaw AI agents with real-time policy enforcement, token monitoring, and alert notifications
 triggers:
-  - how do I secure my OpenClaw AI agent
-  - set up security policies for OpenClaw
-  - monitor and audit AI agent behavior
+  - how do I secure my OpenClaw deployment
+  - set up security policies for AI agent actions
+  - monitor and audit OpenClaw tool calls
+  - block dangerous operations in OpenClaw
   - configure OctoGuard security rules
-  - intercept dangerous AI agent operations
-  - track token usage in OpenClaw
-  - set up alerts for risky AI actions
-  - audit OpenClaw tool execution
+  - track token usage and set alerts for AI agents
+  - intercept high-risk AI behaviors
+  - deploy security supervision for OpenClaw
 ---
 
 # OctoGuard OpenClaw Security Supervision
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-OctoGuard (章鱼卫士) is a security governance and audit system designed for OpenClaw AI agents. It provides real-time detection, policy-based control, and alert notifications for user dialogue commands, tool calls, and execution results. The system acts as a security gateway that monitors and controls all AI agent behaviors without modifying the original OpenClaw deployment.
+OctoGuard (章鱼卫士) is a security governance and audit system designed specifically for OpenClaw AI agents. It provides real-time detection, policy control, and alert notifications for user dialogue commands, tool calls, and execution results. The system acts as a security gateway that intercepts dangerous operations before they execute, monitors token consumption, and maintains comprehensive audit logs.
 
 ## What OctoGuard Does
 
-- **Policy-Based Interception**: Block access to sensitive files, dangerous operations, and high-risk behaviors based on configurable security rules
-- **Token Monitoring**: Track total token usage, session details, and threshold-based alerting
-- **Audit Logging**: Record all events processed through OpenClaw, including allowed and blocked actions
-- **Visual Policy Management**: Web-based dashboard for viewing, enabling/disabling, and managing security policies
-- **OpenClaw Control**: Monitor OpenClaw gateway status and emergency shutdown capability
-- **Alert Notifications**: Push notifications via DingTalk, WeChat Work, and Email when interception events occur
+- **Policy-based Interception**: Configure rules to block sensitive file access, dangerous operations, and high-risk behaviors
+- **Token Monitoring**: Real-time tracking of token usage with threshold alerts
+- **Audit Logging**: Record all OpenClaw events, allowed actions, and blocked attempts
+- **Visual Policy Management**: Web-based dashboard for managing security policies
+- **OpenClaw Gateway Control**: Monitor and control OpenClaw gateway status
+- **Multi-channel Alerts**: Push notifications via DingTalk, WeChat Work, and Email
 - **Security Dashboard**: Comprehensive visualization of OpenClaw security posture
 
 ## Architecture
 
-OctoGuard operates as a security proxy layer between external requests and the OpenClaw gateway:
+OctoGuard sits between external users and OpenClaw, intercepting all requests through a security policy engine before they reach the AI agent. It operates non-invasively without modifying OpenClaw's core functionality.
 
 ```
-User Request → OctoGuard Security Engine → Policy Evaluation → OpenClaw Gateway → AI Agent
-                                        ↓
-                                   Audit Log & Alerts
+User Request → OctoGuard Security Gateway → Policy Engine → OpenClaw → AI Agent
+                        ↓
+              Audit Logs + Alerts
 ```
 
 ## Installation
 
 ### Prerequisites
 
-- Node.js 14+ and npm
-- MySQL 5.7+ or compatible database
+- Node.js (v14+)
+- MySQL database
 - OpenClaw instance running
-- Network access to OpenClaw gateway
+- DingTalk/WeChat Work webhook (optional, for alerts)
 
-### Database Setup
+### Backend Setup
 
-1. Create MySQL database and import schema:
+```bash
+# Clone the repository
+git clone https://github.com/O-ozzz/OctoGuard--Free-OpenClaw-Security-Supervision-System.git
+cd OctoGuard--Free-OpenClaw-Security-Supervision-System
 
-```sql
-CREATE DATABASE octoguard CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE octoguard;
-SOURCE backend/schema.sql;
+# Install backend dependencies
+cd backend
+npm install
+
+# Configure database connection
+# Edit config/database.js
 ```
 
-2. Configure database connection in `backend/config/db.js`:
+**Database Configuration** (`config/database.js`):
 
 ```javascript
 module.exports = {
@@ -66,608 +71,699 @@ module.exports = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || 'octoguard',
-  connectionLimit: 10
+  connectionLimit: 10,
+  waitForConnections: true,
+  queueLimit: 0
 };
 ```
 
-### Backend Setup
+**Environment Variables** (`.env`):
 
 ```bash
-cd backend
-npm install
-npm start
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=octoguard
+
+# Server
+PORT=3000
+NODE_ENV=production
+
+# OpenClaw Gateway
+OPENCLAW_HOST=localhost
+OPENCLAW_PORT=8080
+OPENCLAW_API_KEY=your_openclaw_key
+
+# Alert Webhooks
+DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN
+WECHAT_WEBHOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_KEY
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_app_password
+EMAIL_TO=security-team@company.com
 ```
 
-The backend API will start on `http://localhost:3000` by default.
+### Initialize Database
+
+```bash
+# Run database migrations
+npm run migrate
+
+# Start backend server
+npm start
+# Backend runs on http://localhost:3000
+```
 
 ### Frontend Setup
 
 ```bash
-cd frontend
+# Install frontend dependencies
+cd ../frontend
 npm install
+
+# Configure API endpoint
+# Edit .env or config file
+echo "VITE_API_BASE_URL=http://localhost:3000" > .env
+
+# Build and run frontend
 npm run build
-npm run serve
+npm run preview
+# Or for development
+npm run dev
 ```
 
-Access the dashboard at `http://localhost:8080`.
+## Core API
 
-### OpenClaw Integration
+### Security Policy Management
 
-Configure OctoGuard to proxy requests to your OpenClaw instance in `backend/config/openclaw.js`:
-
-```javascript
-module.exports = {
-  gatewayUrl: process.env.OPENCLAW_GATEWAY_URL || 'http://localhost:8000',
-  timeout: parseInt(process.env.OPENCLAW_TIMEOUT) || 30000,
-  retries: parseInt(process.env.OPENCLAW_RETRIES) || 3
-};
-```
-
-## Core API Usage
-
-### Security Policy Engine
-
-Create and manage security policies through the API:
+**Create Security Policy**:
 
 ```javascript
+// POST /api/policies
 const axios = require('axios');
 
-// Create a new security policy
-async function createPolicy(policyData) {
-  const response = await axios.post('http://localhost:3000/api/policies', {
-    name: policyData.name,
-    description: policyData.description,
-    ruleType: policyData.ruleType, // 'keyword', 'regex', 'path', 'command'
-    pattern: policyData.pattern,
-    action: policyData.action, // 'block', 'alert', 'log'
+async function createSecurityPolicy() {
+  const policy = {
+    name: "Block Sensitive File Access",
+    description: "Prevent access to /etc/passwd and other system files",
     enabled: true,
-    severity: policyData.severity // 'low', 'medium', 'high', 'critical'
-  });
+    priority: 1,
+    conditions: {
+      type: "tool_call",
+      tool_name: "file_read",
+      pattern: ".*(/etc/passwd|/etc/shadow|.*\\.pem|.*\\.key).*",
+      matchType: "regex"
+    },
+    action: "block",
+    alertChannels: ["dingtalk", "email"]
+  };
+
+  const response = await axios.post(
+    `${process.env.VITE_API_BASE_URL}/api/policies`,
+    policy
+  );
+  
   return response.data;
 }
-
-// Example: Block sensitive file access
-await createPolicy({
-  name: 'Block Sensitive Files',
-  description: 'Prevent access to /etc/passwd and shadow files',
-  ruleType: 'regex',
-  pattern: '(/etc/(passwd|shadow)|.*\\.key|.*\\.pem)',
-  action: 'block',
-  severity: 'critical'
-});
-
-// Example: Alert on database operations
-await createPolicy({
-  name: 'Database Operation Alert',
-  description: 'Alert when database commands are executed',
-  ruleType: 'keyword',
-  pattern: 'DROP TABLE,DELETE FROM,TRUNCATE',
-  action: 'alert',
-  severity: 'high'
-});
 ```
 
-### Intercepting Requests
-
-The security middleware processes all requests before forwarding to OpenClaw:
+**List Active Policies**:
 
 ```javascript
-const express = require('express');
+// GET /api/policies
+async function listPolicies() {
+  const response = await axios.get(
+    `${process.env.VITE_API_BASE_URL}/api/policies`,
+    { params: { enabled: true } }
+  );
+  
+  return response.data.policies;
+}
+```
+
+**Toggle Policy Status**:
+
+```javascript
+// PATCH /api/policies/:id
+async function togglePolicy(policyId, enabled) {
+  const response = await axios.patch(
+    `${process.env.VITE_API_BASE_URL}/api/policies/${policyId}`,
+    { enabled }
+  );
+  
+  return response.data;
+}
+```
+
+### Request Interception
+
+**Intercept OpenClaw Request**:
+
+```javascript
+// Middleware for intercepting OpenClaw requests
 const policyEngine = require('./services/policyEngine');
 const auditLogger = require('./services/auditLogger');
 
-const router = express.Router();
-
-router.post('/execute', async (req, res) => {
-  const { userId, sessionId, command, toolName, parameters } = req.body;
-
-  // Evaluate request against security policies
-  const evaluation = await policyEngine.evaluate({
-    command,
-    toolName,
-    parameters,
-    userId,
-    sessionId
-  });
-
-  // Log the evaluation
-  await auditLogger.log({
-    userId,
-    sessionId,
-    command,
-    toolName,
-    parameters,
-    action: evaluation.action,
-    matchedPolicies: evaluation.matchedPolicies,
-    timestamp: new Date()
-  });
-
-  // Block if policy dictates
-  if (evaluation.action === 'block') {
-    await sendAlert(evaluation);
-    return res.status(403).json({
-      blocked: true,
-      reason: evaluation.reason,
-      policies: evaluation.matchedPolicies
-    });
-  }
-
-  // Forward to OpenClaw
+async function interceptRequest(req, res, next) {
+  const { user_input, tool_call, session_id } = req.body;
+  
   try {
-    const openclawResponse = await forwardToOpenClaw(req.body);
+    // Check against all active policies
+    const evaluation = await policyEngine.evaluate({
+      userInput: user_input,
+      toolCall: tool_call,
+      sessionId: session_id,
+      timestamp: new Date()
+    });
     
-    // Log successful execution
-    await auditLogger.logExecution({
-      userId,
-      sessionId,
-      success: true,
-      response: openclawResponse.data
+    if (evaluation.action === 'block') {
+      // Log blocked attempt
+      await auditLogger.log({
+        type: 'BLOCKED',
+        sessionId: session_id,
+        reason: evaluation.reason,
+        policy: evaluation.policyName,
+        details: { user_input, tool_call }
+      });
+      
+      // Send alerts
+      await sendAlerts(evaluation);
+      
+      return res.status(403).json({
+        error: 'Request blocked by security policy',
+        reason: evaluation.reason,
+        policy: evaluation.policyName
+      });
+    }
+    
+    // Log allowed request
+    await auditLogger.log({
+      type: 'ALLOWED',
+      sessionId: session_id,
+      details: { user_input, tool_call }
     });
-
-    return res.json(openclawResponse.data);
+    
+    next();
   } catch (error) {
-    await auditLogger.logExecution({
-      userId,
-      sessionId,
-      success: false,
-      error: error.message
-    });
-    throw error;
+    console.error('Policy evaluation error:', error);
+    next(error);
+  }
+}
+```
+
+### Token Monitoring
+
+**Track Token Usage**:
+
+```javascript
+// POST /api/tokens/track
+async function trackTokenUsage(sessionId, tokensUsed, model) {
+  const response = await axios.post(
+    `${process.env.VITE_API_BASE_URL}/api/tokens/track`,
+    {
+      session_id: sessionId,
+      tokens_used: tokensUsed,
+      model: model,
+      timestamp: new Date().toISOString()
+    }
+  );
+  
+  return response.data;
+}
+```
+
+**Get Token Statistics**:
+
+```javascript
+// GET /api/tokens/stats
+async function getTokenStats(startDate, endDate) {
+  const response = await axios.get(
+    `${process.env.VITE_API_BASE_URL}/api/tokens/stats`,
+    {
+      params: {
+        start_date: startDate,
+        end_date: endDate
+      }
+    }
+  );
+  
+  return {
+    totalTokens: response.data.total_tokens,
+    sessionCount: response.data.session_count,
+    averagePerSession: response.data.average_per_session,
+    breakdown: response.data.breakdown
+  };
+}
+```
+
+**Set Token Threshold Alert**:
+
+```javascript
+// POST /api/tokens/threshold
+async function setTokenThreshold(threshold, period = '1h') {
+  const response = await axios.post(
+    `${process.env.VITE_API_BASE_URL}/api/tokens/threshold`,
+    {
+      threshold: threshold,
+      period: period,
+      alert_channels: ["email", "dingtalk"]
+    }
+  );
+  
+  return response.data;
+}
+```
+
+### Audit Logs
+
+**Query Audit Logs**:
+
+```javascript
+// GET /api/audit/logs
+async function queryAuditLogs(filters) {
+  const response = await axios.get(
+    `${process.env.VITE_API_BASE_URL}/api/audit/logs`,
+    {
+      params: {
+        type: filters.type, // 'BLOCKED', 'ALLOWED', 'ERROR'
+        session_id: filters.sessionId,
+        start_date: filters.startDate,
+        end_date: filters.endDate,
+        limit: filters.limit || 100,
+        offset: filters.offset || 0
+      }
+    }
+  );
+  
+  return response.data.logs;
+}
+```
+
+**Export Audit Report**:
+
+```javascript
+// GET /api/audit/export
+async function exportAuditReport(format = 'csv') {
+  const response = await axios.get(
+    `${process.env.VITE_API_BASE_URL}/api/audit/export`,
+    {
+      params: {
+        format: format, // 'csv' or 'json'
+        start_date: new Date(Date.now() - 30*24*60*60*1000).toISOString(),
+        end_date: new Date().toISOString()
+      },
+      responseType: 'blob'
+    }
+  );
+  
+  return response.data;
+}
+```
+
+## Common Security Patterns
+
+### Pattern 1: File System Protection
+
+```javascript
+// Prevent access to sensitive system files
+const fileSystemPolicy = {
+  name: "File System Protection",
+  enabled: true,
+  priority: 1,
+  conditions: {
+    type: "tool_call",
+    tool_name: ["file_read", "file_write", "file_delete"],
+    patterns: [
+      "^/etc/.*",
+      "^/root/.*",
+      ".*\\.ssh/.*",
+      ".*\\.pem$",
+      ".*\\.key$",
+      ".*password.*",
+      ".*secret.*"
+    ],
+    matchType: "regex_any"
+  },
+  action: "block",
+  message: "Access to system files and credentials is prohibited"
+};
+```
+
+### Pattern 2: Network Request Filtering
+
+```javascript
+// Block requests to internal network ranges
+const networkPolicy = {
+  name: "Internal Network Protection",
+  enabled: true,
+  priority: 2,
+  conditions: {
+    type: "tool_call",
+    tool_name: ["http_request", "curl", "wget"],
+    patterns: [
+      "^https?://10\\..*",
+      "^https?://172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
+      "^https?://192\\.168\\..*",
+      "^https?://localhost.*",
+      "^https?://127\\.0\\.0\\..*"
+    ],
+    matchType: "regex_any"
+  },
+  action: "block",
+  message: "Requests to internal network addresses are blocked"
+};
+```
+
+### Pattern 3: Command Execution Prevention
+
+```javascript
+// Prevent dangerous shell commands
+const commandPolicy = {
+  name: "Dangerous Command Prevention",
+  enabled: true,
+  priority: 1,
+  conditions: {
+    type: "tool_call",
+    tool_name: ["shell_exec", "bash", "terminal"],
+    patterns: [
+      ".*(rm -rf|dd if=|mkfs|format).*",
+      ".*(sudo|su ).*",
+      ".*>/dev/sd[a-z].*",
+      ".*(wget|curl).*\\|.*sh.*",
+      ".*nc -l.*",
+      ".*iptables.*"
+    ],
+    matchType: "regex_any"
+  },
+  action: "block",
+  message: "Dangerous system commands are not allowed"
+};
+```
+
+### Pattern 4: Data Exfiltration Detection
+
+```javascript
+// Detect potential data exfiltration
+const exfiltrationPolicy = {
+  name: "Data Exfiltration Detection",
+  enabled: true,
+  priority: 3,
+  conditions: {
+    type: "combined",
+    rules: [
+      {
+        tool_name: "file_read",
+        pattern: ".*(database|backup|export|dump).*"
+      },
+      {
+        tool_name: ["http_request", "ftp_upload"],
+        pattern: ".*"
+      }
+    ],
+    logic: "sequential_within_5min"
+  },
+  action: "block",
+  alertChannels: ["email", "dingtalk", "wechat"],
+  message: "Potential data exfiltration attempt detected"
+};
+```
+
+## Alert Configuration
+
+### DingTalk Integration
+
+```javascript
+// services/alerts/dingtalk.js
+const axios = require('axios');
+
+async function sendDingTalkAlert(event) {
+  const webhook = process.env.DINGTALK_WEBHOOK;
+  
+  const message = {
+    msgtype: "markdown",
+    markdown: {
+      title: `🚨 OctoGuard Security Alert`,
+      text: `### Security Event Detected
+      
+**Type**: ${event.type}
+**Policy**: ${event.policyName}
+**Session**: ${event.sessionId}
+**Time**: ${new Date(event.timestamp).toLocaleString()}
+
+**Reason**: ${event.reason}
+
+**Details**:
+\`\`\`
+${JSON.stringify(event.details, null, 2)}
+\`\`\`
+
+> Please review and take appropriate action.`
+    }
+  };
+  
+  await axios.post(webhook, message);
+}
+
+module.exports = { sendDingTalkAlert };
+```
+
+### Email Alerts
+
+```javascript
+// services/alerts/email.js
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransporter({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
-module.exports = router;
+async function sendEmailAlert(event) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_TO,
+    subject: `[OctoGuard] Security Alert - ${event.type}`,
+    html: `
+      <h2>🚨 OctoGuard Security Alert</h2>
+      <p><strong>Type:</strong> ${event.type}</p>
+      <p><strong>Policy:</strong> ${event.policyName}</p>
+      <p><strong>Session:</strong> ${event.sessionId}</p>
+      <p><strong>Time:</strong> ${new Date(event.timestamp).toLocaleString()}</p>
+      <p><strong>Reason:</strong> ${event.reason}</p>
+      <h3>Details:</h3>
+      <pre>${JSON.stringify(event.details, null, 2)}</pre>
+    `
+  };
+  
+  await transporter.sendMail(mailOptions);
+}
+
+module.exports = { sendEmailAlert };
 ```
 
-### Policy Engine Implementation
+## Policy Engine Implementation
 
 ```javascript
-// backend/services/policyEngine.js
+// services/policyEngine.js
+const db = require('../config/database');
+
 class PolicyEngine {
-  constructor() {
-    this.policies = [];
-    this.loadPolicies();
-  }
-
-  async loadPolicies() {
-    // Load active policies from database
-    const db = require('../config/db');
-    const [rows] = await db.query(
-      'SELECT * FROM policies WHERE enabled = 1 ORDER BY severity DESC'
-    );
-    this.policies = rows;
-  }
-
   async evaluate(request) {
-    const matchedPolicies = [];
-    let highestAction = 'allow';
-    let reason = '';
-
-    const requestString = JSON.stringify(request).toLowerCase();
-
-    for (const policy of this.policies) {
-      let matched = false;
-
-      switch (policy.ruleType) {
-        case 'keyword':
-          const keywords = policy.pattern.split(',');
-          matched = keywords.some(kw => 
-            requestString.includes(kw.trim().toLowerCase())
-          );
-          break;
-
-        case 'regex':
-          const regex = new RegExp(policy.pattern, 'i');
-          matched = regex.test(requestString);
-          break;
-
-        case 'path':
-          matched = request.parameters?.path && 
-                   request.parameters.path.includes(policy.pattern);
-          break;
-
-        case 'command':
-          matched = request.command?.includes(policy.pattern);
-          break;
+    // Load active policies sorted by priority
+    const policies = await this.loadActivePolicies();
+    
+    for (const policy of policies) {
+      const matches = await this.checkPolicy(policy, request);
+      
+      if (matches) {
+        return {
+          action: policy.action,
+          reason: policy.message || `Blocked by policy: ${policy.name}`,
+          policyName: policy.name,
+          policyId: policy.id
+        };
       }
-
-      if (matched) {
-        matchedPolicies.push({
-          id: policy.id,
-          name: policy.name,
-          severity: policy.severity,
-          action: policy.action
-        });
-
-        if (policy.action === 'block') {
-          highestAction = 'block';
-          reason = policy.description;
-          break;
-        } else if (policy.action === 'alert' && highestAction !== 'block') {
-          highestAction = 'alert';
-          reason = policy.description;
+    }
+    
+    return { action: 'allow' };
+  }
+  
+  async loadActivePolicies() {
+    const [policies] = await db.query(
+      'SELECT * FROM policies WHERE enabled = true ORDER BY priority ASC'
+    );
+    return policies;
+  }
+  
+  async checkPolicy(policy, request) {
+    const conditions = JSON.parse(policy.conditions);
+    
+    // Check tool call conditions
+    if (conditions.type === 'tool_call' && request.toolCall) {
+      if (conditions.tool_name) {
+        const toolNames = Array.isArray(conditions.tool_name) 
+          ? conditions.tool_name 
+          : [conditions.tool_name];
+          
+        if (!toolNames.includes(request.toolCall.name)) {
+          return false;
+        }
+      }
+      
+      // Check pattern matching
+      if (conditions.pattern) {
+        const patterns = Array.isArray(conditions.patterns)
+          ? conditions.patterns
+          : [conditions.pattern];
+          
+        const content = JSON.stringify(request.toolCall.arguments);
+        
+        for (const pattern of patterns) {
+          const regex = new RegExp(pattern, 'i');
+          if (regex.test(content)) {
+            return true;
+          }
         }
       }
     }
-
-    return {
-      action: highestAction,
-      reason,
-      matchedPolicies
-    };
+    
+    // Check user input conditions
+    if (conditions.type === 'user_input' && request.userInput) {
+      if (conditions.pattern) {
+        const regex = new RegExp(conditions.pattern, 'i');
+        if (regex.test(request.userInput)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
   }
 }
 
 module.exports = new PolicyEngine();
 ```
 
-### Token Monitoring
-
-Track and monitor token usage across sessions:
+## OpenClaw Gateway Control
 
 ```javascript
-// backend/services/tokenMonitor.js
-const db = require('../config/db');
-
-class TokenMonitor {
-  async recordUsage(sessionId, userId, tokensUsed, modelName) {
-    await db.query(
-      `INSERT INTO token_usage 
-       (session_id, user_id, tokens_used, model_name, timestamp)
-       VALUES (?, ?, ?, ?, NOW())`,
-      [sessionId, userId, tokensUsed, modelName]
-    );
-
-    // Check threshold
-    const threshold = await this.getThreshold(userId);
-    const totalUsage = await this.getTotalUsage(userId);
-
-    if (totalUsage >= threshold) {
-      await this.sendThresholdAlert(userId, totalUsage, threshold);
-    }
-  }
-
-  async getTotalUsage(userId, period = 'day') {
-    const periodMap = {
-      day: 'DATE(timestamp) = CURDATE()',
-      week: 'YEARWEEK(timestamp) = YEARWEEK(NOW())',
-      month: 'MONTH(timestamp) = MONTH(NOW()) AND YEAR(timestamp) = YEAR(NOW())'
-    };
-
-    const [rows] = await db.query(
-      `SELECT SUM(tokens_used) as total
-       FROM token_usage
-       WHERE user_id = ? AND ${periodMap[period]}`,
-      [userId]
-    );
-
-    return rows[0]?.total || 0;
-  }
-
-  async getThreshold(userId) {
-    const [rows] = await db.query(
-      'SELECT token_threshold FROM users WHERE id = ?',
-      [userId]
-    );
-    return rows[0]?.token_threshold || 1000000;
-  }
-
-  async sendThresholdAlert(userId, usage, threshold) {
-    const alertService = require('./alertService');
-    await alertService.send({
-      type: 'token_threshold',
-      userId,
-      message: `Token usage (${usage}) exceeded threshold (${threshold})`,
-      severity: 'warning'
-    });
-  }
-}
-
-module.exports = new TokenMonitor();
-```
-
-### Alert Configuration
-
-Configure multiple alert channels:
-
-```javascript
-// backend/services/alertService.js
+// controllers/gatewayController.js
 const axios = require('axios');
+const { spawn } = require('child_process');
 
-class AlertService {
-  async send(alert) {
-    const channels = await this.getEnabledChannels();
-
-    const promises = channels.map(channel => {
-      switch (channel.type) {
-        case 'dingtalk':
-          return this.sendDingTalk(channel.webhook, alert);
-        case 'wechat_work':
-          return this.sendWechatWork(channel.webhook, alert);
-        case 'email':
-          return this.sendEmail(channel.config, alert);
-      }
-    });
-
-    await Promise.allSettled(promises);
-  }
-
-  async sendDingTalk(webhook, alert) {
-    await axios.post(webhook, {
-      msgtype: 'text',
-      text: {
-        content: `🚨 OctoGuard Alert\n\n${alert.message}\n\nSeverity: ${alert.severity}\nTime: ${new Date().toISOString()}`
-      }
-    });
-  }
-
-  async sendWechatWork(webhook, alert) {
-    await axios.post(webhook, {
-      msgtype: 'text',
-      text: {
-        content: `🚨 OctoGuard Alert\n\n${alert.message}\n\nSeverity: ${alert.severity}\nTime: ${new Date().toISOString()}`
-      }
-    });
-  }
-
-  async sendEmail(config, alert) {
-    const nodemailer = require('nodemailer');
-    
-    const transporter = nodemailer.createTransporter({
-      host: config.smtp_host,
-      port: config.smtp_port,
-      secure: config.smtp_secure,
-      auth: {
-        user: config.smtp_user,
-        pass: process.env.SMTP_PASSWORD
-      }
-    });
-
-    await transporter.sendMail({
-      from: config.from_email,
-      to: config.to_email,
-      subject: `OctoGuard Alert - ${alert.severity}`,
-      text: `${alert.message}\n\nTime: ${new Date().toISOString()}`
-    });
-  }
-
-  async getEnabledChannels() {
-    const db = require('../config/db');
-    const [rows] = await db.query(
-      'SELECT * FROM alert_channels WHERE enabled = 1'
-    );
-    return rows;
-  }
-}
-
-module.exports = new AlertService();
-```
-
-## Common Usage Patterns
-
-### Pattern 1: File Access Protection
-
-```javascript
-// Prevent access to sensitive system files
-await createPolicy({
-  name: 'System File Protection',
-  description: 'Block access to critical system files',
-  ruleType: 'regex',
-  pattern: '^(/etc|/sys|/proc|/boot|/root)',
-  action: 'block',
-  severity: 'critical'
-});
-
-// Prevent credential file access
-await createPolicy({
-  name: 'Credential File Protection',
-  description: 'Block access to credential files',
-  ruleType: 'regex',
-  pattern: '\\.(key|pem|p12|pfx|crt|cer|env|credentials)$',
-  action: 'block',
-  severity: 'critical'
-});
-```
-
-### Pattern 2: Command Execution Control
-
-```javascript
-// Block dangerous shell commands
-await createPolicy({
-  name: 'Dangerous Command Block',
-  description: 'Prevent execution of destructive commands',
-  ruleType: 'keyword',
-  pattern: 'rm -rf,mkfs,dd if=,format,fdisk,parted',
-  action: 'block',
-  severity: 'critical'
-});
-
-// Monitor network operations
-await createPolicy({
-  name: 'Network Activity Monitor',
-  description: 'Alert on network-related commands',
-  ruleType: 'keyword',
-  pattern: 'curl,wget,nc,netcat,ssh,scp,ftp',
-  action: 'alert',
-  severity: 'medium'
-});
-```
-
-### Pattern 3: Data Exfiltration Prevention
-
-```javascript
-// Monitor large data transfers
-await createPolicy({
-  name: 'Data Transfer Monitor',
-  description: 'Alert on potential data exfiltration',
-  ruleType: 'keyword',
-  pattern: 'base64,gzip,tar,zip,compress',
-  action: 'alert',
-  severity: 'high'
-});
-
-// Block external connections
-await createPolicy({
-  name: 'External Connection Block',
-  description: 'Prevent connections to external IPs',
-  ruleType: 'regex',
-  pattern: '(?:\\d{1,3}\\.){3}\\d{1,3}|http[s]?://',
-  action: 'block',
-  severity: 'high'
-});
-```
-
-### Pattern 4: Session Management
-
-```javascript
-const TokenMonitor = require('./services/tokenMonitor');
-
-// Track token usage per session
-async function handleAIRequest(userId, sessionId, request) {
-  const response = await executeOpenClawRequest(request);
-  
-  // Record token usage
-  await TokenMonitor.recordUsage(
-    sessionId,
-    userId,
-    response.tokensUsed,
-    response.model
-  );
-
-  return response;
-}
-
-// Get usage statistics
-async function getUserStats(userId) {
-  const dayUsage = await TokenMonitor.getTotalUsage(userId, 'day');
-  const weekUsage = await TokenMonitor.getTotalUsage(userId, 'week');
-  const monthUsage = await TokenMonitor.getTotalUsage(userId, 'month');
-
-  return { dayUsage, weekUsage, monthUsage };
-}
-```
-
-## Configuration
-
-### Environment Variables
-
-```bash
-# Database
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=octoguard
-DB_PASSWORD=your_secure_password
-DB_NAME=octoguard
-
-# OpenClaw Gateway
-OPENCLAW_GATEWAY_URL=http://localhost:8000
-OPENCLAW_TIMEOUT=30000
-OPENCLAW_RETRIES=3
-
-# Server
-PORT=3000
-NODE_ENV=production
-
-# Alert Services
-SMTP_PASSWORD=your_smtp_password
-DINGTALK_WEBHOOK=your_webhook_url
-WECHAT_WORK_WEBHOOK=your_webhook_url
-
-# Token Monitoring
-DEFAULT_TOKEN_THRESHOLD=1000000
-TOKEN_ALERT_ENABLED=true
-```
-
-### Policy Configuration File
-
-```json
-{
-  "defaultPolicies": [
-    {
-      "name": "System Protection",
-      "ruleType": "regex",
-      "pattern": "(/etc/passwd|/etc/shadow)",
-      "action": "block",
-      "severity": "critical"
-    },
-    {
-      "name": "Database Safety",
-      "ruleType": "keyword",
-      "pattern": "DROP,TRUNCATE,DELETE",
-      "action": "alert",
-      "severity": "high"
+class GatewayController {
+  async getStatus() {
+    try {
+      const response = await axios.get(
+        `http://${process.env.OPENCLAW_HOST}:${process.env.OPENCLAW_PORT}/health`,
+        { timeout: 5000 }
+      );
+      
+      return {
+        status: 'running',
+        health: response.data,
+        uptime: response.data.uptime
+      };
+    } catch (error) {
+      return {
+        status: 'stopped',
+        error: error.message
+      };
     }
-  ],
-  "auditRetentionDays": 90,
-  "alertBatchSize": 10,
-  "policyRefreshInterval": 60000
+  }
+  
+  async shutdown() {
+    try {
+      await axios.post(
+        `http://${process.env.OPENCLAW_HOST}:${process.env.OPENCLAW_PORT}/admin/shutdown`,
+        {},
+        {
+          headers: {
+            'X-API-Key': process.env.OPENCLAW_API_KEY
+          }
+        }
+      );
+      
+      return { success: true, message: 'OpenClaw gateway shutdown initiated' };
+    } catch (error) {
+      throw new Error(`Failed to shutdown gateway: ${error.message}`);
+    }
+  }
 }
+
+module.exports = new GatewayController();
 ```
 
 ## Troubleshooting
 
-### OctoGuard Not Intercepting Requests
+### Issue: Policies Not Blocking Requests
 
-**Issue**: Policies are configured but requests are not being intercepted.
+**Check policy priority and conditions**:
 
-**Solutions**:
-- Verify policies are enabled: `SELECT * FROM policies WHERE enabled = 1`
-- Check policy engine is loaded: Restart backend to reload policies
-- Verify request routing through OctoGuard proxy
-- Check pattern matching in logs
+```javascript
+// Debug policy evaluation
+async function debugPolicy(policyId, testRequest) {
+  const policy = await db.query('SELECT * FROM policies WHERE id = ?', [policyId]);
+  const conditions = JSON.parse(policy[0].conditions);
+  
+  console.log('Policy conditions:', conditions);
+  console.log('Test request:', testRequest);
+  
+  const engine = require('./services/policyEngine');
+  const result = await engine.checkPolicy(policy[0], testRequest);
+  
+  console.log('Match result:', result);
+  return result;
+}
+```
 
-### High False Positive Rate
+### Issue: Alerts Not Sending
 
-**Issue**: Too many legitimate requests being blocked.
+**Verify webhook configuration**:
 
-**Solutions**:
-- Review and refine regex patterns for specificity
-- Use `alert` action instead of `block` for testing
-- Add whitelist exceptions to policies
-- Lower severity thresholds
+```bash
+# Test DingTalk webhook
+curl -X POST "${DINGTALK_WEBHOOK}" \
+  -H 'Content-Type: application/json' \
+  -d '{"msgtype":"text","text":{"content":"Test from OctoGuard"}}'
 
-### Alerts Not Sending
+# Check email configuration
+node -e "
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransporter({
+  host: '${EMAIL_HOST}',
+  auth: { user: '${EMAIL_USER}', pass: '${EMAIL_PASSWORD}' }
+});
+transporter.verify((err, success) => {
+  console.log(err || 'Email config OK');
+});
+"
+```
 
-**Issue**: Configured alerts are not being delivered.
+### Issue: High Token Usage Not Alerting
 
-**Solutions**:
-- Verify webhook URLs are correct and accessible
-- Check SMTP credentials and network access
-- Review alert channel enabled status
-- Check application logs for delivery errors
-- Test webhooks independently with curl
+**Check threshold configuration**:
 
-### Token Monitoring Inaccurate
+```javascript
+// Verify token threshold settings
+async function checkTokenThreshold() {
+  const [settings] = await db.query(
+    'SELECT * FROM token_thresholds WHERE enabled = true'
+  );
+  
+  console.log('Active thresholds:', settings);
+  
+  // Manually trigger check
+  const totalTokens = await db.query(
+    'SELECT SUM(tokens_used) as total FROM token_usage WHERE timestamp > ?',
+    [new Date(Date.now() - 3600000)] // Last hour
+  );
+  
+  console.log('Current usage:', totalTokens[0].total);
+  
+  if (totalTokens[0].total > settings[0].threshold) {
+    console.log('Threshold exceeded - alert should trigger');
+  }
+}
+```
 
-**Issue**: Token counts don't match expected usage.
+### Issue: Database Connection Errors
 
-**Solutions**:
-- Ensure all OpenClaw requests flow through OctoGuard
-- Verify token extraction from OpenClaw responses
-- Check database connection and query execution
-- Review token calculation logic for specific models
+**Test database connectivity**:
 
-### Performance Degradation
-
-**Issue**: OctoGuard adds significant latency.
-
-**Solutions**:
-- Enable policy caching: Refresh policies periodically not per-request
-- Optimize database queries with indexes
-- Use connection pooling for database
-- Consider async logging for audit events
-- Profile and optimize regex patterns
-
-### Database Connection Issues
-
-**Issue**: Cannot connect to MySQL database.
-
-**Solutions**:
 ```javascript
 // Test database connection
 const mysql = require('mysql2/promise');
 
-async function testConnection() {
+async function testDatabaseConnection() {
   try {
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -675,23 +771,71 @@ async function testConnection() {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME
     });
-    console.log('Database connected successfully');
+    
+    const [rows] = await connection.execute('SELECT 1 as test');
+    console.log('Database connection successful:', rows);
+    
     await connection.end();
+    return true;
   } catch (error) {
     console.error('Database connection failed:', error.message);
+    return false;
+  }
+}
+```
+
+### Issue: Frontend Cannot Reach Backend
+
+**Verify CORS and API endpoint**:
+
+```javascript
+// backend/server.js - Add CORS middleware
+const cors = require('cors');
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
+
+// Frontend - Check API base URL
+console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL);
+```
+
+## Performance Optimization
+
+**Cache active policies in memory**:
+
+```javascript
+// services/policyCache.js
+class PolicyCache {
+  constructor() {
+    this.cache = null;
+    this.lastUpdate = null;
+    this.ttl = 60000; // 1 minute
+  }
+  
+  async getPolicies() {
+    const now = Date.now();
+    
+    if (!this.cache || !this.lastUpdate || (now - this.lastUpdate) > this.ttl) {
+      const [policies] = await db.query(
+        'SELECT * FROM policies WHERE enabled = true ORDER BY priority ASC'
+      );
+      
+      this.cache = policies;
+      this.lastUpdate = now;
+    }
+    
+    return this.cache;
+  }
+  
+  invalidate() {
+    this.cache = null;
+    this.lastUpdate = null;
   }
 }
 
-testConnection();
+module.exports = new PolicyCache();
 ```
 
-## Best Practices
-
-1. **Start with Alert Mode**: Use `alert` action initially to tune policies before enabling `block`
-2. **Regular Policy Review**: Audit and update policies based on logged events
-3. **Layered Defense**: Combine multiple policy types (keyword, regex, path) for comprehensive coverage
-4. **Monitor Performance**: Track policy evaluation latency and optimize slow patterns
-5. **Secure Credentials**: Always use environment variables for sensitive configuration
-6. **Backup Policies**: Export and version control policy configurations
-7. **Test Webhooks**: Verify alert delivery before relying on notifications in production
-8. **Archive Logs**: Implement log rotation and archival for compliance requirements
+OctoGuard provides comprehensive security supervision for OpenClaw deployments, ensuring AI agents operate within defined security boundaries while maintaining full audit trails and real-time alerting capabilities.
