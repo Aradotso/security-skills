@@ -156,6 +156,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [pentest-lyan-web-security-testing](skills/pentest-lyan-web-security-testing/) | [install](https://skills.sh/aradotso/security-skills/pentest-lyan-web-security-testing) | [HeaSec/Pentest-Lyan](https://github.com/HeaSec/Pentest-Lyan) | 2026-06-27 |
 | [jamboree-android-security-sandbox](skills/jamboree-android-security-sandbox/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-sandbox) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 | [android-mobile-security-sandbox-jamboree](skills/android-mobile-security-sandbox-jamboree/) | [install](https://skills.sh/aradotso/security-skills/android-mobile-security-sandbox-jamboree) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
+| [jamboree-android-security-testing](skills/jamboree-android-security-testing/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-testing) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 <!-- SKILL_INDEX -->
 
 ---
