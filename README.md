@@ -154,6 +154,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [octoguard-openclaw-security-supervision](skills/octoguard-openclaw-security-supervision/) | [install](https://skills.sh/aradotso/security-skills/octoguard-openclaw-security-supervision) | [O-ozzz/OctoGuard--Free-OpenClaw-Security-Supervision-System](https://github.com/O-ozzz/OctoGuard--Free-OpenClaw-Security-Supervision-System) | 2026-06-27 |
 | [octoguard-openclaw-security-governance](skills/octoguard-openclaw-security-governance/) | [install](https://skills.sh/aradotso/security-skills/octoguard-openclaw-security-governance) | [O-ozzz/OctoGuard--Free-OpenClaw-Security-Supervision-System](https://github.com/O-ozzz/OctoGuard--Free-OpenClaw-Security-Supervision-System) | 2026-06-27 |
 | [pentest-lyan-web-security-testing](skills/pentest-lyan-web-security-testing/) | [install](https://skills.sh/aradotso/security-skills/pentest-lyan-web-security-testing) | [HeaSec/Pentest-Lyan](https://github.com/HeaSec/Pentest-Lyan) | 2026-06-27 |
+| [jamboree-android-security-sandbox](skills/jamboree-android-security-sandbox/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-sandbox) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 <!-- SKILL_INDEX -->
 
 ---
