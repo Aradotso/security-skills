@@ -1,570 +1,669 @@
 ---
 name: jamboree-android-security-sandbox
-description: Configure and orchestrate Android security testing environments with Magisk, Burp Suite, Objection, and rooted emulators for mobile penetration testing
+description: Configure and orchestrate Android security testing environments with Magisk, Burp Suite, Objection, and Frida for mobile pentesting
 triggers:
   - set up android security testing environment
-  - configure burp suite with android emulator
-  - install magisk modules for android pentesting
-  - set up objection frida hooks on android
-  - create rooted android testing sandbox
+  - configure jamboree android sandbox
   - intercept android app traffic with burp
-  - bypass ssl pinning on android app
-  - configure jamboree android toolkit
+  - hook android app with objection and frida
+  - bypass android certificate pinning
+  - configure magisk modules for security testing
+  - set up rooted android emulator for pentesting
+  - automate android security assessment workflow
 ---
 
-# JAMBOREE Android Security Sandbox Skill
+# JAMBOREE Android Security Sandbox
 
-> Skill by [ara.so](https://ara.so) — Security Skills collection
+> Skill by [ara.so](https://ara.so) — Security Skills collection.
 
 ## Overview
 
 JAMBOREE (Java Android Magisk Burp Objection Root Emulator Easy) is a unified Android security testing framework that integrates:
 
-- **Magisk modules** for systemless root and privilege escalation
-- **Burp Suite** for HTTPS traffic interception and manipulation
-- **Objection/Frida** for runtime instrumentation and method hooking
-- **Rooted Android emulators** optimized for security testing
+- **Magisk modules** for systemless root and runtime modifications
+- **Burp Suite** for HTTP/HTTPS traffic interception
+- **Objection** (Frida-based) for runtime instrumentation and hooking
+- **Rooted emulator environments** optimized for security testing
 
-This framework eliminates the fragmentation of traditional Android pentesting by providing a cohesive, pre-configured environment for application security audits, malware analysis, and reverse engineering.
+This framework eliminates fragmented tool setups by providing a cohesive, pre-configured sandbox for Android application security assessment, reverse engineering, and malware analysis.
 
 ## Installation
 
 ### Prerequisites
 
-Ensure the following are installed:
+Ensure these tools are installed and in your PATH:
 
 ```bash
-# Verify Java Development Kit (11+)
+# Java Development Kit (11+)
 java -version
 
-# Verify Android SDK and platform tools
+# Android SDK platform tools
 adb version
-echo $ANDROID_HOME
 
-# Verify Python (for Objection)
+# Python 3.8+ for Objection/Frida
 python3 --version
 pip3 --version
 
-# Verify Frida tools
-frida --version
+# Node.js (optional, for some Frida scripts)
+node --version
 ```
 
-### Core Framework Setup
+### Core Setup
 
 ```bash
-# Clone the JAMBOREE repository
+# Clone the repository
 git clone https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing.git
 cd Android-Mobile-Security-Sandbox-Testing
 
-# Run the orchestration setup script
-chmod +x orchestration/setup.sh
-./orchestration/setup.sh
+# Install Python dependencies
+pip3 install frida-tools objection
 
-# Verify installation
-./orchestration/validate.sh
+# Verify Frida installation
+frida --version
+objection --version
 ```
 
-### Install Objection
+### Environment Configuration
+
+Create a configuration file `config.env`:
 
 ```bash
-pip3 install objection
-objection --help
+# Android SDK paths
+export ANDROID_HOME="/path/to/android/sdk"
+export ANDROID_SDK_ROOT="$ANDROID_HOME"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+
+# Burp Suite configuration
+export BURP_JAR_PATH="/path/to/burpsuite.jar"
+export BURP_PROXY_HOST="127.0.0.1"
+export BURP_PROXY_PORT="8080"
+
+# Certificate paths
+export BURP_CERT_PATH="./modules/burp/certificates/burp-ca.der"
+export SYSTEM_CERT_PATH="/system/etc/security/cacerts"
+
+# Frida/Objection settings
+export FRIDA_SERVER_VERSION="16.1.4"
+export OBJECTION_SCRIPTS_PATH="./modules/objection/scripts"
 ```
 
-### Configure Burp Suite Certificate
+Load configuration:
 
 ```bash
-# Export Burp Suite CA certificate (DER format)
-# Place it in: modules/burp/certificates/burp-ca.der
-
-# Convert to PEM for Android system trust
-openssl x509 -inform DER -in modules/burp/certificates/burp-ca.der \
-  -out modules/burp/certificates/burp-ca.pem
-
-# Calculate certificate hash for system store
-CERT_HASH=$(openssl x509 -inform PEM -subject_hash_old \
-  -in modules/burp/certificates/burp-ca.pem | head -1)
-cp modules/burp/certificates/burp-ca.pem \
-  modules/burp/certificates/${CERT_HASH}.0
+source config.env
 ```
 
-## Key Components
+## Emulator Setup
 
-### 1. Emulator Configuration
-
-Create a rooted Android emulator with Magisk:
+### Create Rooted Android Virtual Device
 
 ```bash
-# Create AVD with Google APIs (rootable)
-avdmanager create avd -n jamboree-test \
-  -k "system-images;android-30;google_apis;x86_64" \
-  -d "pixel_4"
+# Create AVD (Android 11, x86_64)
+avdmanager create avd \
+  --name "JAMBOREE_Security" \
+  --package "system-images;android-30;google_apis;x86_64" \
+  --device "pixel_4"
 
-# Start emulator with writable system partition
-emulator -avd jamboree-test -writable-system -no-snapshot-load &
+# Launch emulator in writable system mode
+emulator -avd JAMBOREE_Security \
+  -writable-system \
+  -no-snapshot-load \
+  -http-proxy $BURP_PROXY_HOST:$BURP_PROXY_PORT &
 
-# Wait for emulator to boot
-adb wait-for-device
-
-# Remount system as writable
-adb root
-adb remount
-
-# Install Magisk via orchestration script
-./orchestration/deployers/deploy_magisk.sh
-```
-
-### 2. Magisk Module Deployment
-
-```bash
-# List available Magisk modules
-ls modules/magisk/
-
-# Deploy systemless modules
-./orchestration/deployers/deploy_magisk_modules.sh
-
-# Verify Magisk installation
-adb shell su -c "magisk -v"
-
-# Install custom modules
-adb push modules/magisk/systemless/custom-module.zip /sdcard/
-adb shell su -c "magisk --install-module /sdcard/custom-module.zip"
-
-# Reboot to apply modules
-adb reboot
+# Wait for device
 adb wait-for-device
 ```
 
-### 3. Burp Suite Proxy Configuration
+### Install Magisk
 
 ```bash
-# Configure device to use Burp proxy
-# Burp typically runs on 127.0.0.1:8080
+# Download Magisk APK (replace with actual URL)
+wget -O magisk.apk https://github.com/topjohnwu/Magisk/releases/download/v26.1/Magisk-v26.1.apk
 
-# Set up ADB port forwarding
-adb reverse tcp:8080 tcp:8080
+# Install Magisk
+adb install magisk.apk
 
-# Configure global proxy via ADB
-adb shell settings put global http_proxy $(adb shell ip route | awk '{print $9}'):8080
+# Patch boot image (manual step in Magisk app)
+# Then flash patched boot image
+adb reboot bootloader
+fastboot flash boot magisk_patched.img
+fastboot reboot
+```
 
-# Install Burp CA certificate as system certificate
+### Deploy Frida Server
+
+```bash
+# Download Frida server for appropriate architecture
+ARCH="x86_64"  # or "arm64" for ARM devices
+wget https://github.com/frida/frida/releases/download/${FRIDA_SERVER_VERSION}/frida-server-${FRIDA_SERVER_VERSION}-android-${ARCH}.xz
+xz -d frida-server-${FRIDA_SERVER_VERSION}-android-${ARCH}.xz
+mv frida-server-${FRIDA_SERVER_VERSION}-android-${ARCH} frida-server
+
+# Push and run Frida server
 adb root
 adb remount
-CERT_HASH=$(openssl x509 -inform PEM -subject_hash_old \
-  -in modules/burp/certificates/burp-ca.pem | head -1)
-adb push modules/burp/certificates/${CERT_HASH}.0 \
-  /system/etc/security/cacerts/
-adb shell chmod 644 /system/etc/security/cacerts/${CERT_HASH}.0
+adb push frida-server /data/local/tmp/
+adb shell "chmod 755 /data/local/tmp/frida-server"
+adb shell "/data/local/tmp/frida-server &"
+
+# Verify Frida is running
+frida-ps -U
+```
+
+## Burp Suite Integration
+
+### Install CA Certificate as System Certificate
+
+```bash
+# Export Burp CA certificate (DER format) from Burp Suite first
+# Then convert and install
+
+# Convert DER to PEM
+openssl x509 -inform DER -in burp-ca.der -out burp-ca.pem
+
+# Get certificate hash
+CERT_HASH=$(openssl x509 -inform PEM -subject_hash_old -in burp-ca.pem | head -1)
+
+# Rename and push to system
+cp burp-ca.pem ${CERT_HASH}.0
+adb root
+adb remount
+adb push ${CERT_HASH}.0 /system/etc/security/cacerts/
+adb shell "chmod 644 /system/etc/security/cacerts/${CERT_HASH}.0"
 adb reboot
 ```
 
-### 4. Objection Runtime Instrumentation
+### Configure Proxy Settings
 
 ```bash
-# Explore a running application
-objection --gadget "com.example.app" explore
+# Set global proxy via ADB
+adb shell settings put global http_proxy $BURP_PROXY_HOST:$BURP_PROXY_PORT
 
-# Common Objection commands (interactive mode)
-# List activities
+# Or configure WiFi proxy programmatically
+adb shell settings put global wifi_proxy_host $BURP_PROXY_HOST
+adb shell settings put global wifi_proxy_port $BURP_PROXY_PORT
+
+# Clear proxy when done
+adb shell settings delete global http_proxy
+```
+
+## Objection Usage
+
+### Basic Runtime Exploration
+
+```bash
+# List running processes
+frida-ps -Ua
+
+# Attach to application
+objection -g com.example.targetapp explore
+
+# Inside Objection REPL
 android hooking list activities
-
-# List classes
-android hooking list classes
-
-# Search for specific methods
-android hooking search methods <keyword>
-
-# Bypass SSL pinning
-android sslpinning disable
-
-# Dump memory
-memory dump all <output-dir>
-
-# List loaded classes
-android hooking list class_methods <class-name>
-
-# Hook a specific method
-android hooking watch class_method <class>.<method> --dump-args --dump-return
+android hooking list services
+android intent launch_activity com.example.MainActivity
 ```
 
-## Common Workflows
+### SSL Pinning Bypass
 
-### Workflow 1: Basic App Traffic Interception
+```bash
+# Automatic SSL pinning bypass
+objection -g com.example.targetapp explore --startup-command "android sslpinning disable"
+
+# Or within REPL
+android sslpinning disable
+```
+
+### Common Objection Commands
+
+```javascript
+// Inside Objection REPL
+
+// Memory search
+memory list modules
+memory list exports libcrypto.so
+memory search "api_key" --string
+
+// Heap search
+android heap search instances com.example.User
+android heap print_methods com.example.User
+
+// File system
+file download /data/data/com.example.app/databases/app.db ./app.db
+file upload ./modified.xml /data/data/com.example.app/shared_prefs/config.xml
+
+// SQLite database
+sqlite connect /data/data/com.example.app/databases/app.db
+sqlite execute "SELECT * FROM users"
+
+// SharedPreferences
+android sharedpreferences dump
+```
+
+### Custom Frida Scripts
+
+Create `modules/objection/scripts/custom-hook.js`:
+
+```javascript
+// Hook specific method
+Java.perform(function() {
+    var TargetClass = Java.use("com.example.TargetClass");
+    
+    TargetClass.sensitiveMethod.implementation = function(arg1, arg2) {
+        console.log("[*] sensitiveMethod called");
+        console.log("[*] arg1: " + arg1);
+        console.log("[*] arg2: " + arg2);
+        
+        // Call original method
+        var result = this.sensitiveMethod(arg1, arg2);
+        console.log("[*] Original result: " + result);
+        
+        // Modify return value
+        return "MODIFIED_RESULT";
+    };
+    
+    console.log("[*] Hook installed on sensitiveMethod");
+});
+```
+
+Run custom script:
+
+```bash
+frida -U -l modules/objection/scripts/custom-hook.js -f com.example.targetapp
+```
+
+### Certificate Pinning Bypass Script
+
+Create `modules/objection/scripts/ssl-bypass.js`:
+
+```javascript
+Java.perform(function() {
+    console.log("[*] SSL Pinning Bypass Loaded");
+    
+    // Hook TrustManager
+    var X509TrustManager = Java.use('javax.net.ssl.X509TrustManager');
+    var SSLContext = Java.use('javax.net.ssl.SSLContext');
+    
+    var TrustManager = Java.registerClass({
+        name: 'com.custom.TrustManager',
+        implements: [X509TrustManager],
+        methods: {
+            checkClientTrusted: function(chain, authType) {},
+            checkServerTrusted: function(chain, authType) {},
+            getAcceptedIssuers: function() {
+                return [];
+            }
+        }
+    });
+    
+    var TrustManagers = [TrustManager.$new()];
+    var SSLContext_init = SSLContext.init.overload(
+        '[Ljavax.net.ssl.KeyManager;',
+        '[Ljavax.net.ssl.TrustManager;',
+        'java.security.SecureRandom'
+    );
+    
+    SSLContext_init.implementation = function(keyManager, trustManager, secureRandom) {
+        console.log("[*] SSLContext.init() called, replacing TrustManager");
+        SSLContext_init.call(this, keyManager, TrustManagers, secureRandom);
+    };
+    
+    console.log("[*] SSL Pinning Bypass Active");
+});
+```
+
+## Magisk Module Management
+
+### List Installed Modules
+
+```bash
+# Via ADB
+adb shell su -c "magisk --list"
+
+# Check module status
+adb shell "ls -la /data/adb/modules/"
+```
+
+### Install Custom Module
+
+Structure for systemless modifications:
+
+```bash
+modules/magisk/custom-module/
+├── module.prop
+├── install.sh
+├── uninstall.sh
+└── system/
+    └── etc/
+        └── hosts  # Example: hosts file modification
+```
+
+`module.prop`:
+
+```ini
+id=jamboree-custom
+name=JAMBOREE Custom Module
+version=1.0
+versionCode=1
+author=Security Tester
+description=Custom systemless modifications for security testing
+```
+
+`install.sh`:
+
+```bash
+#!/system/bin/sh
+MODPATH=${0%/*}
+ui_print "Installing JAMBOREE Custom Module"
+ui_print "- Copying files"
+cp -af $MODPATH/system/* $MODPATH/system/
+set_perm_recursive $MODPATH/system 0 0 0755 0644
+ui_print "- Done"
+```
+
+Install module:
+
+```bash
+# Zip the module
+cd modules/magisk/custom-module
+zip -r custom-module.zip *
+
+# Install via Magisk Manager or command line
+adb push custom-module.zip /sdcard/
+adb shell su -c "magisk --install-module /sdcard/custom-module.zip"
+adb reboot
+```
+
+## Orchestration Workflows
+
+### Complete Setup Script
+
+Create `scripts/setup-jamboree.sh`:
 
 ```bash
 #!/bin/bash
-# intercept_app.sh
+set -e
 
-APP_PACKAGE="com.target.app"
-PROXY_HOST="127.0.0.1"
-PROXY_PORT="8080"
+echo "[*] JAMBOREE Environment Setup"
 
-# Start emulator with proxy
-adb reverse tcp:${PROXY_PORT} tcp:${PROXY_PORT}
+# Source configuration
+source config.env
 
-# Install target app
-adb install target_app.apk
+# Start emulator
+echo "[*] Starting emulator..."
+emulator -avd JAMBOREE_Security -writable-system -no-snapshot-load &
+adb wait-for-device
+sleep 10
 
-# Launch app with Objection
-objection --gadget "${APP_PACKAGE}" explore
+# Root and remount
+echo "[*] Rooting device..."
+adb root
+adb remount
 
-# In Objection shell:
-# android sslpinning disable
-# android intent launch_activity ${APP_PACKAGE}/.MainActivity
+# Deploy Frida server
+echo "[*] Deploying Frida server..."
+adb push frida-server /data/local/tmp/
+adb shell "chmod 755 /data/local/tmp/frida-server"
+adb shell "/data/local/tmp/frida-server &"
+sleep 5
+
+# Install Burp certificate
+echo "[*] Installing Burp CA certificate..."
+CERT_HASH=$(openssl x509 -inform PEM -subject_hash_old -in burp-ca.pem | head -1)
+cp burp-ca.pem ${CERT_HASH}.0
+adb push ${CERT_HASH}.0 /system/etc/security/cacerts/
+adb shell "chmod 644 /system/etc/security/cacerts/${CERT_HASH}.0"
+
+# Configure proxy
+echo "[*] Configuring proxy..."
+adb shell settings put global http_proxy $BURP_PROXY_HOST:$BURP_PROXY_PORT
+
+# Start Burp Suite
+echo "[*] Starting Burp Suite..."
+java -jar "$BURP_JAR_PATH" &
+
+echo "[*] Setup complete. Verify with 'frida-ps -U'"
 ```
 
-### Workflow 2: SSL Pinning Bypass Script
+Run setup:
 
-```python
-# ssl_pinning_bypass.py
-# Run with: objection --gadget com.target.app run ssl_pinning_bypass.py
-
-import frida
-import sys
-
-def on_message(message, data):
-    print(f"[*] {message}")
-
-js_code = """
-Java.perform(function() {
-    // Hook OkHttp3 CertificatePinner
-    var CertificatePinner = Java.use('okhttp3.CertificatePinner');
-    CertificatePinner.check.overload('java.lang.String', 'java.util.List').implementation = function(hostname, peerCertificates) {
-        console.log('[+] SSL Pinning bypass for: ' + hostname);
-        return;
-    };
-
-    // Hook SSLContext
-    var SSLContext = Java.use('javax.net.ssl.SSLContext');
-    SSLContext.init.overload('[Ljavax.net.ssl.KeyManager;', '[Ljavax.net.ssl.TrustManager;', 'java.security.SecureRandom').implementation = function(keyManager, trustManager, secureRandom) {
-        console.log('[+] SSLContext.init() bypassed');
-        this.init.overload('[Ljavax.net.ssl.KeyManager;', '[Ljavax.net.ssl.TrustManager;', 'java.security.SecureRandom').call(this, keyManager, null, secureRandom);
-    };
-
-    console.log('[+] SSL Pinning bypass installed');
-});
-"""
-
-device = frida.get_usb_device()
-pid = device.spawn([sys.argv[1]])
-session = device.attach(pid)
-script = session.create_script(js_code)
-script.on('message', on_message)
-script.load()
-device.resume(pid)
-sys.stdin.read()
+```bash
+chmod +x scripts/setup-jamboree.sh
+./scripts/setup-jamboree.sh
 ```
 
-### Workflow 3: Root Detection Bypass
+### Testing Workflow Script
+
+Create `scripts/test-app.sh`:
+
+```bash
+#!/bin/bash
+
+APP_PACKAGE=$1
+
+if [ -z "$APP_PACKAGE" ]; then
+    echo "Usage: $0 <package_name>"
+    exit 1
+fi
+
+echo "[*] Testing application: $APP_PACKAGE"
+
+# Install app if APK provided
+if [ -f "$2" ]; then
+    echo "[*] Installing APK..."
+    adb install -r "$2"
+fi
+
+# Clear app data
+echo "[*] Clearing app data..."
+adb shell pm clear $APP_PACKAGE
+
+# Launch with Objection
+echo "[*] Launching with Objection..."
+objection -g $APP_PACKAGE explore \
+    --startup-command "android sslpinning disable" \
+    --startup-command "android root disable" \
+    --startup-command "android hooking list activities"
+```
+
+Usage:
+
+```bash
+./scripts/test-app.sh com.example.targetapp ./target.apk
+```
+
+## Common Patterns
+
+### Root Detection Bypass
 
 ```javascript
-// root_detection_bypass.js
-// Load with: objection --gadget com.target.app run root_detection_bypass.js
-
+// modules/objection/scripts/root-bypass.js
 Java.perform(function() {
     // Common root detection methods
     var RootBeer = Java.use('com.scottyab.rootbeer.RootBeer');
     RootBeer.isRooted.implementation = function() {
-        console.log('[+] Root detection bypassed (RootBeer)');
+        console.log("[*] Root check bypassed");
         return false;
     };
-
-    // Hook common file checks
+    
+    // File-based checks
     var File = Java.use('java.io.File');
     File.exists.implementation = function() {
         var path = this.getAbsolutePath();
-        if (path.indexOf('su') !== -1 || path.indexOf('magisk') !== -1) {
-            console.log('[+] File existence check bypassed: ' + path);
+        if (path.includes("su") || path.includes("magisk")) {
+            console.log("[*] Hiding file: " + path);
             return false;
         }
-        return this.exists.call(this);
+        return this.exists();
     };
-
-    // Hook Runtime.exec
-    var Runtime = Java.use('java.lang.Runtime');
-    Runtime.exec.overload('java.lang.String').implementation = function(cmd) {
-        if (cmd.indexOf('su') !== -1 || cmd.indexOf('which') !== -1) {
-            console.log('[+] Runtime.exec bypassed: ' + cmd);
-            throw new Error('Command not found');
-        }
-        return this.exec.call(this, cmd);
-    };
-
-    console.log('[+] Root detection bypass installed');
 });
 ```
 
-### Workflow 4: Automated Security Assessment
+### API Key Extraction
 
-```bash
-#!/bin/bash
-# automated_assessment.sh
-
-TARGET_APK="$1"
-APP_PACKAGE=$(aapt dump badging "$TARGET_APK" | grep package | awk '{print $2}' | sed "s/name='\(.*\)'/\1/")
-
-echo "[*] Starting automated assessment for: $APP_PACKAGE"
-
-# 1. Install APK
-adb install "$TARGET_APK"
-
-# 2. Start Objection with SSL pinning bypass
-objection --gadget "$APP_PACKAGE" explore <<EOF
-android sslpinning disable
-android hooking list activities
-android hooking list services
-android hooking search methods crypto
-android intent launch_activity
-memory list modules
-exit
-EOF
-
-# 3. Capture traffic logs
-adb logcat -d | grep -i "$APP_PACKAGE" > logs/${APP_PACKAGE}_logcat.txt
-
-# 4. Extract APK data
-adb shell run-as "$APP_PACKAGE" ls -la /data/data/"$APP_PACKAGE"/ > logs/${APP_PACKAGE}_filesystem.txt
-
-echo "[*] Assessment complete. Review logs/ directory for results."
+```javascript
+// Search memory for API keys
+Java.perform(function() {
+    Java.choose("com.example.ApiClient", {
+        onMatch: function(instance) {
+            console.log("[*] Found ApiClient instance");
+            try {
+                console.log("[*] API Key: " + instance.getApiKey());
+            } catch(e) {
+                console.log("[!] Error: " + e);
+            }
+        },
+        onComplete: function() {}
+    });
+});
 ```
 
-## Configuration Files
+### Traffic Decryption Hook
 
-### Emulator Network Configuration
-
-```bash
-# configurations/network/emulator_proxy.conf
-HTTP_PROXY=127.0.0.1:8080
-HTTPS_PROXY=127.0.0.1:8080
-NO_PROXY=localhost,127.0.0.1
-```
-
-### Objection Configuration
-
-```yaml
-# configurations/security/objection_config.yaml
-frida:
-  version: "16.0.0"
-  server_mode: true
-  gadget_path: "/data/local/tmp/frida-gadget.so"
-
-objection:
-  auto_ssl_pinning_bypass: true
-  log_level: "debug"
-  script_paths:
-    - "./modules/objection/scripts"
-    - "./modules/objection/plugins"
-
-hooks:
-  - name: "ssl_pinning"
-    enabled: true
-    script: "ssl_pinning_bypass.js"
-  - name: "root_detection"
-    enabled: true
-    script: "root_detection_bypass.js"
-```
-
-### Burp Suite Extension Configuration
-
-```json
-// configurations/burp/extension_config.json
-{
-  "upstream_proxy": {
-    "enabled": false,
-    "host": "",
-    "port": 0
-  },
-  "certificate_trust": {
-    "auto_install": true,
-    "system_level": true
-  },
-  "interception_rules": [
-    {
-      "match": "*.googleapis.com",
-      "action": "intercept"
-    },
-    {
-      "match": "*/api/*",
-      "action": "intercept_and_log"
+```javascript
+// Hook crypto operations
+Java.perform(function() {
+    var Cipher = Java.use('javax.crypto.Cipher');
+    
+    Cipher.doFinal.overload('[B').implementation = function(input) {
+        console.log("[*] Cipher.doFinal called");
+        console.log("[*] Input: " + bytesToHex(input));
+        
+        var result = this.doFinal(input);
+        console.log("[*] Output: " + bytesToHex(result));
+        
+        return result;
+    };
+    
+    function bytesToHex(bytes) {
+        var hexArray = [];
+        for (var i = 0; i < bytes.length; i++) {
+            hexArray.push(("0" + (bytes[i] & 0xFF).toString(16)).slice(-2));
+        }
+        return hexArray.join('');
     }
-  ]
-}
+});
 ```
 
 ## Troubleshooting
 
-### Issue: ADB Device Not Found
+### Frida Connection Issues
 
 ```bash
-# Check ADB connection
+# Check if Frida server is running
+adb shell "ps | grep frida-server"
+
+# Restart Frida server
+adb shell "killall frida-server"
+adb shell "/data/local/tmp/frida-server &"
+
+# Check port forwarding
+adb forward tcp:27042 tcp:27042
+adb forward tcp:27043 tcp:27043
+
+# Verify connection
+frida-ps -U
+```
+
+### Certificate Not Trusted
+
+```bash
+# Verify certificate installation
+adb shell "ls -l /system/etc/security/cacerts/ | grep $(openssl x509 -inform PEM -subject_hash_old -in burp-ca.pem | head -1)"
+
+# Check certificate format
+openssl x509 -in /system/etc/security/cacerts/HASH.0 -text
+
+# Reboot after installation
+adb reboot
+```
+
+### Objection Fails to Attach
+
+```bash
+# Enable debugging in app
+adb shell am set-debug-app -w --persistent com.example.targetapp
+
+# Use spawn mode instead of attach
+objection -g com.example.targetapp explore --startup-spawn
+
+# Check SELinux mode (should be permissive)
+adb shell getenforce
+adb shell setenforce 0
+```
+
+### Proxy Not Working
+
+```bash
+# Verify proxy settings
+adb shell settings get global http_proxy
+
+# Test connectivity
+adb shell ping -c 3 $BURP_PROXY_HOST
+
+# Check iptables rules (if using VPN mode)
+adb shell iptables -t nat -L -v
+
+# Use ProxyDroid or VPN approach for system-wide proxy
+```
+
+### Magisk Module Not Loading
+
+```bash
+# Check module logs
+adb shell su -c "cat /cache/magisk.log"
+
+# Boot to safe mode (disable all modules)
+adb reboot
+# Hold volume down during boot
+
+# Remove problematic module
+adb shell su -c "rm -rf /data/adb/modules/module-name"
+adb reboot
+```
+
+## Advanced Configurations
+
+### Multi-Device Testing
+
+```bash
+# List connected devices
 adb devices
 
-# Restart ADB server
-adb kill-server
-adb start-server
+# Target specific device
+export ANDROID_SERIAL="emulator-5554"
+adb -s $ANDROID_SERIAL shell
 
-# Verify emulator is running
-emulator -list-avds
+# Frida with specific device
+frida-ps -D emulator-5554
 ```
 
-### Issue: Magisk Module Won't Load
+### Custom Objection Plugin
 
-```bash
-# Boot into Magisk safe mode
-adb shell setprop persist.sys.safemode 1
-adb reboot
+Create `modules/objection/plugins/custom.py`:
 
-# Remove conflicting modules
-adb shell su -c "rm -rf /data/adb/modules/<module-name>"
+```python
+from objection.utils.plugin import Plugin
 
-# Re-deploy modules
-./orchestration/deployers/deploy_magisk_modules.sh
-```
-
-### Issue: Burp Certificate Not Trusted
-
-```bash
-# Verify certificate is in system store
-adb shell ls -la /system/etc/security/cacerts/ | grep burp
-
-# Check certificate permissions
-adb shell ls -l /system/etc/security/cacerts/<cert-hash>.0
-
-# Should be: -rw-r--r-- (644)
-# If not, fix permissions:
-adb shell su -c "chmod 644 /system/etc/security/cacerts/<cert-hash>.0"
-
-# Reboot device
-adb reboot
-```
-
-### Issue: Objection Cannot Attach to Process
-
-```bash
-# Verify Frida server is running
-adb shell "ps | grep frida"
-
-# Start Frida server manually
-adb push frida-server /data/local/tmp/
-adb shell chmod 755 /data/local/tmp/frida-server
-adb shell su -c "/data/local/tmp/frida-server &"
-
-# Verify app is debuggable
-aapt dump badging target.apk | grep "application: label"
-
-# Force spawn mode instead of attach
-objection --gadget "com.target.app" explore --startup-command "android hooking disable"
-```
-
-### Issue: SSL Pinning Bypass Not Working
-
-```bash
-# Try alternative bypass methods
-objection --gadget "com.target.app" explore
-
-# In Objection shell, try multiple techniques:
-android sslpinning disable --quiet
-android sslpinning disable --all
-android sslpinning disable --universal
-
-# If still failing, use custom Frida script
-objection --gadget "com.target.app" run modules/objection/scripts/universal_ssl_bypass.js
-```
-
-### Issue: Emulator Performance Degradation
-
-```bash
-# Allocate more resources to emulator
-emulator -avd jamboree-test \
-  -memory 4096 \
-  -cores 4 \
-  -gpu swiftshader_indirect \
-  -no-snapshot-load
-
-# Clear emulator cache
-rm -rf ~/.android/avd/jamboree-test.avd/cache/*
-
-# Reduce logging overhead
-adb shell setprop log.tag.JAMBOREE ERROR
-```
-
-## Advanced Usage
-
-### Custom Frida Hook for API Interception
-
-```javascript
-// api_interceptor.js
-Java.perform(function() {
-    var ApiClient = Java.use('com.example.app.network.ApiClient');
+class CustomPlugin(Plugin):
+    def __init__(self, ns):
+        self.ns = ns
     
-    ApiClient.makeRequest.implementation = function(endpoint, payload) {
-        console.log('[*] API Request Intercepted');
-        console.log('    Endpoint: ' + endpoint);
-        console.log('    Payload: ' + payload);
-        
-        var result = this.makeRequest(endpoint, payload);
-        
-        console.log('[*] API Response: ' + result);
-        return result;
-    };
-});
+    def run(self, args):
+        api = self.api()
+        result = api.android_hooking_watch_class(args[0])
+        print(f"[*] Watching class: {args[0]}")
+        return result
+
+namespace = 'custom'
+plugin = CustomPlugin
 ```
 
-### Automated Credential Extraction
-
-```javascript
-// credential_harvester.js
-Java.perform(function() {
-    var SharedPreferences = Java.use('android.content.SharedPreferences');
-    var Editor = Java.use('android.content.SharedPreferences$Editor');
-    
-    Editor.putString.implementation = function(key, value) {
-        if (key.toLowerCase().indexOf('token') !== -1 || 
-            key.toLowerCase().indexOf('password') !== -1 ||
-            key.toLowerCase().indexOf('secret') !== -1) {
-            console.log('[!] Credential Captured');
-            console.log('    Key: ' + key);
-            console.log('    Value: ' + value);
-        }
-        return this.putString(key, value);
-    };
-});
-```
-
-## Environment Variables
+Load plugin:
 
 ```bash
-# Set these in your shell profile
-export JAMBOREE_HOME="/path/to/Android-Mobile-Security-Sandbox-Testing"
-export ANDROID_HOME="/path/to/Android/Sdk"
-export BURP_PROXY_HOST="127.0.0.1"
-export BURP_PROXY_PORT="8080"
-export FRIDA_SERVER_PATH="${JAMBOREE_HOME}/tools/frida-server"
+objection -g com.example.app explore --plugin-folder modules/objection/plugins/
+# Then use: custom.run com.example.TargetClass
 ```
 
-## Integration with CI/CD
-
-```yaml
-# .github/workflows/android-security-scan.yml
-name: Android Security Scan
-on: [push]
-
-jobs:
-  security-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JAMBOREE
-        run: |
-          git clone https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing.git
-          cd Android-Mobile-Security-Sandbox-Testing
-          ./orchestration/setup.sh
-      - name: Run automated assessment
-        run: |
-          ./orchestration/automated_assessment.sh ${{ github.workspace }}/app.apk
-      - name: Upload results
-        uses: actions/upload-artifact@v3
-        with:
-          name: security-scan-results
-          path: logs/
-```
+This skill provides comprehensive guidance for AI agents to help developers set up and use JAMBOREE for Android security testing, covering installation, configuration, common workflows, and troubleshooting.
