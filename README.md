@@ -157,6 +157,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [jamboree-android-security-sandbox](skills/jamboree-android-security-sandbox/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-sandbox) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 | [android-mobile-security-sandbox-jamboree](skills/android-mobile-security-sandbox-jamboree/) | [install](https://skills.sh/aradotso/security-skills/android-mobile-security-sandbox-jamboree) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 | [jamboree-android-security-testing](skills/jamboree-android-security-testing/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-testing) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
+| [azure-security-lab-terraform](skills/azure-security-lab-terraform/) | [install](https://skills.sh/aradotso/security-skills/azure-security-lab-terraform) | [Jamonygr/Azure-Security-Lab](https://github.com/Jamonygr/Azure-Security-Lab) | 2026-07-02 |
 <!-- SKILL_INDEX -->
 
 ---
