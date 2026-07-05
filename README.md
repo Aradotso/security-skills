@@ -159,6 +159,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [jamboree-android-security-testing](skills/jamboree-android-security-testing/) | [install](https://skills.sh/aradotso/security-skills/jamboree-android-security-testing) | [hero-mike/Android-Mobile-Security-Sandbox-Testing](https://github.com/hero-mike/Android-Mobile-Security-Sandbox-Testing) | 2026-06-30 |
 | [azure-security-lab-terraform](skills/azure-security-lab-terraform/) | [install](https://skills.sh/aradotso/security-skills/azure-security-lab-terraform) | [Jamonygr/Azure-Security-Lab](https://github.com/Jamonygr/Azure-Security-Lab) | 2026-07-02 |
 | [fsecure-internet-security-activation-warning](skills/fsecure-internet-security-activation-warning/) | [install](https://skills.sh/aradotso/security-skills/fsecure-internet-security-activation-warning) | [yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator](https://github.com/yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator) | 2026-07-05 |
+| [eset-security-patch-tool-analysis](skills/eset-security-patch-tool-analysis/) | [install](https://skills.sh/aradotso/security-skills/eset-security-patch-tool-analysis) | [chaudharyparth/ESET-Security-8.8.720-Patch-Tool](https://github.com/chaudharyparth/ESET-Security-8.8.720-Patch-Tool) | 2026-07-05 |
 <!-- SKILL_INDEX -->
 
 ---
