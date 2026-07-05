@@ -163,6 +163,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [fort-firewall-malware-repository-detection](skills/fort-firewall-malware-repository-detection/) | [install](https://skills.sh/aradotso/security-skills/fort-firewall-malware-repository-detection) | [BinayRAj-boop/fort-firewall-security-fix](https://github.com/BinayRAj-boop/fort-firewall-security-fix) | 2026-07-05 |
 | [k7-total-security-configuration](skills/k7-total-security-configuration/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-configuration) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-05 |
 | [k7-total-security-deployment-automation](skills/k7-total-security-deployment-automation/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-deployment-automation) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-05 |
+| [k7-total-security-unified-defense](skills/k7-total-security-unified-defense/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-unified-defense) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-05 |
 <!-- SKILL_INDEX -->
 
 ---
