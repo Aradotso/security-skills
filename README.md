@@ -168,6 +168,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [k7-total-security-deployment-framework](skills/k7-total-security-deployment-framework/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-deployment-framework) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-05 |
 | [k7-total-security-patch-unlock-warning](skills/k7-total-security-patch-unlock-warning/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-patch-unlock-warning) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-05 |
 | [k7-total-security-unlock-patch-detection](skills/k7-total-security-unlock-patch-detection/) | [install](https://skills.sh/aradotso/security-skills/k7-total-security-unlock-patch-detection) | [29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195](https://github.com/29Hinojosa/K7-Total-Security-Unlock-Patch-16-0-1195) | 2026-07-06 |
+| [fort-firewall-malware-warning](skills/fort-firewall-malware-warning/) | [install](https://skills.sh/aradotso/security-skills/fort-firewall-malware-warning) | [lloyd17x/fort-firewall-security-fix](https://github.com/lloyd17x/fort-firewall-security-fix) | 2026-07-06 |
 <!-- SKILL_INDEX -->
 
 ---
