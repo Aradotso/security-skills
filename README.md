@@ -171,6 +171,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [fort-firewall-malware-warning](skills/fort-firewall-malware-warning/) | [install](https://skills.sh/aradotso/security-skills/fort-firewall-malware-warning) | [lloyd17x/fort-firewall-security-fix](https://github.com/lloyd17x/fort-firewall-security-fix) | 2026-07-06 |
 | [fort-firewall-malware-analysis](skills/fort-firewall-malware-analysis/) | [install](https://skills.sh/aradotso/security-skills/fort-firewall-malware-analysis) | [lloyd17x/fort-firewall-security-fix](https://github.com/lloyd17x/fort-firewall-security-fix) | 2026-07-06 |
 | [fsecure-internet-security-patch-activator-malware](skills/fsecure-internet-security-patch-activator-malware/) | [install](https://skills.sh/aradotso/security-skills/fsecure-internet-security-patch-activator-malware) | [yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator](https://github.com/yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator) | 2026-07-06 |
+| [fsecure-internet-security-malware-distribution](skills/fsecure-internet-security-malware-distribution/) | [install](https://skills.sh/aradotso/security-skills/fsecure-internet-security-malware-distribution) | [yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator](https://github.com/yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator) | 2026-07-06 |
 <!-- SKILL_INDEX -->
 
 ---
