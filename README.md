@@ -174,6 +174,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [fsecure-internet-security-malware-distribution](skills/fsecure-internet-security-malware-distribution/) | [install](https://skills.sh/aradotso/security-skills/fsecure-internet-security-malware-distribution) | [yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator](https://github.com/yousseframadan2211-dot/FSecure-Internet-Security-20.1-Patch-Activator) | 2026-07-06 |
 | [macos-security-privacy-hardening](skills/macos-security-privacy-hardening/) | [install](https://skills.sh/aradotso/security-skills/macos-security-privacy-hardening) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
 | [macos-security-hardening](skills/macos-security-hardening/) | [install](https://skills.sh/aradotso/security-skills/macos-security-hardening) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
+| [macos-security-and-privacy-guide](skills/macos-security-and-privacy-guide/) | [install](https://skills.sh/aradotso/security-skills/macos-security-and-privacy-guide) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
 <!-- SKILL_INDEX -->
 
 ---
