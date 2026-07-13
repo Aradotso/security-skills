@@ -2,174 +2,155 @@
 name: macos-security-privacy-hardening
 description: Comprehensive security and privacy hardening guide for macOS systems with Apple silicon
 triggers:
-  - "How do I secure my Mac?"
-  - "Configure macOS security settings"
-  - "Harden macOS privacy"
-  - "Set up FileVault and firewall on Mac"
-  - "Improve macOS security posture"
-  - "Follow macOS security best practices"
-  - "Lock down macOS system"
-  - "Configure macOS for maximum privacy"
+  - how do I secure my macOS system
+  - implement macOS security hardening
+  - configure macOS privacy settings
+  - setup FileVault and firewall on Mac
+  - harden macOS against threats
+  - improve macOS security and privacy
+  - setup secure macOS workstation
+  - configure macOS security best practices
 ---
 
 # macOS Security and Privacy Hardening
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-This guide provides comprehensive security and privacy hardening techniques for Apple silicon Mac computers running currently supported versions of macOS. It covers enterprise-standard security configurations suitable for both power users and organizations.
+This guide provides enterprise-standard security and privacy hardening techniques for macOS systems, particularly Apple silicon Macs running currently supported macOS versions. It covers threat modeling, system configuration, encryption, firewalls, DNS security, browser hardening, and operational security practices.
 
 ## Overview
 
-The macOS Security and Privacy Guide is a community-maintained collection of:
+The macOS Security and Privacy Guide is a comprehensive collection of security hardening techniques that covers:
 
-- **Threat modeling frameworks** for identifying and mitigating risks
-- **System hardening configurations** for securing macOS at multiple layers
-- **Privacy protection techniques** to minimize data leakage
-- **Security tools and utilities** for monitoring and protection
-- **Best practices** for secure Mac administration
+- Threat modeling and risk assessment
+- Hardware security considerations
+- System installation and initial configuration
+- FileVault disk encryption
+- Firewall configuration (application, kernel, and third-party)
+- DNS security with DNSCrypt and encrypted DNS
+- Browser hardening (Firefox, Chrome, Safari)
+- Certificate authority management
+- VPN and Tor configuration
+- PGP/GPG encryption
+- System monitoring and auditing
+- Physical security measures
 
-**Important**: This guide targets Apple silicon Macs. Intel-based Macs have hardware-level vulnerabilities (like checkm8) that cannot be patched.
+**Key Security Principle**: Apple silicon Macs are strongly recommended over Intel Macs due to hardware-level security vulnerabilities in Intel CPUs that cannot be patched.
 
-## Accessing the Guide
+## Installation and Setup
 
-The guide is available at: https://drduh.github.io/macOS-Security-and-Privacy-Guide/
+### Initial System Setup
 
-Or clone the repository:
+1. **Install Latest macOS**:
+   ```bash
+   # Check for system updates
+   softwareupdate --list
+   
+   # Install all available updates
+   sudo softwareupdate --install --all
+   
+   # Enable automatic updates
+   sudo softwareupdate --schedule on
+   ```
 
-```bash
-git clone https://github.com/drduh/macOS-Security-and-Privacy-Guide.git
-cd macOS-Security-and-Privacy-Guide
-```
+2. **Enable FileVault Disk Encryption**:
+   ```bash
+   # Enable FileVault (requires restart)
+   sudo fdesetup enable
+   
+   # Check FileVault status
+   sudo fdesetup status
+   
+   # List FileVault enabled users
+   sudo fdesetup list
+   ```
 
-## Core Security Concepts
+3. **Configure Firmware Password** (Apple silicon):
+   ```bash
+   # Set firmware password in Recovery Mode
+   # Restart and hold Command+R, then in Terminal:
+   firmwarepasswd -setpasswd
+   
+   # Verify firmware password is set
+   firmwarepasswd -check
+   ```
 
-### Threat Modeling
+## Core Security Configurations
 
-Before applying any configurations, create a threat model:
+### Firewall Setup
 
-1. **Identify Assets**: What needs protection (passwords, files, communications)
-2. **Identify Adversaries**: Who might attack (roommate, thief, corporation, nation-state)
-3. **Identify Capabilities**: What attackers can do (physical access, network sniffing, malware)
-4. **Identify Mitigations**: How to counter each threat
-
-Example threat model table:
-
-```
-Adversary       | Motivation        | Capabilities              | Mitigation
-----------------|-------------------|---------------------------|---------------------------
-Roommate        | Curiosity         | Physical proximity        | Use biometrics, lock screen
-Thief           | Financial gain    | Device theft              | FileVault, Find My, strong password
-Criminal        | Financial         | Malware, phishing         | Sandbox, updates, 2FA
-Corporation     | Data collection   | Telemetry, tracking       | Block connections, reset IDs
-Nation State    | Surveillance      | Advanced exploitation     | E2EE, secure boot, monitoring
-```
-
-## Essential Security Commands
-
-### System Updates
-
-```bash
-# Check for updates
-softwareupdate --list
-
-# Install all available updates
-sudo softwareupdate --install --all
-
-# Enable automatic updates
-sudo softwareupdate --schedule on
-
-# Download and install automatically
-sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
-sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
-sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallMacOSUpdates -bool true
-```
-
-### FileVault (Full Disk Encryption)
+#### Enable Application Layer Firewall
 
 ```bash
-# Check FileVault status
-sudo fdesetup status
-
-# Enable FileVault (requires restart)
-sudo fdesetup enable
-
-# List FileVault-enabled users
-sudo fdesetup list
-
-# Add user to FileVault
-sudo fdesetup add -usertoadd username
-```
-
-### Firewall Configuration
-
-```bash
-# Enable application firewall
+# Enable firewall
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
-
-# Enable stealth mode (ignore ICMP ping)
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 
 # Enable logging
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
 
-# Block all incoming connections
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
+# Enable stealth mode (don't respond to ping)
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 
 # Prevent built-in software from being auto-allowed
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsigned off
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setallowsignedapp off
 
-# Check firewall status
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+# Restart firewall
+sudo pkill -HUP socketfilterfw
 ```
 
-### Packet Filtering (PF)
+#### Kernel-Level Packet Filtering (pf)
 
-Create `/etc/pf.conf` for advanced firewall rules:
+Create `/etc/pf.conf`:
 
 ```bash
-# Basic PF configuration
-# Block all incoming by default, allow outgoing
-block in all
-pass out all keep state
+# Default deny policy
+set block-policy drop
+set fingerprints "/etc/pf.os"
+set ruleset-optimization basic
+set skip on lo0
 
-# Allow loopback
-pass on lo0 all
+# Scrub incoming packets
+scrub in all no-df
 
-# Allow established connections
-pass in proto tcp from any to any flags S/SA keep state
-pass in proto udp from any to any keep state
+# Block all by default
+block in log all
+block out log all
 
-# Allow specific services (SSH example)
-# pass in proto tcp from any to any port 22 keep state
+# Allow outgoing connections
+pass out quick proto {tcp, udp, icmp} from any to any keep state
+
+# Allow specific incoming services (example: SSH)
+# pass in quick proto tcp from any to any port 22 keep state
 ```
 
-Enable PF:
+Enable pf firewall:
 
 ```bash
-# Load PF rules
-sudo pfctl -f /etc/pf.conf
+# Test configuration
+sudo pfctl -nf /etc/pf.conf
 
-# Enable PF
+# Enable pf
 sudo pfctl -e
 
-# Check PF status
-sudo pfctl -s info
+# Load rules
+sudo pfctl -f /etc/pf.conf
 
-# View active rules
-sudo pfctl -s rules
+# View current rules
+sudo pfctl -sr
 
-# Disable PF
-sudo pfctl -d
+# View statistics
+sudo pfctl -si
 ```
 
-### User Account Management
+### Admin and User Accounts
 
 ```bash
-# Create non-admin user account
+# Create standard user account (not admin)
 sudo dscl . -create /Users/username
-sudo dscl . -create /Users/username UserShell /bin/zsh
-sudo dscl . -create /Users/username RealName "Full Name"
-sudo dscl . -create /Users/username UniqueID 1001
+sudo dscl . -create /Users/username UserShell /bin/bash
+sudo dscl . -create /Users/username RealName "User Name"
+sudo dscl . -create /Users/username UniqueID 501
 sudo dscl . -create /Users/username PrimaryGroupID 20
 sudo dscl . -create /Users/username NFSHomeDirectory /Users/username
 sudo dscl . -passwd /Users/username
@@ -177,687 +158,643 @@ sudo dscl . -passwd /Users/username
 # Create home directory
 sudo createhomedir -c -u username
 
-# Add user to admin group (if needed)
-sudo dscl . -append /Groups/admin GroupMembership username
+# Disable guest account
+sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 
-# List all users
-dscl . list /Users
+# Show full name in login window instead of username
+sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool true
 
-# Check if user is admin
-dscl . -read /Groups/admin GroupMembership
+# Disable automatic login
+sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser
 ```
 
-## Privacy Configuration
+## DNS Security
 
-### Disable Telemetry and Analytics
-
-```bash
-# Disable diagnostic and usage data
-sudo defaults write /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist AutoSubmit -bool false
-sudo defaults write /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist ThirdPartyDataSubmit -bool false
-
-# Disable Siri
-defaults write com.apple.assistant.support "Assistant Enabled" -bool false
-defaults write com.apple.Siri StatusMenuVisible -bool false
-
-# Disable personalized ads
-defaults write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
-
-# Disable Safari suggestions
-defaults write com.apple.Safari UniversalSearchEnabled -bool false
-defaults write com.apple.Safari SuppressSearchSuggestions -bool true
-
-# Disable Spotlight suggestions
-defaults write com.apple.lookup.shared LookupSuggestionsDisabled -bool true
-```
-
-### Location Services
-
-```bash
-# Disable location services entirely
-sudo defaults write /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd LocationServicesEnabled -int 0
-
-# Check location services status
-defaults read /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd
-```
-
-### DNS Configuration
-
-Install and configure DNSCrypt for encrypted DNS:
+### Install and Configure DNSCrypt
 
 ```bash
 # Install via Homebrew
 brew install dnscrypt-proxy
 
-# Configure DNSCrypt
-sudo cp /usr/local/etc/dnscrypt-proxy.toml.example /usr/local/etc/dnscrypt-proxy.toml
-
 # Edit configuration
-sudo nano /usr/local/etc/dnscrypt-proxy.toml
+vim /usr/local/etc/dnscrypt-proxy.toml
 ```
 
-Example DNSCrypt configuration:
+DNSCrypt configuration (`/usr/local/etc/dnscrypt-proxy.toml`):
 
 ```toml
-server_names = ['cloudflare', 'cloudflare-ipv6']
 listen_addresses = ['127.0.0.1:53', '[::1]:53']
 max_clients = 250
-ipv4_servers = true
-ipv6_servers = true
-dnscrypt_servers = true
-doh_servers = true
-require_dnssec = true
-require_nolog = true
-require_nofilter = true
-force_tcp = false
-timeout = 5000
-keepalive = 30
-cert_refresh_delay = 240
+
+server_names = ['cloudflare', 'cloudflare-ipv6']
+
+[query_log]
+  file = '/var/log/dnscrypt-proxy/query.log'
+
+[nx_log]
+  file = '/var/log/dnscrypt-proxy/nx.log'
+
+[sources]
+  [sources.'public-resolvers']
+    urls = ['https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md']
+    cache_file = 'public-resolvers.md'
+    minisign_key = 'RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3'
+    refresh_delay = 72
+    prefix = ''
 ```
 
 Start DNSCrypt:
 
 ```bash
+# Create log directory
+sudo mkdir -p /var/log/dnscrypt-proxy
+
 # Start service
 sudo brew services start dnscrypt-proxy
 
-# Configure system to use DNSCrypt
-sudo networksetup -setdnsservers Wi-Fi 127.0.0.1
-sudo networksetup -setdnsservers Ethernet 127.0.0.1
+# Configure system DNS to use localhost
+networksetup -setdnsservers Wi-Fi 127.0.0.1
+networksetup -setdnsservers Ethernet 127.0.0.1
 
-# Verify DNS settings
-scutil --dns
+# Test DNS resolution
+dig @127.0.0.1 example.com
 ```
 
-### Hosts File Blocking
-
-Add tracking/malware domains to `/etc/hosts`:
+### Hosts File Configuration
 
 ```bash
-# Backup existing hosts file
-sudo cp /etc/hosts /etc/hosts.backup
+# Edit hosts file
+sudo vim /etc/hosts
 
-# Download and merge hosts file (example using StevenBlack's list)
-curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | sudo tee -a /etc/hosts
+# Add entries to block tracking domains
+# Example entries:
+# 0.0.0.0 ads.example.com
+# 0.0.0.0 tracker.example.com
 
 # Flush DNS cache
 sudo dscacheutil -flushcache
 sudo killall -HUP mDNSResponder
 ```
 
-## Security Monitoring
+## System Services Hardening
 
-### OpenBSM Audit
-
-```bash
-# Enable auditing
-sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.auditd.plist
-
-# Check audit status
-sudo audit -s
-
-# View audit logs
-sudo praudit -xn /var/audit/*
-
-# Configure audit policy
-sudo nano /etc/security/audit_control
-```
-
-Example `audit_control` configuration:
-
-```
-dir:/var/audit
-flags:lo,aa,ad,fd,fm,-all
-minfree:5
-naflags:lo,aa,ad,fd,fm,-all
-policy:cnt,argv
-filesz:10M
-expire-after:90d
-```
-
-### System Monitoring Scripts
-
-Monitor process execution:
+### Disable Unnecessary Services
 
 ```bash
-#!/bin/bash
-# monitor_processes.sh - Log new process execution
+# Disable Bonjour multicast advertising
+sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
 
-while true; do
-    ps axo lstart,uid,pid,ppid,comm | tail -n +2 | \
-    awk '{$1=$2=$3=$4=""; print substr($0,5)}' | \
-    while read line; do
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - $line" >> /var/log/process_monitor.log
-    done
-    sleep 1
-done
+# Disable Captive Portal
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control.plist Active -bool false
+
+# Disable Spotlight indexing
+sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist 2>/dev/null
+
+# Disable Handoff
+defaults write ~/Library/Preferences/ByHost/com.apple.coreservices.useractivityd.plist ActivityAdvertisingAllowed -bool no
+defaults write ~/Library/Preferences/ByHost/com.apple.coreservices.useractivityd.plist ActivityReceivingAllowed -bool no
+
+# Disable remote Apple events
+sudo systemsetup -setremoteappleevents off
+
+# Disable remote login (SSH) if not needed
+sudo systemsetup -setremotelogin off
+
+# Disable wake on network access
+sudo systemsetup -setwakeonnetworkaccess off
+
+# Disable Bluetooth if not needed
+sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -int 0
 ```
 
-Monitor network connections:
+## Privacy Configuration
+
+### Disable Telemetry and Tracking
 
 ```bash
-#!/bin/bash
-# monitor_network.sh - Log network connections
+# Disable Siri
+defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+launchctl disable user/com.apple.assistantd
 
-lsof -i -n -P | grep ESTABLISHED | \
-awk '{print $1, $2, $3, $8, $9}' | \
-while read line; do
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $line" >> /var/log/network_monitor.log
-done
+# Disable Siri suggestions
+defaults write com.apple.lookup.shared LookupSuggestionsDisabled -bool true
+
+# Disable Spotlight Suggestions
+defaults write com.apple.spotlight orderedItems -array \
+  '{"enabled" = 0;"name" = "APPLICATIONS";}' \
+  '{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+
+# Disable diagnostic data
+sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.SubmitDiagInfo.plist
+
+# Disable personalized ads
+defaults write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
+
+# Clear advertising identifier
+defaults write com.apple.AdLib allowIdentifierForAdvertising -bool false
 ```
 
-### DTrace Monitoring
-
-Monitor file system access:
+### Location Services
 
 ```bash
-# Monitor file opens
-sudo dtrace -n 'syscall::open*:entry { printf("%s %s", execname, copyinstr(arg0)); }'
+# Disable location services entirely (if not needed)
+sudo launchctl unload /System/Library/LaunchDaemons/com.apple.locationd.plist
 
-# Monitor network connections
-sudo dtrace -n 'syscall::connect:entry { printf("%s", execname); }'
-
-# Monitor process execution
-sudo dtrace -n 'proc:::exec-success { trace(curpsinfo->pr_psargs); }'
+# Or disable for specific apps via System Preferences > Security & Privacy > Privacy > Location Services
 ```
 
 ## Browser Hardening
 
 ### Firefox Configuration
 
-Create `user.js` in Firefox profile directory (`~/Library/Application Support/Firefox/Profiles/*.default-release/`):
+Create/edit `user.js` in Firefox profile directory (`~/Library/Application Support/Firefox/Profiles/*.default-release/`):
 
 ```javascript
+// Privacy settings
+user_pref("privacy.trackingprotection.enabled", true);
+user_pref("privacy.trackingprotection.socialtracking.enabled", true);
+user_pref("privacy.trackingprotection.fingerprinting.enabled", true);
+user_pref("privacy.trackingprotection.cryptomining.enabled", true);
+
 // Disable telemetry
 user_pref("toolkit.telemetry.enabled", false);
 user_pref("toolkit.telemetry.unified", false);
 user_pref("toolkit.telemetry.archive.enabled", false);
+user_pref("datareporting.healthreport.uploadEnabled", false);
+user_pref("datareporting.policy.dataSubmissionEnabled", false);
 
-// Enable tracking protection
-user_pref("privacy.trackingprotection.enabled", true);
-user_pref("privacy.trackingprotection.socialtracking.enabled", true);
+// DNS over HTTPS
+user_pref("network.trr.mode", 2);
+user_pref("network.trr.uri", "https://cloudflare-dns.com/dns-query");
 
-// Disable WebRTC (prevents IP leak)
+// Disable WebRTC IP leak
 user_pref("media.peerconnection.enabled", false);
 
-// Enable HTTPS-Only Mode
+// HTTPS-only mode
 user_pref("dom.security.https_only_mode", true);
 user_pref("dom.security.https_only_mode_ever_enabled", true);
-
-// Disable password manager
-user_pref("signon.rememberSignons", false);
-
-// Disable form autofill
-user_pref("browser.formfill.enable", false);
-
-// Enhanced fingerprinting protection
-user_pref("privacy.resistFingerprinting", true);
 
 // Disable geolocation
 user_pref("geo.enabled", false);
 
-// Clear on shutdown
-user_pref("privacy.sanitize.sanitizeOnShutdown", true);
-user_pref("privacy.clearOnShutdown.cache", true);
-user_pref("privacy.clearOnShutdown.cookies", true);
-user_pref("privacy.clearOnShutdown.history", true);
+// Disable password manager
+user_pref("signon.rememberSignons", false);
+
+// Enhanced cookie protection
+user_pref("privacy.firstparty.isolate", true);
 ```
 
-### Safari Configuration
+### Safari Hardening
 
 ```bash
-# Disable auto-fill
+# Prevent cross-site tracking
+defaults write com.apple.Safari WebKitPreferences.storageBlockingPolicy -int 1
+
+# Disable autofill
 defaults write com.apple.Safari AutoFillPasswords -bool false
 defaults write com.apple.Safari AutoFillCreditCardData -bool false
 
-# Enable "Do Not Track"
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+# Block all cookies (strict mode)
+defaults write com.apple.Safari BlockStoragePolicy -int 2
+
+# Enable fraudulent website warnings
+defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
 
 # Disable preloading top hit
 defaults write com.apple.Safari PreloadTopHit -bool false
 
-# Block pop-ups
-defaults write com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
-
-# Enable fraud warnings
-defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
-
-# Disable plugins
-defaults write com.apple.Safari WebKitPluginsEnabled -bool false
+# Disable Safari suggestions
+defaults write com.apple.Safari UniversalSearchEnabled -bool false
+defaults write com.apple.Safari SuppressSearchSuggestions -bool true
 
 # Show full URL
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+```
 
-# Clear history items older than 1 day
-defaults write com.apple.Safari HistoryAgeInDaysLimit -int 1
+## Certificate Authority Management
+
+```bash
+# List all certificates
+security find-certificate -a /System/Library/Keychains/SystemRootCertificates.keychain
+security find-certificate -a /Library/Keychains/System.keychain
+
+# List trusted root CAs
+security dump-trust-settings
+
+# Distrust a specific certificate (by hash)
+sudo security add-trusted-cert -d -r deny -k /Library/Keychains/System.keychain /path/to/cert.pem
+
+# Remove untrusted certificate authorities
+# This should be done through Keychain Access app:
+# Open Keychain Access > System Roots > Right-click cert > Get Info > Trust > Never Trust
+```
+
+## System Monitoring
+
+### OpenBSM Audit
+
+```bash
+# Enable audit
+sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.auditd.plist
+
+# Configure audit flags in /etc/security/audit_control
+# Example: audit login, logout, authentication events
+sudo vim /etc/security/audit_control
+
+# Add to flags: lo,aa,ad,fd,fm,-all
+
+# Restart auditd
+sudo audit -s
+
+# View audit logs
+sudo praudit -xn /var/audit/*
+
+# Query specific events (failed authentication)
+sudo praudit /var/audit/* | grep "authentication failure"
+```
+
+### Network Monitoring
+
+```bash
+# Monitor network connections
+lsof -i -P -n | grep LISTEN
+
+# Monitor DNS queries (with dnscrypt-proxy)
+tail -f /var/log/dnscrypt-proxy/query.log
+
+# Monitor outgoing connections
+sudo tcpdump -i en0 -n
+
+# Network statistics
+netstat -an | grep ESTABLISHED
+
+# Use Little Snitch or LuLu for application-level firewall
+# LuLu (open source):
+# Download from https://objective-see.com/products/lulu.html
+```
+
+### Execution Monitoring
+
+```bash
+# Monitor process execution with DTrace
+sudo dtrace -n 'proc:::exec-success { printf("%s launched by %s\n", execname, curpsinfo->pr_fname); }'
+
+# Monitor file system events
+sudo fs_usage -w | grep -v "0.000"
+
+# Watch for new listening ports
+sudo lsof -i -P | grep LISTEN
+
+# Use KnockKnock to scan for persistent software
+# Download from https://objective-see.com/products/knockknock.html
+```
+
+## Backup and Recovery
+
+### Time Machine with Encryption
+
+```bash
+# Enable Time Machine encryption
+sudo tmutil setdestination -a /Volumes/BackupDrive
+sudo diskutil apfs enableFileVault /Volumes/BackupDrive
+
+# Manual backup
+tmutil startbackup
+
+# List backups
+tmutil listbackups
+
+# Compare backups
+tmutil compare
+
+# Verify backup integrity
+tmutil verifychecksums /path/to/backup
+```
+
+### Secure Backup Script
+
+```bash
+#!/bin/bash
+# secure-backup.sh - Encrypted backup script
+
+BACKUP_DIR="/Volumes/ExternalDrive/Backups"
+DATE=$(date +%Y-%m-%d_%H-%M-%S)
+BACKUP_NAME="backup_${DATE}.tar.gz.gpg"
+
+# Create encrypted backup
+tar czf - ~/Documents ~/Projects | \
+  gpg --symmetric --cipher-algo AES256 --compress-algo none \
+  --output "${BACKUP_DIR}/${BACKUP_NAME}"
+
+# Verify backup was created
+if [ -f "${BACKUP_DIR}/${BACKUP_NAME}" ]; then
+  echo "Backup created: ${BACKUP_NAME}"
+  shasum -a 256 "${BACKUP_DIR}/${BACKUP_NAME}" > "${BACKUP_DIR}/${BACKUP_NAME}.sha256"
+else
+  echo "Backup failed!"
+  exit 1
+fi
+
+# Remove backups older than 30 days
+find "${BACKUP_DIR}" -name "backup_*.tar.gz.gpg" -mtime +30 -delete
 ```
 
 ## SSH Hardening
 
-Create/edit `~/.ssh/config`:
+### Configure Secure SSH
 
-```ssh-config
-# Default settings for all hosts
-Host *
-    # Use strong key exchange algorithms
-    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
-    
-    # Use strong ciphers
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
-    
-    # Use strong MACs
-    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
-    
-    # Disable password authentication
-    PasswordAuthentication no
-    ChallengeResponseAuthentication no
-    
-    # Enable compression
-    Compression yes
-    
-    # Connection settings
-    ServerAliveInterval 60
-    ServerAliveCountMax 3
-    
-    # Use SSH keys only
-    PubkeyAuthentication yes
-    
-    # Hash known hosts for privacy
-    HashKnownHosts yes
-```
-
-Edit SSH daemon config `/etc/ssh/sshd_config`:
+Edit `/etc/ssh/sshd_config` (if SSH is enabled):
 
 ```bash
 # Disable root login
 PermitRootLogin no
 
-# Key-based authentication only
+# Use public key authentication only
+PubkeyAuthentication yes
 PasswordAuthentication no
 ChallengeResponseAuthentication no
-PubkeyAuthentication yes
 
 # Disable empty passwords
 PermitEmptyPasswords no
 
-# Limit authentication attempts
-MaxAuthTries 3
-
-# Disconnect after failed attempts
-MaxSessions 2
-
-# Use protocol 2 only
-Protocol 2
-
-# Strong ciphers only
-Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
-KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
-
 # Disable X11 forwarding
 X11Forwarding no
 
-# Log verbosely
-LogLevel VERBOSE
+# Use strong ciphers
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org
+
+# Limit authentication attempts
+MaxAuthTries 3
+MaxSessions 2
+
+# Set idle timeout
+ClientAliveInterval 300
+ClientAliveCountMax 2
 ```
 
-Generate strong SSH keys:
+Generate secure SSH keys:
 
 ```bash
-# Ed25519 key (recommended)
-ssh-keygen -t ed25519 -a 100 -C "user@host"
+# Generate Ed25519 key (recommended)
+ssh-keygen -t ed25519 -a 100 -f ~/.ssh/id_ed25519
 
-# RSA key (if Ed25519 not supported)
-ssh-keygen -t rsa -b 4096 -o -a 100 -C "user@host"
+# Or RSA 4096-bit
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
 
 # Set proper permissions
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/id_ed25519
 chmod 644 ~/.ssh/id_ed25519.pub
-chmod 600 ~/.ssh/config
-chmod 600 ~/.ssh/authorized_keys
 ```
 
-## Encryption and Key Management
+## Password Management
 
-### GPG Configuration
+### Use macOS Keychain from Command Line
 
 ```bash
-# Install GPG
-brew install gnupg
+# Add password to keychain
+security add-generic-password -a "$USER" -s "ServiceName" -w "password"
 
-# Generate key
-gpg --full-generate-key
-# Choose: (1) RSA and RSA, 4096 bits, does not expire
+# Retrieve password
+security find-generic-password -a "$USER" -s "ServiceName" -w
 
-# List keys
-gpg --list-keys
-gpg --list-secret-keys
-
-# Export public key
-gpg --armor --export user@example.com > public_key.asc
-
-# Encrypt file
-gpg --encrypt --recipient user@example.com file.txt
-
-# Decrypt file
-gpg --decrypt file.txt.gpg > file.txt
-
-# Sign file
-gpg --sign file.txt
-
-# Verify signature
-gpg --verify file.txt.gpg
-```
-
-GPG configuration (`~/.gnupg/gpg.conf`):
-
-```
-# Strong preferences
-personal-cipher-preferences AES256 AES192 AES
-personal-digest-preferences SHA512 SHA384 SHA256
-personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
-default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
-
-# Use strong hash
-cert-digest-algo SHA512
-s2k-digest-algo SHA512
-s2k-cipher-algo AES256
-
-# Long key IDs
-keyid-format 0xlong
-with-fingerprint
-
-# No version in output
-no-emit-version
-no-comments
-
-# Use agent
-use-agent
-```
-
-### Password Management
-
-```bash
 # Generate strong password
 openssl rand -base64 32
 
-# Generate diceware passphrase
-# Install diceware: brew install diceware
-diceware --num 6 --wordlist en_eff
-
-# Store in Keychain
-security add-generic-password -a "$USER" -s "service_name" -w "password"
-
-# Retrieve from Keychain
-security find-generic-password -a "$USER" -s "service_name" -w
-
-# Delete from Keychain
-security delete-generic-password -a "$USER" -s "service_name"
+# Generate diceware passphrase (requires word list)
+shuf -n 6 /usr/share/dict/words | tr '\n' ' ' && echo
 ```
 
-## Wi-Fi Security
+## Physical Security
 
 ```bash
-# Disable Wi-Fi if not needed
-networksetup -setairportpower en0 off
+# Require password immediately after sleep/screensaver
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Forget network
-sudo /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -z
+# Enable screen saver with timeout
+defaults -currentHost write com.apple.screensaver idleTime -int 300
 
-# Disable auto-join for network
-networksetup -setnetworkserviceenabled "Wi-Fi" off
+# Show message on lock screen
+sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText "If found, please contact: email@example.com"
 
-# Use randomized MAC (requires manual setting in System Preferences)
-# Check current MAC
-ifconfig en0 | grep ether
+# Disable automatic login
+sudo defaults delete /Library/Preferences/com.apple.loginwindow autoLoginUser
 
-# Set static MAC temporarily
-sudo ifconfig en0 ether aa:bb:cc:dd:ee:ff
-
-# Scan networks
-/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s
-```
-
-## System Integrity and Hardening
-
-### System Integrity Protection (SIP)
-
-```bash
-# Check SIP status
-csrutil status
-
-# Disable SIP (requires Recovery Mode)
-# Boot to Recovery (Command+R), then:
-# csrutil disable
-
-# Enable SIP (recommended)
-# Boot to Recovery (Command+R), then:
-# csrutil enable
-```
-
-### Gatekeeper
-
-```bash
-# Check Gatekeeper status
-spctl --status
-
-# Enable Gatekeeper
-sudo spctl --master-enable
-
-# Check app signature
-spctl -a -v /Applications/AppName.app
-
-# Allow unsigned app (not recommended)
-sudo spctl --add /Applications/AppName.app
-```
-
-### Disable Services
-
-```bash
-# Disable AirDrop
-defaults write com.apple.NetworkBrowser DisableAirDrop -bool YES
-
-# Disable Bonjour
-sudo defaults write /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist ProgramArguments -array-add "-NoMulticastAdvertisements"
-
-# Disable Captive Portal
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
-
-# Disable IR receiver
-sudo defaults write /Library/Preferences/com.apple.driver.AppleIRController DeviceEnabled -int 0
-
-# Disable Bluetooth
-sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -int 0
-```
-
-## Backup and Recovery
-
-### Time Machine
-
-```bash
-# Enable Time Machine
-sudo tmutil enable
-
-# Set destination
-sudo tmutil setdestination /Volumes/BackupDrive
-
-# Start backup
-sudo tmutil startbackup
-
-# Exclude directory
-sudo tmutil addexclusion /path/to/exclude
-
-# List exclusions
-sudo tmutil isexcluded /path/to/check
-
-# Disable local snapshots
-sudo tmutil disablelocal
-```
-
-### Encrypted Backups
-
-```bash
-# Create encrypted disk image
-hdiutil create -size 100g -fs APFS -encryption AES-256 -volname Backup ~/backup.dmg
-
-# Mount encrypted image
-hdiutil attach ~/backup.dmg
-
-# Backup with rsync
-rsync -avz --delete --exclude-from=exclude.txt ~/ /Volumes/Backup/
-
-# Unmount
-hdiutil detach /Volumes/Backup
+# Log out after inactivity (3600 seconds = 1 hour)
+sudo defaults write /Library/Preferences/.GlobalPreferences com.apple.autologout.AutoLogOutDelay -int 3600
 ```
 
 ## Metadata Removal
 
 ```bash
-# Remove extended attributes
-xattr -cr /path/to/file
+# Remove metadata from files
+exiftool -all= file.jpg
 
-# Remove metadata from image
-exiftool -all= image.jpg
+# Or use mdls/xattr
+xattr -l file.pdf
+xattr -c file.pdf  # Clear all extended attributes
 
-# Remove metadata from PDF
-exiftool -all:all= document.pdf
+# Remove location data from photos
+exiftool -gps:all= photo.jpg
 
-# Remove .DS_Store files
-find . -name ".DS_Store" -delete
-
-# Disable .DS_Store creation on network volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-
-# Disable .DS_Store creation on USB volumes
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+# Secure file deletion (on APFS, overwriting is not effective)
+# Instead, use encrypted volumes and delete normally
+rm -P file.txt  # Note: -P is deprecated on APFS
 ```
 
-## Common Troubleshooting
+## Troubleshooting
 
-### Firewall Issues
-
-If applications can't connect after enabling firewall:
+### FileVault Issues
 
 ```bash
-# Check application firewall status
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getappblocked /Applications/App.app
+# Check FileVault status
+sudo fdesetup status
 
-# Allow specific application
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /Applications/App.app
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /Applications/App.app
+# Validate FileVault recovery key
+sudo fdesetup validaterecovery
+
+# Fix FileVault if it won't enable
+sudo fdesetup disable
+sudo diskutil apfs list
+sudo fdesetup enable
 ```
 
-### DNS Resolution Problems
+### Firewall Debugging
 
 ```bash
+# Check pf status
+sudo pfctl -si
+
+# View pf logs
+sudo log show --predicate 'process == "kernel" AND eventMessage CONTAINS "pf"' --last 1h
+
+# Test firewall rules
+sudo pfctl -vvn -f /etc/pf.conf
+
+# Clear pf statistics
+sudo pfctl -F all
+
+# Application firewall logs
+log show --predicate 'process == "socketfilterfw"' --last 1h
+```
+
+### DNS Resolution Issues
+
+```bash
+# Test DNS resolution
+dig example.com @127.0.0.1
+
+# Check dnscrypt-proxy status
+sudo brew services list | grep dnscrypt-proxy
+
+# View dnscrypt-proxy logs
+tail -f /usr/local/var/log/dnscrypt-proxy.log
+
 # Flush DNS cache
 sudo dscacheutil -flushcache
 sudo killall -HUP mDNSResponder
 
-# Check DNS servers
-scutil --dns
-
-# Test DNS resolution
-nslookup example.com
-dig example.com
-
-# Reset DNS to DHCP
-sudo networksetup -setdnsservers Wi-Fi "Empty"
-```
-
-### FileVault Recovery
-
-```bash
-# Get recovery key
-sudo fdesetup changerecovery -personal
-
-# Disable and re-enable if having issues
-sudo fdesetup disable
-sudo fdesetup enable
+# Reset DNS settings
+networksetup -setdnsservers Wi-Fi "Empty"
+networksetup -setdnsservers Wi-Fi 127.0.0.1
 ```
 
 ### Permission Issues
 
 ```bash
 # Reset permissions on home directory
-sudo chown -R $USER:staff ~/
-chmod -R u+rwX,go-rwx ~/
+sudo chown -R $USER:staff ~
+chmod 755 ~
 
-# Reset Keychain permissions
-sudo chmod 600 ~/Library/Keychains/*.keychain-db
+# Fix SIP-protected files (requires disabling SIP in Recovery Mode)
+# Only do this if absolutely necessary
+csrutil status
+# Reboot to Recovery Mode, then:
+# csrutil disable
+# Reboot, make changes, then re-enable
+# csrutil enable
 
-# Repair disk permissions (pre-El Capitan)
-sudo diskutil resetUserPermissions / $(id -u)
+# Reset keychain permissions
+security unlock-keychain ~/Library/Keychains/login.keychain-db
 ```
 
-## Security Checklist
+## Common Patterns
 
-Quick checklist for securing a new Mac:
+### Security Audit Script
 
 ```bash
 #!/bin/bash
-# security_setup.sh - Initial Mac security setup
+# security-audit.sh - Basic macOS security audit
 
-# Update system
-sudo softwareupdate --install --all
+echo "=== macOS Security Audit ==="
+echo ""
+
+echo "FileVault Status:"
+sudo fdesetup status
+echo ""
+
+echo "Firmware Password:"
+sudo firmwarepasswd -check
+echo ""
+
+echo "Firewall Status:"
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+echo ""
+
+echo "System Integrity Protection:"
+csrutil status
+echo ""
+
+echo "Gatekeeper Status:"
+spctl --status
+echo ""
+
+echo "Automatic Updates:"
+sudo softwareupdate --schedule
+echo ""
+
+echo "Listening Ports:"
+lsof -i -P -n | grep LISTEN
+echo ""
+
+echo "Remote Login (SSH):"
+sudo systemsetup -getremotelogin
+echo ""
+
+echo "Screen Saver Password:"
+defaults read com.apple.screensaver askForPassword
+echo ""
+
+echo "Installed Applications (not from App Store):"
+system_profiler SPApplicationsDataType | grep -B 3 "Obtained from: Identified Developer"
+```
+
+### Security Hardening Script
+
+```bash
+#!/bin/bash
+# harden-macos.sh - Automated security hardening
+
+set -e
+
+echo "Applying macOS security hardening..."
 
 # Enable FileVault
-sudo fdesetup enable
+if ! sudo fdesetup status | grep -q "On"; then
+  echo "Enabling FileVault..."
+  sudo fdesetup enable -user "$USER"
+fi
 
-# Enable firewall
+# Enable Firewall
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setloggingmode on
 
-# Disable services
-defaults write com.apple.NetworkBrowser DisableAirDrop -bool YES
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
+# Disable Bonjour
+sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool true
 
-# Configure Safari
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
-defaults write com.apple.Safari AutoFillPasswords -bool false
+# Require password immediately
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Disable telemetry
-sudo defaults write /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist AutoSubmit -bool false
+# Disable guest account
+sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
 
-# Set firmware password (requires restart)
-sudo firmwarepasswd -setpasswd
+# Show full path in Finder
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
-echo "Basic security setup complete. Restart required."
+# Enable software updates
+sudo softwareupdate --schedule on
+
+# Disable Siri
+defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+
+# Disable remote services
+sudo systemsetup -setremoteappleevents off
+sudo systemsetup -setremotelogin off
+
+echo "Security hardening complete. Restart required for some changes."
 ```
+
+## Best Practices
+
+1. **Regular Updates**: Keep macOS and all software updated
+2. **Principle of Least Privilege**: Use standard user account for daily work, admin only when needed
+3. **Encryption Everywhere**: Enable FileVault, encrypt backups, use HTTPS/TLS
+4. **Network Security**: Use VPN on untrusted networks, configure firewall properly
+5. **Strong Authentication**: Use long passphrases, enable 2FA where possible
+6. **Backup Strategy**: Regular encrypted backups to offline storage
+7. **Privacy First**: Disable telemetry, use privacy-focused alternatives
+8. **Monitor System**: Regularly check logs and running processes
+9. **Physical Security**: Never leave machine unlocked, use firmware password
+10. **Threat Modeling**: Regularly reassess your threat model and adjust defenses
 
 ## Additional Resources
 
-- Official Guide: https://drduh.github.io/macOS-Security-and-Privacy-Guide/
-- Apple Security Guide: https://support.apple.com/guide/security/welcome/web
-- NIST macOS Guidelines: https://github.com/usnistgov/macos_security
-- CIS Benchmarks: https://www.cisecurity.org/benchmark/apple_os
-
-## Related Tools
-
-Install security utilities via Homebrew:
-
-```bash
-# Security scanning
-brew install lynis              # Security auditing
-brew install rkhunter          # Rootkit detection
-brew install chkrootkit        # Rootkit checker
-
-# Network security
-brew install nmap              # Network scanning
-brew install wireshark         # Packet analysis
-brew install mtr               # Network diagnostics
-
-# Encryption
-brew install gnupg             # GPG encryption
-brew install openssl           # Crypto library
-brew install age               # File encryption
-
-# Monitoring
-brew install htop              # Process monitoring
-brew install iftop             # Network monitoring
-brew install osquery           # System query tool
-```
-
-This skill provides comprehensive coverage of macOS security hardening based on the drduh guide, with practical commands and configurations ready for immediate use.
+- Official NIST macOS Security Guide: https://github.com/usnistgov/macos_security
+- Objective-See Security Tools: https://objective-see.com/products.html
+- Apple Platform Security Guide: https://support.apple.com/guide/security/welcome/web
+- macOS Security Updates: https://support.apple.com/HT201222
