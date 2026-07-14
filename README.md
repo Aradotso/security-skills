@@ -176,6 +176,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [macos-security-hardening](skills/macos-security-hardening/) | [install](https://skills.sh/aradotso/security-skills/macos-security-hardening) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
 | [macos-security-and-privacy-guide](skills/macos-security-and-privacy-guide/) | [install](https://skills.sh/aradotso/security-skills/macos-security-and-privacy-guide) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
 | [awesome-ai-security-tools-guide](skills/awesome-ai-security-tools-guide/) | [install](https://skills.sh/aradotso/security-skills/awesome-ai-security-tools-guide) | [scadastrangelove/awesome-ai-security-tools](https://github.com/scadastrangelove/awesome-ai-security-tools) | 2026-07-14 |
+| [pentestcode-ai-pentest-agent](skills/pentestcode-ai-pentest-agent/) | [install](https://skills.sh/aradotso/security-skills/pentestcode-ai-pentest-agent) | [s0ld13rr/pentestcode](https://github.com/s0ld13rr/pentestcode) | 2026-07-14 |
 <!-- SKILL_INDEX -->
 
 ---
