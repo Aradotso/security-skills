@@ -177,6 +177,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [macos-security-and-privacy-guide](skills/macos-security-and-privacy-guide/) | [install](https://skills.sh/aradotso/security-skills/macos-security-and-privacy-guide) | [drduh/macOS-Security-and-Privacy-Guide](https://github.com/drduh/macOS-Security-and-Privacy-Guide) | 2026-07-13 |
 | [awesome-ai-security-tools-guide](skills/awesome-ai-security-tools-guide/) | [install](https://skills.sh/aradotso/security-skills/awesome-ai-security-tools-guide) | [scadastrangelove/awesome-ai-security-tools](https://github.com/scadastrangelove/awesome-ai-security-tools) | 2026-07-14 |
 | [pentestcode-ai-pentest-agent](skills/pentestcode-ai-pentest-agent/) | [install](https://skills.sh/aradotso/security-skills/pentestcode-ai-pentest-agent) | [s0ld13rr/pentestcode](https://github.com/s0ld13rr/pentestcode) | 2026-07-14 |
+| [server-security-init-skill](skills/server-security-init-skill/) | [install](https://skills.sh/aradotso/security-skills/server-security-init-skill) | [DeerYang/server-security-init-skill](https://github.com/DeerYang/server-security-init-skill) | 2026-07-16 |
 <!-- SKILL_INDEX -->
 
 ---
