@@ -183,6 +183,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [enterprise-windows-infrastructure-security](skills/enterprise-windows-infrastructure-security/) | [install](https://skills.sh/aradotso/security-skills/enterprise-windows-infrastructure-security) | [armourinfosec/Enterprise-Windows-Infrastructure-Security](https://github.com/armourinfosec/Enterprise-Windows-Infrastructure-Security) | 2026-07-30 |
 | [wireless-security-wifi-pentesting](skills/wireless-security-wifi-pentesting/) | [install](https://skills.sh/aradotso/security-skills/wireless-security-wifi-pentesting) | [armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing](https://github.com/armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing) | 2026-07-30 |
 | [wireless-security-wifi-penetration-testing](skills/wireless-security-wifi-penetration-testing/) | [install](https://skills.sh/aradotso/security-skills/wireless-security-wifi-penetration-testing) | [armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing](https://github.com/armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing) | 2026-07-30 |
+| [api-security-checklist](skills/api-security-checklist/) | [install](https://skills.sh/aradotso/security-skills/api-security-checklist) | [shieldfy/API-Security-Checklist](https://github.com/shieldfy/API-Security-Checklist) | 2026-07-30 |
 <!-- SKILL_INDEX -->
 
 ---
