@@ -180,6 +180,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [server-security-init-skill](skills/server-security-init-skill/) | [install](https://skills.sh/aradotso/security-skills/server-security-init-skill) | [DeerYang/server-security-init-skill](https://github.com/DeerYang/server-security-init-skill) | 2026-07-16 |
 | [vulnhunter-security-scanner](skills/vulnhunter-security-scanner/) | [install](https://skills.sh/aradotso/security-skills/vulnhunter-security-scanner) | [capitalone/VulnHunter](https://github.com/capitalone/VulnHunter) | 2026-07-16 |
 | [openai-codex-security](skills/openai-codex-security/) | [install](https://skills.sh/aradotso/security-skills/openai-codex-security) | [openai/codex-security](https://github.com/openai/codex-security) | 2026-07-30 |
+| [enterprise-windows-infrastructure-security](skills/enterprise-windows-infrastructure-security/) | [install](https://skills.sh/aradotso/security-skills/enterprise-windows-infrastructure-security) | [armourinfosec/Enterprise-Windows-Infrastructure-Security](https://github.com/armourinfosec/Enterprise-Windows-Infrastructure-Security) | 2026-07-30 |
 <!-- SKILL_INDEX -->
 
 ---
