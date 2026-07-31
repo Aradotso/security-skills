@@ -186,6 +186,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [api-security-checklist](skills/api-security-checklist/) | [install](https://skills.sh/aradotso/security-skills/api-security-checklist) | [shieldfy/API-Security-Checklist](https://github.com/shieldfy/API-Security-Checklist) | 2026-07-30 |
 | [ikb42603-cloud-security-essentials](skills/ikb42603-cloud-security-essentials/) | [install](https://skills.sh/aradotso/security-skills/ikb42603-cloud-security-essentials) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
 | [ikb42603-cloud-security-labs](skills/ikb42603-cloud-security-labs/) | [install](https://skills.sh/aradotso/security-skills/ikb42603-cloud-security-labs) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
+| [aws-cloud-security-essentials-lab](skills/aws-cloud-security-essentials-lab/) | [install](https://skills.sh/aradotso/security-skills/aws-cloud-security-essentials-lab) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
 <!-- SKILL_INDEX -->
 
 ---
