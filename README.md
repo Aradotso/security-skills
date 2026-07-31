@@ -184,6 +184,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [wireless-security-wifi-pentesting](skills/wireless-security-wifi-pentesting/) | [install](https://skills.sh/aradotso/security-skills/wireless-security-wifi-pentesting) | [armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing](https://github.com/armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing) | 2026-07-30 |
 | [wireless-security-wifi-penetration-testing](skills/wireless-security-wifi-penetration-testing/) | [install](https://skills.sh/aradotso/security-skills/wireless-security-wifi-penetration-testing) | [armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing](https://github.com/armourinfosec/Wireless-Security-and-WiFi-Penetration-Testing) | 2026-07-30 |
 | [api-security-checklist](skills/api-security-checklist/) | [install](https://skills.sh/aradotso/security-skills/api-security-checklist) | [shieldfy/API-Security-Checklist](https://github.com/shieldfy/API-Security-Checklist) | 2026-07-30 |
+| [ikb42603-cloud-security-essentials](skills/ikb42603-cloud-security-essentials/) | [install](https://skills.sh/aradotso/security-skills/ikb42603-cloud-security-essentials) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
 <!-- SKILL_INDEX -->
 
 ---
