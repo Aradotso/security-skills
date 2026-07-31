@@ -188,6 +188,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [ikb42603-cloud-security-labs](skills/ikb42603-cloud-security-labs/) | [install](https://skills.sh/aradotso/security-skills/ikb42603-cloud-security-labs) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
 | [aws-cloud-security-essentials-lab](skills/aws-cloud-security-essentials-lab/) | [install](https://skills.sh/aradotso/security-skills/aws-cloud-security-essentials-lab) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
 | [ikb42603-cloud-computing-security-essentials](skills/ikb42603-cloud-computing-security-essentials/) | [install](https://skills.sh/aradotso/security-skills/ikb42603-cloud-computing-security-essentials) | [AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS](https://github.com/AdaniKamal/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS) | 2026-07-31 |
+| [ai-runtime-security-sandbox](skills/ai-runtime-security-sandbox/) | [install](https://skills.sh/aradotso/security-skills/ai-runtime-security-sandbox) | [TatarinBlack/ai-runtime-security-sandbox](https://github.com/TatarinBlack/ai-runtime-security-sandbox) | 2026-07-31 |
 <!-- SKILL_INDEX -->
 
 ---
