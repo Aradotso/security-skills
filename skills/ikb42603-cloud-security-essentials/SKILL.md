@@ -1,15 +1,15 @@
 ---
 name: ikb42603-cloud-security-essentials
-description: Educational lab repository for AWS cloud computing security fundamentals covering IAM, encryption, VPC isolation, network security, and monitoring
+description: Educational AWS cloud security lab exercises covering IAM, encryption, VPC isolation, network security, and monitoring with CloudTrail and CloudWatch
 triggers:
-  - "help me with cloud security lab exercises"
-  - "set up AWS security labs for IKB42603"
-  - "configure IAM users and roles for cloud security course"
-  - "implement AWS encryption and key management lab"
-  - "create VPC isolation and multitenancy setup"
-  - "set up CloudTrail and CloudWatch monitoring"
-  - "work on cloud computing security essentials"
-  - "complete AWS security lab assignments"
+  - how do I complete the cloud security labs
+  - help me with AWS security essentials lab
+  - show me IAM security best practices
+  - configure AWS encryption and key management
+  - set up VPC isolation and security groups
+  - implement CloudTrail and CloudWatch monitoring
+  - complete IKB42603 lab exercises
+  - AWS cloud security fundamentals practice
 ---
 
 # IKB42603 Cloud Security Essentials Skill
@@ -18,17 +18,14 @@ triggers:
 
 ## Overview
 
-IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS is an educational repository containing hands-on laboratory exercises for AWS cloud security fundamentals. The course covers five core security domains: account security and IAM, secure isolation and multitenancy, encryption and key management, access control and network security, and monitoring/logging/incident detection.
+IKB42603 Cloud Computing Security Essentials is an educational repository containing five comprehensive AWS security laboratory exercises. The labs cover fundamental cloud security concepts including IAM (Identity and Access Management), secure multi-tenancy, encryption and key management, network security with VPCs and Security Groups, and monitoring/logging with CloudTrail and CloudWatch.
 
-This skill helps you complete and document AWS security labs following academic best practices.
+This skill helps AI agents guide students through practical AWS security implementations following academic best practices.
 
 ## Repository Structure
 
-The repository follows this standard structure:
-
 ```
 IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS/
-│
 ├── README.md
 ├── Lab0_Environment_Setup.md
 ├── Lab1_Account_Security_and_IAM.md
@@ -40,434 +37,401 @@ IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS/
 
 ## Initial Setup
 
-### Create Repository
+### Clone and Initialize Repository
 
 ```bash
-# Clone or create the repository
+# Clone the repository
 git clone https://github.com/<username>/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS.git
 cd IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS
 
-# Initialize if creating from scratch
-git init
-echo "# IKB42603 - Cloud Computing Security Essentials" > README.md
-git add README.md
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/<username>/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS.git
-git push -u origin main
+# Create lab documentation files
+touch Lab0_Environment_Setup.md
+touch Lab1_Account_Security_and_IAM.md
+touch Lab2_Secure_Isolation_and_Multitenancy.md
+touch Lab3_Encryption_and_Key_Management.md
+touch Lab4_Access_Control_and_Network_Security.md
+touch Lab5_Monitoring_Logging_and_Incident_Detection.md
+
+# Initial commit
+git add .
+git commit -m "Initial lab setup"
+git push origin main
 ```
 
-### Environment Setup
-
-Create `Lab0_Environment_Setup.md`:
-
-```markdown
-# Lab 0 - Environment Setup
-
-## Objective
-Configure AWS CLI and prepare local environment for cloud security labs.
-
-## Prerequisites
-- AWS Account (Free Tier)
-- AWS CLI installed
-- Git installed
-
-## Steps
-
-### 1. Install AWS CLI
-
-**macOS:**
-```bash
-brew install awscli
-```
-
-**Linux:**
-```bash
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-```
-
-**Windows:**
-Download from: https://aws.amazon.com/cli/
-
-### 2. Configure AWS Credentials
+### AWS CLI Configuration
 
 ```bash
+# Install AWS CLI (if not installed)
+pip install awscli
+
+# Configure AWS credentials
 aws configure
-```
+# AWS Access Key ID: ${AWS_ACCESS_KEY_ID}
+# AWS Secret Access Key: ${AWS_SECRET_ACCESS_KEY}
+# Default region: us-east-1
+# Default output format: json
 
-Enter:
-- AWS Access Key ID: `${AWS_ACCESS_KEY_ID}`
-- AWS Secret Access Key: `${AWS_SECRET_ACCESS_KEY}`
-- Default region: `us-east-1`
-- Default output format: `json`
-
-### 3. Verify Configuration
-
-```bash
+# Verify configuration
 aws sts get-caller-identity
-```
-
-## Screenshots
-![AWS CLI Configuration](./images/lab0-aws-cli-config.png)
-
-## References
-- [AWS CLI Documentation](https://docs.aws.amazon.com/cli/)
 ```
 
 ## Lab 1: Account Security and IAM
 
-### Key Concepts
-- IAM Users, Groups, and Roles
-- Multi-Factor Authentication (MFA)
-- Password Policies
-- Access Keys Management
-
-### Example Implementation
-
-Create `Lab1_Account_Security_and_IAM.md`:
-
-```markdown
-# Lab 1 - Account Security and IAM
-
-## Objective
-Implement secure identity and access management practices using AWS IAM.
-
-## Learning Outcomes
-- Create IAM users and groups
-- Configure password policies
-- Enable MFA
-- Assign permissions using policies
-
-## Implementation
-
-### Step 1: Create IAM User
+### Creating IAM Users
 
 ```bash
-# Create IAM user
-aws iam create-user --user-name lab-admin
+# Create a new IAM user
+aws iam create-user --user-name lab-user-admin
 
-# Create login profile with password
-aws iam create-login-profile \
-  --user-name lab-admin \
-  --password "${TEMP_PASSWORD}" \
-  --password-reset-required
+# Create access key for programmatic access
+aws iam create-access-key --user-name lab-user-admin
+
+# Attach administrative policy
+aws iam attach-user-policy \
+  --user-name lab-user-admin \
+  --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
 ```
 
-### Step 2: Create IAM Group
+### IAM Groups and Permissions
 
 ```bash
-# Create administrators group
-aws iam create-group --group-name Administrators
-
-# Attach managed policy
-aws iam attach-group-policy \
-  --group-name Administrators \
-  --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+# Create IAM group
+aws iam create-group --group-name Developers
 
 # Add user to group
 aws iam add-user-to-group \
-  --user-name lab-admin \
-  --group-name Administrators
+  --user-name lab-user-admin \
+  --group-name Developers
+
+# Attach policy to group
+aws iam attach-group-policy \
+  --group-name Developers \
+  --policy-arn arn:aws:iam::aws:policy/PowerUserAccess
 ```
 
-### Step 3: Configure Password Policy
+### Custom IAM Policy
 
-```bash
-# Set account password policy
-aws iam update-account-password-policy \
-  --minimum-password-length 12 \
-  --require-symbols \
-  --require-numbers \
-  --require-uppercase-characters \
-  --require-lowercase-characters \
-  --allow-users-to-change-password \
-  --max-password-age 90 \
-  --password-reuse-prevention 5
-```
-
-### Step 4: Enable MFA (Console Steps)
-
-1. Sign in to AWS Console
-2. Navigate to IAM > Users > lab-admin
-3. Security credentials tab
-4. Click "Assign MFA device"
-5. Choose Virtual MFA device
-6. Scan QR code with authenticator app
-7. Enter two consecutive MFA codes
-
-### Step 5: Create Custom IAM Policy
-
-```bash
-# Create policy document
-cat > s3-readonly-policy.json <<EOF
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
       "Action": [
-        "s3:Get*",
-        "s3:List*"
+        "s3:GetObject",
+        "s3:PutObject"
       ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-
-# Create the policy
-aws iam create-policy \
-  --policy-name S3ReadOnlyAccess \
-  --policy-document file://s3-readonly-policy.json
-```
-
-### Step 6: Create IAM Role
-
-```bash
-# Create trust policy for EC2
-cat > ec2-trust-policy.json <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+      "Resource": "arn:aws:s3:::lab-bucket-${AWS_ACCOUNT_ID}/*"
+    },
     {
       "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::lab-bucket-${AWS_ACCOUNT_ID}"
     }
   ]
 }
-EOF
-
-# Create role
-aws iam create-role \
-  --role-name EC2-S3-ReadOnly-Role \
-  --assume-role-policy-document file://ec2-trust-policy.json
-
-# Attach policy to role
-aws iam attach-role-policy \
-  --role-name EC2-S3-ReadOnly-Role \
-  --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 ```
 
-## Screenshots
-![IAM User Created](./images/lab1-iam-user.png)
-![MFA Enabled](./images/lab1-mfa-enabled.png)
+```bash
+# Create custom policy
+aws iam create-policy \
+  --policy-name S3ReadWritePolicy \
+  --policy-document file://s3-policy.json
 
-## Challenges Encountered
-- Initial confusion about difference between policies and roles
-- MFA setup required mobile authenticator app
+# Attach custom policy
+aws iam attach-user-policy \
+  --user-name lab-user-admin \
+  --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/S3ReadWritePolicy
+```
 
-## Lessons Learned
-- Principle of least privilege is crucial
-- Always enable MFA for privileged accounts
-- Use groups for permission management, not individual users
+### Enable MFA
 
-## References
-- [IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+```bash
+# Create virtual MFA device
+aws iam create-virtual-mfa-device \
+  --virtual-mfa-device-name lab-user-mfa \
+  --outfile QRCode.png \
+  --bootstrap-method QRCodePNG
+
+# Enable MFA for user (requires authentication codes)
+aws iam enable-mfa-device \
+  --user-name lab-user-admin \
+  --serial-number arn:aws:iam::${AWS_ACCOUNT_ID}:mfa/lab-user-mfa \
+  --authentication-code1 123456 \
+  --authentication-code2 789012
 ```
 
 ## Lab 2: Secure Isolation and Multitenancy
 
-### Key Concepts
-- Virtual Private Cloud (VPC)
-- Subnets (Public/Private)
-- Route Tables
-- Internet Gateway
-- NAT Gateway
-
-### Example Implementation
+### Create VPC with Isolated Subnets
 
 ```bash
 # Create VPC
-aws ec2 create-vpc \
+VPC_ID=$(aws ec2 create-vpc \
   --cidr-block 10.0.0.0/16 \
-  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=Lab2-VPC}]' \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=Lab-VPC}]' \
   --query 'Vpc.VpcId' \
-  --output text
-
-VPC_ID="<vpc-id-output>"
+  --output text)
 
 # Create public subnet
-aws ec2 create-subnet \
+PUBLIC_SUBNET=$(aws ec2 create-subnet \
   --vpc-id $VPC_ID \
   --cidr-block 10.0.1.0/24 \
   --availability-zone us-east-1a \
-  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=PublicSubnet}]'
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Public-Subnet}]' \
+  --query 'Subnet.SubnetId' \
+  --output text)
 
 # Create private subnet
-aws ec2 create-subnet \
+PRIVATE_SUBNET=$(aws ec2 create-subnet \
   --vpc-id $VPC_ID \
   --cidr-block 10.0.2.0/24 \
   --availability-zone us-east-1a \
-  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=PrivateSubnet}]'
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Private-Subnet}]' \
+  --query 'Subnet.SubnetId' \
+  --output text)
 
-# Create and attach Internet Gateway
-aws ec2 create-internet-gateway \
-  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=Lab2-IGW}]' \
+# Create Internet Gateway
+IGW_ID=$(aws ec2 create-internet-gateway \
+  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=Lab-IGW}]' \
   --query 'InternetGateway.InternetGatewayId' \
-  --output text
+  --output text)
 
-IGW_ID="<igw-id-output>"
-
+# Attach IGW to VPC
 aws ec2 attach-internet-gateway \
   --vpc-id $VPC_ID \
   --internet-gateway-id $IGW_ID
+```
 
-# Configure route table for public subnet
-aws ec2 create-route-table \
+### Configure Route Tables
+
+```bash
+# Create route table for public subnet
+PUBLIC_RT=$(aws ec2 create-route-table \
   --vpc-id $VPC_ID \
-  --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=PublicRouteTable}]'
+  --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=Public-RT}]' \
+  --query 'RouteTable.RouteTableId' \
+  --output text)
 
 # Add route to Internet Gateway
 aws ec2 create-route \
-  --route-table-id <rtb-id> \
+  --route-table-id $PUBLIC_RT \
   --destination-cidr-block 0.0.0.0/0 \
   --gateway-id $IGW_ID
+
+# Associate route table with public subnet
+aws ec2 associate-route-table \
+  --subnet-id $PUBLIC_SUBNET \
+  --route-table-id $PUBLIC_RT
 ```
 
-## Lab 3: Encryption and Key Management
-
-### Key Concepts
-- AWS Key Management Service (KMS)
-- Customer Master Keys (CMK)
-- S3 Encryption
-- EBS Encryption
-
-### Example Implementation
+### Network ACLs for Isolation
 
 ```bash
-# Create KMS key
-aws kms create-key \
-  --description "Lab3 Customer Master Key" \
-  --key-usage ENCRYPT_DECRYPT \
-  --origin AWS_KMS \
-  --query 'KeyMetadata.KeyId' \
-  --output text
-
-KEY_ID="<key-id-output>"
-
-# Create alias for the key
-aws kms create-alias \
-  --alias-name alias/lab3-cmk \
-  --target-key-id $KEY_ID
-
-# Create encrypted S3 bucket
-aws s3api create-bucket \
-  --bucket lab3-encrypted-bucket-${AWS_ACCOUNT_ID} \
-  --region us-east-1
-
-# Enable default encryption
-aws s3api put-bucket-encryption \
-  --bucket lab3-encrypted-bucket-${AWS_ACCOUNT_ID} \
-  --server-side-encryption-configuration '{
-    "Rules": [{
-      "ApplyServerSideEncryptionByDefault": {
-        "SSEAlgorithm": "aws:kms",
-        "KMSMasterKeyID": "'$KEY_ID'"
-      }
-    }]
-  }'
-
-# Upload encrypted object
-echo "Sensitive data" > test-file.txt
-aws s3 cp test-file.txt s3://lab3-encrypted-bucket-${AWS_ACCOUNT_ID}/ \
-  --server-side-encryption aws:kms \
-  --ssekms-key-id $KEY_ID
-
-# Verify encryption
-aws s3api head-object \
-  --bucket lab3-encrypted-bucket-${AWS_ACCOUNT_ID} \
-  --key test-file.txt
-```
-
-## Lab 4: Access Control and Network Security
-
-### Key Concepts
-- Security Groups
-- Network ACLs
-- VPC Peering
-- Security Group Rules
-
-### Example Implementation
-
-```bash
-# Create security group for web server
-aws ec2 create-security-group \
-  --group-name WebServerSG \
-  --description "Security group for web servers" \
-  --vpc-id $VPC_ID \
-  --query 'GroupId' \
-  --output text
-
-SG_ID="<sg-id-output>"
-
-# Allow HTTP from anywhere
-aws ec2 authorize-security-group-ingress \
-  --group-id $SG_ID \
-  --protocol tcp \
-  --port 80 \
-  --cidr 0.0.0.0/0
-
-# Allow HTTPS from anywhere
-aws ec2 authorize-security-group-ingress \
-  --group-id $SG_ID \
-  --protocol tcp \
-  --port 443 \
-  --cidr 0.0.0.0/0
-
-# Allow SSH from specific IP only
-aws ec2 authorize-security-group-ingress \
-  --group-id $SG_ID \
-  --protocol tcp \
-  --port 22 \
-  --cidr ${MY_IP}/32
-
-# Create security group for database
-aws ec2 create-security-group \
-  --group-name DatabaseSG \
-  --description "Security group for database servers" \
-  --vpc-id $VPC_ID
-
-DB_SG_ID="<db-sg-id-output>"
-
-# Allow MySQL only from web server security group
-aws ec2 authorize-security-group-ingress \
-  --group-id $DB_SG_ID \
-  --protocol tcp \
-  --port 3306 \
-  --source-group $SG_ID
-
 # Create Network ACL
-aws ec2 create-network-acl \
+NACL_ID=$(aws ec2 create-network-acl \
   --vpc-id $VPC_ID \
-  --tag-specifications 'ResourceType=network-acl,Tags=[{Key=Name,Value=CustomNACL}]'
+  --tag-specifications 'ResourceType=network-acl,Tags=[{Key=Name,Value=Private-NACL}]' \
+  --query 'NetworkAcl.NetworkAclId' \
+  --output text)
 
-NACL_ID="<nacl-id-output>"
-
-# Add inbound rule
+# Add inbound rule (allow SSH from specific IP)
 aws ec2 create-network-acl-entry \
   --network-acl-id $NACL_ID \
   --rule-number 100 \
   --protocol tcp \
-  --port-range From=80,To=80 \
+  --port-range From=22,To=22 \
+  --cidr-block 10.0.1.0/24 \
+  --rule-action allow \
+  --ingress
+
+# Add outbound rule
+aws ec2 create-network-acl-entry \
+  --network-acl-id $NACL_ID \
+  --rule-number 100 \
+  --protocol -1 \
   --cidr-block 0.0.0.0/0 \
-  --egress false \
-  --rule-action allow
+  --rule-action allow \
+  --egress
+
+# Associate NACL with private subnet
+aws ec2 replace-network-acl-association \
+  --association-id $(aws ec2 describe-network-acls \
+    --filters "Name=association.subnet-id,Values=$PRIVATE_SUBNET" \
+    --query 'NetworkAcls[0].Associations[0].NetworkAclAssociationId' \
+    --output text) \
+  --network-acl-id $NACL_ID
+```
+
+## Lab 3: Encryption and Key Management
+
+### Create KMS Key
+
+```bash
+# Create KMS key
+KEY_ID=$(aws kms create-key \
+  --description "Lab encryption key" \
+  --key-usage ENCRYPT_DECRYPT \
+  --query 'KeyMetadata.KeyId' \
+  --output text)
+
+# Create alias for key
+aws kms create-alias \
+  --alias-name alias/lab-key \
+  --target-key-id $KEY_ID
+
+# List KMS keys
+aws kms list-keys
+```
+
+### Encrypt and Decrypt Data
+
+```bash
+# Encrypt plaintext
+echo "Sensitive data" > plaintext.txt
+
+aws kms encrypt \
+  --key-id alias/lab-key \
+  --plaintext fileb://plaintext.txt \
+  --output text \
+  --query CiphertextBlob | base64 --decode > encrypted.dat
+
+# Decrypt data
+aws kms decrypt \
+  --ciphertext-blob fileb://encrypted.dat \
+  --output text \
+  --query Plaintext | base64 --decode
+```
+
+### S3 Bucket Encryption
+
+```bash
+# Create S3 bucket with encryption
+aws s3api create-bucket \
+  --bucket lab-secure-bucket-${AWS_ACCOUNT_ID} \
+  --region us-east-1
+
+# Enable default encryption with KMS
+aws s3api put-bucket-encryption \
+  --bucket lab-secure-bucket-${AWS_ACCOUNT_ID} \
+  --server-side-encryption-configuration '{
+    "Rules": [{
+      "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "aws:kms",
+        "KMSMasterKeyID": "alias/lab-key"
+      },
+      "BucketKeyEnabled": true
+    }]
+  }'
+
+# Upload encrypted object
+aws s3 cp plaintext.txt s3://lab-secure-bucket-${AWS_ACCOUNT_ID}/ \
+  --server-side-encryption aws:kms \
+  --ssekms-key-id alias/lab-key
+```
+
+### EBS Volume Encryption
+
+```bash
+# Create encrypted EBS volume
+VOLUME_ID=$(aws ec2 create-volume \
+  --availability-zone us-east-1a \
+  --size 10 \
+  --volume-type gp3 \
+  --encrypted \
+  --kms-key-id alias/lab-key \
+  --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=Encrypted-Volume}]' \
+  --query 'VolumeId' \
+  --output text)
+
+# Verify encryption
+aws ec2 describe-volumes \
+  --volume-ids $VOLUME_ID \
+  --query 'Volumes[0].[Encrypted,KmsKeyId]'
+```
+
+## Lab 4: Access Control and Network Security
+
+### Security Groups Configuration
+
+```bash
+# Create security group for web server
+WEB_SG=$(aws ec2 create-security-group \
+  --group-name web-server-sg \
+  --description "Security group for web servers" \
+  --vpc-id $VPC_ID \
+  --query 'GroupId' \
+  --output text)
+
+# Allow HTTP traffic
+aws ec2 authorize-security-group-ingress \
+  --group-id $WEB_SG \
+  --protocol tcp \
+  --port 80 \
+  --cidr 0.0.0.0/0
+
+# Allow HTTPS traffic
+aws ec2 authorize-security-group-ingress \
+  --group-id $WEB_SG \
+  --protocol tcp \
+  --port 443 \
+  --cidr 0.0.0.0/0
+
+# Allow SSH from specific IP
+aws ec2 authorize-security-group-ingress \
+  --group-id $WEB_SG \
+  --protocol tcp \
+  --port 22 \
+  --cidr ${MY_IP}/32
+```
+
+### Database Security Group
+
+```bash
+# Create security group for database
+DB_SG=$(aws ec2 create-security-group \
+  --group-name database-sg \
+  --description "Security group for database servers" \
+  --vpc-id $VPC_ID \
+  --query 'GroupId' \
+  --output text)
+
+# Allow MySQL only from web server security group
+aws ec2 authorize-security-group-ingress \
+  --group-id $DB_SG \
+  --protocol tcp \
+  --port 3306 \
+  --source-group $WEB_SG
+```
+
+### Launch EC2 Instance with Security
+
+```bash
+# Launch instance in public subnet
+INSTANCE_ID=$(aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t2.micro \
+  --key-name ${KEY_PAIR_NAME} \
+  --security-group-ids $WEB_SG \
+  --subnet-id $PUBLIC_SUBNET \
+  --associate-public-ip-address \
+  --iam-instance-profile Name=EC2-CloudWatch-Role \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Web-Server}]' \
+  --query 'Instances[0].InstanceId' \
+  --output text)
+
+# Get instance public IP
+aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --query 'Reservations[0].Instances[0].PublicIpAddress' \
+  --output text
 ```
 
 ## Lab 5: Monitoring, Logging, and Incident Detection
 
-### Key Concepts
-- AWS CloudTrail
-- Amazon CloudWatch
-- CloudWatch Logs
-- CloudWatch Alarms
-
-### Example Implementation
+### Enable CloudTrail
 
 ```bash
 # Create S3 bucket for CloudTrail logs
@@ -475,8 +439,8 @@ aws s3api create-bucket \
   --bucket cloudtrail-logs-${AWS_ACCOUNT_ID} \
   --region us-east-1
 
-# Create bucket policy for CloudTrail
-cat > cloudtrail-bucket-policy.json <<EOF
+# Apply bucket policy for CloudTrail
+cat > cloudtrail-policy.json <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -509,365 +473,345 @@ EOF
 
 aws s3api put-bucket-policy \
   --bucket cloudtrail-logs-${AWS_ACCOUNT_ID} \
-  --policy file://cloudtrail-bucket-policy.json
+  --policy file://cloudtrail-policy.json
 
 # Create CloudTrail
 aws cloudtrail create-trail \
-  --name Lab5-Trail \
+  --name lab-trail \
   --s3-bucket-name cloudtrail-logs-${AWS_ACCOUNT_ID} \
   --is-multi-region-trail
 
 # Start logging
-aws cloudtrail start-logging --name Lab5-Trail
+aws cloudtrail start-logging --name lab-trail
+```
 
-# Create CloudWatch Log Group
-aws logs create-log-group \
-  --log-group-name /aws/security/lab5
+### CloudWatch Alarms
 
-# Create metric filter for failed login attempts
-aws logs put-metric-filter \
-  --log-group-name /aws/security/lab5 \
-  --filter-name FailedLoginAttempts \
-  --filter-pattern '[time, request_id, event_type = ConsoleLogin, event_outcome = Failure]' \
-  --metric-transformations \
-    metricName=FailedConsoleLogins,\
-metricNamespace=SecurityMetrics,\
-metricValue=1
+```bash
+# Create SNS topic for alerts
+TOPIC_ARN=$(aws sns create-topic \
+  --name security-alerts \
+  --query 'TopicArn' \
+  --output text)
 
-# Create CloudWatch Alarm
+# Subscribe email to topic
+aws sns subscribe \
+  --topic-arn $TOPIC_ARN \
+  --protocol email \
+  --notification-endpoint ${YOUR_EMAIL}
+
+# Create alarm for unauthorized API calls
 aws cloudwatch put-metric-alarm \
-  --alarm-name FailedLoginAlarm \
-  --alarm-description "Alert on failed login attempts" \
-  --metric-name FailedConsoleLogins \
-  --namespace SecurityMetrics \
+  --alarm-name unauthorized-api-calls \
+  --alarm-description "Alert on unauthorized API calls" \
+  --metric-name UnauthorizedAPICalls \
+  --namespace AWS/CloudTrail \
   --statistic Sum \
   --period 300 \
-  --threshold 3 \
+  --threshold 1 \
   --comparison-operator GreaterThanThreshold \
-  --evaluation-periods 1
+  --evaluation-periods 1 \
+  --alarm-actions $TOPIC_ARN
+```
 
-# Query CloudTrail events
+### CloudWatch Logs for EC2
+
+```bash
+# Create log group
+aws logs create-log-group \
+  --log-group-name /aws/ec2/web-server
+
+# Set retention policy
+aws logs put-retention-policy \
+  --log-group-name /aws/ec2/web-server \
+  --retention-in-days 7
+
+# Create metric filter for failed SSH attempts
+aws logs put-metric-filter \
+  --log-group-name /aws/ec2/web-server \
+  --filter-name failed-ssh-attempts \
+  --filter-pattern "[Mon, day, timestamp, ip, id, status = *failed*]" \
+  --metric-transformations \
+    metricName=FailedSSHAttempts,metricNamespace=Security,metricValue=1
+```
+
+### Query CloudTrail Logs
+
+```bash
+# Lookup recent events
 aws cloudtrail lookup-events \
   --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin \
-  --max-results 10 \
-  --query 'Events[*].[EventTime,Username,CloudTrailEvent]' \
+  --max-results 10
+
+# Query specific user activity
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=Username,AttributeValue=lab-user-admin \
+  --start-time $(date -u -d '1 hour ago' +%s) \
+  --query 'Events[*].[EventTime,EventName,Username]' \
   --output table
+```
+
+### CloudWatch Insights Queries
+
+```bash
+# Query failed authentication attempts
+aws logs start-query \
+  --log-group-name /aws/cloudtrail \
+  --start-time $(date -u -d '24 hours ago' +%s) \
+  --end-time $(date -u +%s) \
+  --query-string 'fields @timestamp, errorCode, errorMessage, userIdentity.principalId
+| filter errorCode like /Unauthorized|Forbidden|AccessDenied/
+| sort @timestamp desc
+| limit 20'
 ```
 
 ## Documentation Best Practices
 
-### Lab Report Template
-
-Each lab markdown file should follow this structure:
+### Lab Documentation Template
 
 ```markdown
-# Lab X - [Title]
+# Lab X: [Lab Title]
 
 ## Objective
-Clear statement of what you're learning.
+[Clear statement of what students will learn]
 
 ## Learning Outcomes
 - Outcome 1
 - Outcome 2
 - Outcome 3
 
+## Prerequisites
+- AWS Account
+- AWS CLI configured
+- Basic understanding of [relevant concept]
+
 ## Environment
 - AWS Region: us-east-1
-- AWS CLI Version: 2.x
-- Tools: AWS Console, AWS CLI
+- Tools: AWS CLI, AWS Console
 
-## Implementation
+## Implementation Steps
 
 ### Step 1: [Task Name]
 
-Description of what you're doing.
-
+**Command:**
 ```bash
-# Commands with comments
-aws service action --parameter value
+aws service command --parameter value
 ```
 
-**Expected Output:**
-```
-Output example
-```
+**Screenshot:**
+![Description](screenshots/lab-x-step-1.png)
+
+**Explanation:**
+[Detailed explanation of what this step accomplishes]
 
 ### Step 2: [Next Task]
+[Continue pattern...]
 
-Continue with clear steps...
-
-## Commands Reference
-
-| Command | Purpose |
-|---------|---------|
-| `aws iam create-user` | Create IAM user |
-| `aws ec2 describe-vpcs` | List VPCs |
-
-## Screenshots
-
-![Description](./images/labX-screenshot1.png)
-![Another view](./images/labX-screenshot2.png)
+## Verification
+[How to verify the lab was completed successfully]
 
 ## Challenges Encountered
-
-1. **Challenge:** Brief description
-   **Solution:** How you resolved it
+- Challenge 1 and resolution
+- Challenge 2 and resolution
 
 ## Lessons Learned
-
-- Key takeaway 1
-- Key takeaway 2
-
-## Security Best Practices Applied
-
-- Practice 1
-- Practice 2
+[Key takeaways from the lab]
 
 ## References
+- [AWS Documentation Link]
+- [Related Tutorial]
 
-- [AWS Documentation](https://docs.aws.amazon.com/)
-- Course materials
-```
-
-## Git Workflow
-
-### Regular Commits
-
+## Cleanup
 ```bash
-# Check status
-git status
-
-# Add files
-git add Lab1_Account_Security_and_IAM.md
-git add images/
-
-# Commit with meaningful message
-git commit -m "Complete Lab 1: IAM users, groups, and MFA setup"
-
-# Push to GitHub
-git push origin main
+# Commands to remove resources
+aws service delete-resource --id $RESOURCE_ID
 ```
-
-### Commit Message Best Practices
-
-```bash
-# Good commit messages
-git commit -m "Add Lab 1 IAM configuration screenshots"
-git commit -m "Complete Step 3: Configure password policy"
-git commit -m "Fix typo in Lab 2 VPC documentation"
-git commit -m "Add troubleshooting section to Lab 3"
-
-# Bad commit messages (avoid)
-git commit -m "update"
-git commit -m "lab done"
-git commit -m "changes"
 ```
 
 ## Common Patterns
 
-### Creating Lab Documentation
+### Resource Tagging Strategy
 
 ```bash
-#!/bin/bash
-# Script to create new lab file
+# Apply consistent tags to all resources
+TAGS='ResourceType=*,Tags=[{Key=Project,Value=IKB42603},{Key=Lab,Value=Lab1},{Key=Environment,Value=Learning}]'
 
-LAB_NUMBER=$1
-LAB_TITLE=$2
+# Tag existing resource
+aws ec2 create-tags \
+  --resources $INSTANCE_ID \
+  --tags Key=Project,Value=IKB42603 Key=Lab,Value=Lab1
+```
 
-cat > Lab${LAB_NUMBER}_${LAB_TITLE}.md <<EOF
-# Lab ${LAB_NUMBER} - ${LAB_TITLE}
+### Git Workflow for Lab Submissions
 
-## Objective
+```bash
+# Create feature branch for each lab
+git checkout -b lab1-iam-security
 
+# Work on lab, commit frequently
+git add Lab1_Account_Security_and_IAM.md screenshots/
+git commit -m "Complete IAM user creation with MFA"
 
-## Learning Outcomes
+# Push to GitHub
+git push origin lab1-iam-security
 
-
-## Implementation
-
-### Step 1:
-
-
-## Screenshots
-
-
-## Challenges Encountered
-
-
-## Lessons Learned
-
-
-## References
-
-EOF
-
-echo "Created Lab${LAB_NUMBER}_${LAB_TITLE}.md"
+# Merge to main when complete
+git checkout main
+git merge lab1-iam-security
+git push origin main
 ```
 
 ### Screenshot Organization
 
 ```bash
-# Create images directory structure
-mkdir -p images/lab{1..5}
+# Create screenshots directory
+mkdir -p screenshots/lab{1..5}
 
 # Naming convention
-# images/lab1/step1-iam-user-creation.png
-# images/lab1/step2-mfa-enabled.png
-# images/lab2/vpc-diagram.png
+# screenshots/lab1/01-iam-user-creation.png
+# screenshots/lab1/02-mfa-enabled.png
+# screenshots/lab2/01-vpc-creation.png
 ```
 
 ## Troubleshooting
 
-### AWS CLI Not Configured
+### AWS CLI Authentication Issues
 
-**Problem:** `Unable to locate credentials`
-
-**Solution:**
 ```bash
-# Configure credentials
-aws configure
+# Verify credentials are configured
+aws sts get-caller-identity
 
-# Or use environment variables
-export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-export AWS_DEFAULT_REGION=us-east-1
+# Check region configuration
+aws configure get region
+
+# Test with simple command
+aws s3 ls
+
+# Re-configure if needed
+aws configure
 ```
 
 ### Permission Denied Errors
 
-**Problem:** `AccessDenied` when running AWS commands
-
-**Solution:**
 ```bash
-# Check current identity
-aws sts get-caller-identity
-
-# Verify IAM permissions
+# Check IAM permissions for current user
 aws iam get-user
 
-# Ensure your user has necessary policies attached
+# List attached policies
+aws iam list-attached-user-policies --user-name $(aws iam get-user --query 'User.UserName' --output text)
+
+# Verify policy details
+aws iam get-policy-version \
+  --policy-arn arn:aws:iam::aws:policy/AdministratorAccess \
+  --version-id v1
 ```
 
-### Git Push Rejected
+### CloudTrail Not Logging
 
-**Problem:** `Updates were rejected because the remote contains work that you do not have locally`
-
-**Solution:**
 ```bash
-# Pull remote changes first
-git pull origin main
+# Verify trail status
+aws cloudtrail get-trail-status --name lab-trail
 
-# If conflicts occur, resolve them
-git status
-# Edit conflicting files
-git add .
-git commit -m "Resolve merge conflicts"
-git push origin main
+# Check if logging is enabled
+aws cloudtrail describe-trails --trail-name-list lab-trail
+
+# Restart logging
+aws cloudtrail start-logging --name lab-trail
 ```
 
-### Region-Specific Resources
+### VPC Connectivity Issues
 
-**Problem:** Resources not found in different regions
-
-**Solution:**
 ```bash
-# Always specify region
-aws ec2 describe-instances --region us-east-1
+# Verify route table associations
+aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID"
 
-# Or set default region
-aws configure set region us-east-1
+# Check security group rules
+aws ec2 describe-security-groups --group-ids $WEB_SG
+
+# Verify network ACLs
+aws ec2 describe-network-acls --filters "Name=vpc-id,Values=$VPC_ID"
+
+# Test connectivity from instance
+aws ec2-instance-connect send-ssh-public-key \
+  --instance-id $INSTANCE_ID \
+  --availability-zone us-east-1a \
+  --instance-os-user ec2-user \
+  --ssh-public-key file://~/.ssh/id_rsa.pub
 ```
 
-## AWS CLI Cheat Sheet
-
-### IAM Commands
+### KMS Key Access Issues
 
 ```bash
-# List users
-aws iam list-users
-
-# List groups
-aws iam list-groups
-
-# List policies
-aws iam list-policies --scope Local
-
-# Get user details
-aws iam get-user --user-name username
-```
-
-### EC2/VPC Commands
-
-```bash
-# List VPCs
-aws ec2 describe-vpcs
-
-# List subnets
-aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxx"
-
-# List security groups
-aws ec2 describe-security-groups
-
-# List instances
-aws ec2 describe-instances
-```
-
-### S3 Commands
-
-```bash
-# List buckets
-aws s3 ls
-
-# List bucket contents
-aws s3 ls s3://bucket-name/
-
-# Copy file to S3
-aws s3 cp file.txt s3://bucket-name/
-
-# Get bucket encryption
-aws s3api get-bucket-encryption --bucket bucket-name
-```
-
-### KMS Commands
-
-```bash
-# List keys
+# List KMS keys
 aws kms list-keys
 
-# Describe key
-aws kms describe-key --key-id key-id
+# Get key policy
+aws kms get-key-policy \
+  --key-id alias/lab-key \
+  --policy-name default
 
-# List aliases
-aws kms list-aliases
+# Grant user permission to use key
+aws kms create-grant \
+  --key-id alias/lab-key \
+  --grantee-principal arn:aws:iam::${AWS_ACCOUNT_ID}:user/lab-user-admin \
+  --operations Encrypt Decrypt
 ```
 
-### CloudTrail Commands
+## Resource Cleanup
+
+### Complete Cleanup Script
 
 ```bash
-# List trails
-aws cloudtrail describe-trails
+#!/bin/bash
+# cleanup.sh - Remove all lab resources
 
-# Get trail status
-aws cloudtrail get-trail-status --name trail-name
+# Terminate EC2 instances
+aws ec2 terminate-instances --instance-ids $INSTANCE_ID
 
-# Lookup events
-aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
+# Delete security groups
+aws ec2 delete-security-group --group-id $WEB_SG
+aws ec2 delete-security-group --group-id $DB_SG
+
+# Delete subnets
+aws ec2 delete-subnet --subnet-id $PUBLIC_SUBNET
+aws ec2 delete-subnet --subnet-id $PRIVATE_SUBNET
+
+# Detach and delete Internet Gateway
+aws ec2 detach-internet-gateway --internet-gateway-id $IGW_ID --vpc-id $VPC_ID
+aws ec2 delete-internet-gateway --internet-gateway-id $IGW_ID
+
+# Delete VPC
+aws ec2 delete-vpc --vpc-id $VPC_ID
+
+# Delete KMS key (schedule deletion)
+aws kms schedule-key-deletion --key-id alias/lab-key --pending-window-in-days 7
+
+# Empty and delete S3 buckets
+aws s3 rm s3://lab-secure-bucket-${AWS_ACCOUNT_ID} --recursive
+aws s3api delete-bucket --bucket lab-secure-bucket-${AWS_ACCOUNT_ID}
+
+aws s3 rm s3://cloudtrail-logs-${AWS_ACCOUNT_ID} --recursive
+aws s3api delete-bucket --bucket cloudtrail-logs-${AWS_ACCOUNT_ID}
+
+# Delete CloudTrail
+aws cloudtrail delete-trail --name lab-trail
+
+# Delete CloudWatch log groups
+aws logs delete-log-group --log-group-name /aws/ec2/web-server
+
+# Delete IAM resources
+aws iam detach-user-policy --user-name lab-user-admin --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+aws iam delete-user --user-name lab-user-admin
+
+echo "Cleanup complete"
 ```
 
-## Academic Integrity Guidelines
+## Academic Integrity Notes
 
-- **DO:** Learn and understand each command
-- **DO:** Customize configurations for your environment
-- **DO:** Document your own challenges and solutions
-- **DO:** Take your own screenshots
-- **DON'T:** Copy lab reports verbatim
-- **DON'T:** Share AWS credentials
-- **DON'T:** Submit others' work as your own
-
-## Additional Resources
-
-- [AWS Security Best Practices](https://aws.amazon.com/architecture/security-identity-compliance/)
-- [AWS Well-Architected Framework - Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html)
-- [AWS CLI Command Reference](https://awscli.amazonaws.com/v2/documentation/api/latest/index.html)
-- [CloudTrail User Guide](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/)
-- [AWS KMS Developer Guide](https://docs.aws.amazon.com/kms/latest/developerguide/)
+When assisting students:
+- Encourage understanding over copying
+- Explain the "why" behind each configuration
+- Ask questions to verify comprehension
+- Suggest improvements to documentation
+- Emphasize security best practices
+- Remind about proper attribution of sources
