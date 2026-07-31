@@ -1,15 +1,15 @@
 ---
 name: ikb42603-cloud-security-essentials
-description: Educational AWS cloud security lab environment covering IAM, encryption, network security, and monitoring with hands-on exercises
+description: AWS cloud security lab exercises covering IAM, encryption, VPC isolation, access control, and monitoring for security education
 triggers:
-  - how do I set up AWS security labs
-  - show me cloud security best practices
-  - help me configure IAM policies and roles
-  - how to implement AWS encryption and KMS
-  - guide me through AWS security monitoring
-  - what are AWS VPC security best practices
-  - help with CloudTrail and CloudWatch setup
-  - show me AWS security group configuration
+  - how do I set up AWS IAM users and policies
+  - show me AWS KMS encryption examples
+  - configure VPC security groups and network isolation
+  - set up AWS CloudTrail and CloudWatch monitoring
+  - implement AWS security best practices
+  - create secure multi-tenant AWS architecture
+  - configure AWS access control and network security
+  - AWS security lab exercises and examples
 ---
 
 # IKB42603 Cloud Security Essentials Skill
@@ -18,57 +18,54 @@ triggers:
 
 ## Overview
 
-IKB42603 Cloud Computing Security Essentials is an educational repository providing hands-on AWS security labs covering five core areas: account security and IAM, secure isolation and multitenancy, encryption and key management, access control and network security, and monitoring/logging/incident detection. This skill helps you implement AWS security best practices through structured laboratory exercises.
+This project provides hands-on AWS cloud security lab exercises for the IKB42603 Cloud Computing Security Essentials course. It covers five core security domains: Account Security & IAM, Secure Isolation & Multitenancy, Encryption & Key Management, Access Control & Network Security, and Monitoring & Incident Detection.
+
+The labs use AWS services including IAM, VPC, EC2, Security Groups, KMS, CloudTrail, and CloudWatch to teach practical cloud security implementation.
 
 ## Repository Structure
 
-The course is organized into 5 weekly labs:
+```
+IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS/
+├── README.md
+├── Lab0_Environment_Setup.md
+├── Lab1_Account_Security_and_IAM.md
+├── Lab2_Secure_Isolation_and_Multitenancy.md
+├── Lab3_Encryption_and_Key_Management.md
+├── Lab4_Access_Control_and_Network_Security.md
+└── Lab5_Monitoring_Logging_and_Incident_Detection.md
+```
 
-- **Lab 1**: Account Security and IAM
-- **Lab 2**: Secure Isolation and Multitenancy
-- **Lab 3**: Encryption and Key Management
-- **Lab 4**: Access Control and Network Security
-- **Lab 5**: Monitoring, Logging, and Incident Detection
+## Prerequisites
+
+- AWS Account (Free Tier eligible)
+- AWS CLI installed and configured
+- Basic understanding of cloud computing concepts
+- Git for version control
 
 ## Installation & Setup
 
-### Initial Repository Setup
+### 1. Clone the Repository
 
 ```bash
-# Clone the repository
 git clone https://github.com/<username>/IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS.git
 cd IKB42603-CLOUD-COMPUTING-SECURITY-ESSENTIALS
-
-# Create lab structure
-mkdir -p Lab{1..5}
-touch Lab0_Environment_Setup.md
-touch Lab{1..5}_*.md
-touch README.md
 ```
 
-### AWS CLI Setup
+### 2. Configure AWS CLI
 
 ```bash
-# Install AWS CLI (macOS)
-brew install awscli
-
-# Install AWS CLI (Linux)
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-
-# Configure AWS credentials
 aws configure
-# Enter: AWS Access Key ID, Secret Access Key, Default region, Output format
+# Enter:
+# AWS Access Key ID: $AWS_ACCESS_KEY_ID
+# AWS Secret Access Key: $AWS_SECRET_ACCESS_KEY
+# Default region: us-east-1
+# Default output format: json
 ```
 
-### Environment Variables
+### 3. Verify AWS Connection
 
 ```bash
-# Set AWS credentials via environment variables
-export AWS_ACCESS_KEY_ID=<your-access-key>
-export AWS_SECRET_ACCESS_KEY=<your-secret-key>
-export AWS_DEFAULT_REGION=us-east-1
+aws sts get-caller-identity
 ```
 
 ## Lab 1: Account Security and IAM
@@ -79,16 +76,16 @@ export AWS_DEFAULT_REGION=us-east-1
 # Create a new IAM user
 aws iam create-user --user-name lab-user-01
 
-# Create access key for programmatic access
+# Create access keys for programmatic access
 aws iam create-access-key --user-name lab-user-01
 
-# Attach managed policy to user
+# Attach a managed policy
 aws iam attach-user-policy \
   --user-name lab-user-01 \
   --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
 ```
 
-### Custom IAM Policy
+### Creating Custom IAM Policies
 
 ```json
 {
@@ -110,18 +107,18 @@ aws iam attach-user-policy \
 ```
 
 ```bash
-# Create custom policy from JSON file
+# Create the policy
 aws iam create-policy \
-  --policy-name Lab-S3-ReadOnly \
+  --policy-name S3ReadOnlyLabPolicy \
   --policy-document file://s3-readonly-policy.json
 
-# Attach custom policy to user
+# Attach to user
 aws iam attach-user-policy \
   --user-name lab-user-01 \
-  --policy-arn arn:aws:iam::123456789012:policy/Lab-S3-ReadOnly
+  --policy-arn arn:aws:iam::$AWS_ACCOUNT_ID:policy/S3ReadOnlyLabPolicy
 ```
 
-### Enable MFA
+### Enabling MFA
 
 ```bash
 # Create virtual MFA device
@@ -130,19 +127,219 @@ aws iam create-virtual-mfa-device \
   --outfile QRCode.png \
   --bootstrap-method QRCodePNG
 
-# Enable MFA device for user (requires two consecutive codes)
+# Enable MFA (after scanning QR code)
 aws iam enable-mfa-device \
   --user-name lab-user-01 \
-  --serial-number arn:aws:iam::123456789012:mfa/lab-mfa-device \
-  --authentication-code1 123456 \
-  --authentication-code2 789012
+  --serial-number arn:aws:iam::$AWS_ACCOUNT_ID:mfa/lab-mfa-device \
+  --authentication-code-1 123456 \
+  --authentication-code-2 789012
+```
+
+### Creating IAM Groups
+
+```bash
+# Create group
+aws iam create-group --group-name Developers
+
+# Attach policy to group
+aws iam attach-group-policy \
+  --group-name Developers \
+  --policy-arn arn:aws:iam::aws:policy/PowerUserAccess
+
+# Add user to group
+aws iam add-user-to-group \
+  --user-name lab-user-01 \
+  --group-name Developers
+```
+
+## Lab 2: Secure Isolation and Multitenancy
+
+### Creating VPC with Isolation
+
+```bash
+# Create VPC
+aws ec2 create-vpc \
+  --cidr-block 10.0.0.0/16 \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=Lab-VPC}]'
+
+# Create public subnet
+aws ec2 create-subnet \
+  --vpc-id vpc-xxxxx \
+  --cidr-block 10.0.1.0/24 \
+  --availability-zone us-east-1a \
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Public-Subnet}]'
+
+# Create private subnet
+aws ec2 create-subnet \
+  --vpc-id vpc-xxxxx \
+  --cidr-block 10.0.2.0/24 \
+  --availability-zone us-east-1a \
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Private-Subnet}]'
+```
+
+### Security Groups for Multi-Tenant Isolation
+
+```bash
+# Create security group for tenant A
+aws ec2 create-security-group \
+  --group-name tenant-a-sg \
+  --description "Security group for Tenant A" \
+  --vpc-id vpc-xxxxx
+
+# Allow inbound HTTP only from specific IP
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxxxx \
+  --protocol tcp \
+  --port 80 \
+  --cidr 203.0.113.0/24
+
+# Create security group for tenant B (isolated)
+aws ec2 create-security-group \
+  --group-name tenant-b-sg \
+  --description "Security group for Tenant B" \
+  --vpc-id vpc-xxxxx
+```
+
+### Network ACLs
+
+```bash
+# Create network ACL
+aws ec2 create-network-acl \
+  --vpc-id vpc-xxxxx \
+  --tag-specifications 'ResourceType=network-acl,Tags=[{Key=Name,Value=Private-NACL}]'
+
+# Add rule to deny traffic from specific subnet
+aws ec2 create-network-acl-entry \
+  --network-acl-id acl-xxxxx \
+  --ingress \
+  --rule-number 100 \
+  --protocol -1 \
+  --cidr-block 10.0.1.0/24 \
+  --rule-action deny
+```
+
+## Lab 3: Encryption and Key Management
+
+### Creating KMS Keys
+
+```bash
+# Create customer managed key
+aws kms create-key \
+  --description "Lab encryption key" \
+  --key-usage ENCRYPT_DECRYPT \
+  --origin AWS_KMS
+
+# Create alias
+aws kms create-alias \
+  --alias-name alias/lab-key \
+  --target-key-id <key-id>
+```
+
+### Encrypting Data with KMS
+
+```bash
+# Encrypt plaintext
+echo "Sensitive data" > plaintext.txt
+aws kms encrypt \
+  --key-id alias/lab-key \
+  --plaintext fileb://plaintext.txt \
+  --output text \
+  --query CiphertextBlob | base64 --decode > encrypted.bin
+
+# Decrypt
+aws kms decrypt \
+  --ciphertext-blob fileb://encrypted.bin \
+  --output text \
+  --query Plaintext | base64 --decode
+```
+
+### S3 Bucket Encryption
+
+```bash
+# Create bucket with encryption
+aws s3api create-bucket \
+  --bucket lab-encrypted-bucket-$RANDOM \
+  --region us-east-1
+
+# Enable default encryption
+aws s3api put-bucket-encryption \
+  --bucket lab-encrypted-bucket-$RANDOM \
+  --server-side-encryption-configuration '{
+    "Rules": [{
+      "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "aws:kms",
+        "KMSMasterKeyID": "alias/lab-key"
+      }
+    }]
+  }'
+```
+
+### EBS Volume Encryption
+
+```bash
+# Create encrypted EBS volume
+aws ec2 create-volume \
+  --size 10 \
+  --availability-zone us-east-1a \
+  --encrypted \
+  --kms-key-id alias/lab-key \
+  --volume-type gp3
+
+# Encrypt existing volume snapshot
+aws ec2 copy-snapshot \
+  --source-region us-east-1 \
+  --source-snapshot-id snap-xxxxx \
+  --encrypted \
+  --kms-key-id alias/lab-key
+```
+
+## Lab 4: Access Control and Network Security
+
+### Configuring Security Groups
+
+```bash
+# Create web server security group
+aws ec2 create-security-group \
+  --group-name web-server-sg \
+  --description "Allow HTTP/HTTPS" \
+  --vpc-id vpc-xxxxx
+
+# Allow HTTPS from anywhere
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxxxx \
+  --protocol tcp \
+  --port 443 \
+  --cidr 0.0.0.0/0
+
+# Allow SSH from specific IP
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxxxx \
+  --protocol tcp \
+  --port 22 \
+  --cidr $MY_IP/32
+```
+
+### VPC Endpoints for Private Access
+
+```bash
+# Create S3 VPC endpoint
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-xxxxx \
+  --service-name com.amazonaws.us-east-1.s3 \
+  --route-table-ids rtb-xxxxx
+
+# Create interface endpoint for EC2
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-xxxxx \
+  --vpc-endpoint-type Interface \
+  --service-name com.amazonaws.us-east-1.ec2 \
+  --subnet-ids subnet-xxxxx \
+  --security-group-ids sg-xxxxx
 ```
 
 ### IAM Roles for EC2
 
-```bash
-# Create trust policy for EC2
-cat > ec2-trust-policy.json <<EOF
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -155,680 +352,292 @@ cat > ec2-trust-policy.json <<EOF
     }
   ]
 }
-EOF
+```
 
-# Create IAM role
+```bash
+# Create role
 aws iam create-role \
-  --role-name Lab-EC2-S3-Access \
-  --assume-role-policy-document file://ec2-trust-policy.json
+  --role-name EC2-S3-Access-Role \
+  --assume-role-policy-document file://trust-policy.json
 
-# Attach policy to role
+# Attach policy
 aws iam attach-role-policy \
-  --role-name Lab-EC2-S3-Access \
+  --role-name EC2-S3-Access-Role \
   --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
 # Create instance profile
 aws iam create-instance-profile \
-  --instance-profile-name Lab-EC2-Profile
+  --instance-profile-name EC2-S3-Profile
 
-# Add role to instance profile
+# Add role to profile
 aws iam add-role-to-instance-profile \
-  --instance-profile-name Lab-EC2-Profile \
-  --role-name Lab-EC2-S3-Access
-```
-
-## Lab 2: Secure Isolation and Multitenancy
-
-### VPC Creation
-
-```bash
-# Create VPC
-aws ec2 create-vpc \
-  --cidr-block 10.0.0.0/16 \
-  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=Lab-VPC}]'
-
-# Create public subnet
-aws ec2 create-subnet \
-  --vpc-id vpc-xxxxxxxxx \
-  --cidr-block 10.0.1.0/24 \
-  --availability-zone us-east-1a \
-  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Lab-Public-Subnet}]'
-
-# Create private subnet
-aws ec2 create-subnet \
-  --vpc-id vpc-xxxxxxxxx \
-  --cidr-block 10.0.2.0/24 \
-  --availability-zone us-east-1a \
-  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=Lab-Private-Subnet}]'
-
-# Create internet gateway
-aws ec2 create-internet-gateway \
-  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=Lab-IGW}]'
-
-# Attach IGW to VPC
-aws ec2 attach-internet-gateway \
-  --internet-gateway-id igw-xxxxxxxxx \
-  --vpc-id vpc-xxxxxxxxx
-```
-
-### Security Groups
-
-```bash
-# Create security group
-aws ec2 create-security-group \
-  --group-name Lab-Web-SG \
-  --description "Security group for web servers" \
-  --vpc-id vpc-xxxxxxxxx
-
-# Allow HTTP traffic
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-xxxxxxxxx \
-  --protocol tcp \
-  --port 80 \
-  --cidr 0.0.0.0/0
-
-# Allow HTTPS traffic
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-xxxxxxxxx \
-  --protocol tcp \
-  --port 443 \
-  --cidr 0.0.0.0/0
-
-# Allow SSH from specific IP
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-xxxxxxxxx \
-  --protocol tcp \
-  --port 22 \
-  --cidr 203.0.113.0/24
-```
-
-### Network ACLs
-
-```bash
-# Create network ACL
-aws ec2 create-network-acl \
-  --vpc-id vpc-xxxxxxxxx \
-  --tag-specifications 'ResourceType=network-acl,Tags=[{Key=Name,Value=Lab-NACL}]'
-
-# Allow inbound HTTP
-aws ec2 create-network-acl-entry \
-  --network-acl-id acl-xxxxxxxxx \
-  --ingress \
-  --rule-number 100 \
-  --protocol tcp \
-  --port-range From=80,To=80 \
-  --cidr-block 0.0.0.0/0 \
-  --rule-action allow
-
-# Allow outbound traffic
-aws ec2 create-network-acl-entry \
-  --network-acl-id acl-xxxxxxxxx \
-  --egress \
-  --rule-number 100 \
-  --protocol -1 \
-  --cidr-block 0.0.0.0/0 \
-  --rule-action allow
-```
-
-## Lab 3: Encryption and Key Management
-
-### AWS KMS Key Creation
-
-```bash
-# Create KMS key
-aws kms create-key \
-  --description "Lab encryption key" \
-  --key-usage ENCRYPT_DECRYPT \
-  --origin AWS_KMS
-
-# Create alias for key
-aws kms create-alias \
-  --alias-name alias/lab-key \
-  --target-key-id arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012
-
-# List KMS keys
-aws kms list-keys
-
-# Describe key
-aws kms describe-key --key-id alias/lab-key
-```
-
-### S3 Bucket Encryption
-
-```bash
-# Create S3 bucket
-aws s3api create-bucket \
-  --bucket lab-encrypted-bucket-$(date +%s) \
-  --region us-east-1
-
-# Enable default encryption with KMS
-aws s3api put-bucket-encryption \
-  --bucket lab-encrypted-bucket-123456789 \
-  --server-side-encryption-configuration '{
-    "Rules": [{
-      "ApplyServerSideEncryptionByDefault": {
-        "SSEAlgorithm": "aws:kms",
-        "KMSMasterKeyID": "alias/lab-key"
-      },
-      "BucketKeyEnabled": true
-    }]
-  }'
-
-# Verify encryption configuration
-aws s3api get-bucket-encryption \
-  --bucket lab-encrypted-bucket-123456789
-```
-
-### Encrypt/Decrypt Data with KMS
-
-```bash
-# Encrypt plaintext
-echo "Sensitive data" > plaintext.txt
-aws kms encrypt \
-  --key-id alias/lab-key \
-  --plaintext fileb://plaintext.txt \
-  --output text \
-  --query CiphertextBlob | base64 --decode > encrypted.dat
-
-# Decrypt ciphertext
-aws kms decrypt \
-  --ciphertext-blob fileb://encrypted.dat \
-  --output text \
-  --query Plaintext | base64 --decode
-```
-
-### EBS Volume Encryption
-
-```bash
-# Create encrypted EBS volume
-aws ec2 create-volume \
-  --availability-zone us-east-1a \
-  --size 10 \
-  --volume-type gp3 \
-  --encrypted \
-  --kms-key-id alias/lab-key \
-  --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=Lab-Encrypted-Volume}]'
-
-# Launch EC2 instance with encrypted root volume
-aws ec2 run-instances \
-  --image-id ami-0c55b159cbfafe1f0 \
-  --instance-type t2.micro \
-  --block-device-mappings '[{
-    "DeviceName": "/dev/xvda",
-    "Ebs": {
-      "VolumeSize": 8,
-      "VolumeType": "gp3",
-      "Encrypted": true,
-      "KmsKeyId": "alias/lab-key"
-    }
-  }]'
-```
-
-## Lab 4: Access Control and Network Security
-
-### VPC Flow Logs
-
-```bash
-# Create CloudWatch log group
-aws logs create-log-group \
-  --log-group-name /aws/vpc/flowlogs
-
-# Create IAM role for Flow Logs
-cat > flowlogs-trust-policy.json <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "vpc-flow-logs.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-
-aws iam create-role \
-  --role-name VPCFlowLogsRole \
-  --assume-role-policy-document file://flowlogs-trust-policy.json
-
-# Enable VPC Flow Logs
-aws ec2 create-flow-logs \
-  --resource-type VPC \
-  --resource-ids vpc-xxxxxxxxx \
-  --traffic-type ALL \
-  --log-destination-type cloud-watch-logs \
-  --log-group-name /aws/vpc/flowlogs \
-  --deliver-logs-permission-arn arn:aws:iam::123456789012:role/VPCFlowLogsRole
-```
-
-### AWS WAF Configuration
-
-```bash
-# Create IP set
-aws wafv2 create-ip-set \
-  --name Lab-Blocked-IPs \
-  --scope REGIONAL \
-  --ip-address-version IPV4 \
-  --addresses 192.0.2.0/24 203.0.113.0/24
-
-# Create web ACL
-aws wafv2 create-web-acl \
-  --name Lab-WebACL \
-  --scope REGIONAL \
-  --default-action Allow={} \
-  --rules file://waf-rules.json \
-  --visibility-config SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true,MetricName=LabWebACL
-```
-
-### S3 Bucket Policies
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "DenyInsecureTransport",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        "arn:aws:s3:::lab-bucket-name",
-        "arn:aws:s3:::lab-bucket-name/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
-        }
-      }
-    },
-    {
-      "Sid": "AllowSpecificVPCOnly",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::lab-bucket-name/*",
-      "Condition": {
-        "StringEquals": {
-          "aws:SourceVpc": "vpc-xxxxxxxxx"
-        }
-      }
-    }
-  ]
-}
-```
-
-```bash
-# Apply bucket policy
-aws s3api put-bucket-policy \
-  --bucket lab-bucket-name \
-  --policy file://bucket-policy.json
-
-# Block public access
-aws s3api put-public-access-block \
-  --bucket lab-bucket-name \
-  --public-access-block-configuration \
-    BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+  --instance-profile-name EC2-S3-Profile \
+  --role-name EC2-S3-Access-Role
 ```
 
 ## Lab 5: Monitoring, Logging, and Incident Detection
 
-### CloudTrail Setup
+### Enabling CloudTrail
 
 ```bash
-# Create S3 bucket for CloudTrail logs
+# Create S3 bucket for logs
 aws s3api create-bucket \
-  --bucket lab-cloudtrail-logs-$(date +%s) \
+  --bucket lab-cloudtrail-logs-$AWS_ACCOUNT_ID \
   --region us-east-1
 
 # Create trail
 aws cloudtrail create-trail \
-  --name Lab-Trail \
-  --s3-bucket-name lab-cloudtrail-logs-123456789 \
-  --is-multi-region-trail \
-  --enable-log-file-validation
+  --name lab-security-trail \
+  --s3-bucket-name lab-cloudtrail-logs-$AWS_ACCOUNT_ID
 
 # Start logging
-aws cloudtrail start-logging --name Lab-Trail
+aws cloudtrail start-logging \
+  --name lab-security-trail
 
 # Verify trail status
-aws cloudtrail get-trail-status --name Lab-Trail
-
-# Lookup recent events
-aws cloudtrail lookup-events \
-  --lookup-attributes AttributeKey=EventName,AttributeValue=CreateUser \
-  --max-results 10
+aws cloudtrail get-trail-status \
+  --name lab-security-trail
 ```
 
-### CloudWatch Alarms
+### CloudWatch Alarms for Security Events
 
 ```bash
 # Create SNS topic for alerts
-aws sns create-topic --name Lab-Security-Alerts
+aws sns create-topic --name SecurityAlerts
 
-# Subscribe email to topic
+# Subscribe email
 aws sns subscribe \
-  --topic-arn arn:aws:sns:us-east-1:123456789012:Lab-Security-Alerts \
+  --topic-arn arn:aws:sns:us-east-1:$AWS_ACCOUNT_ID:SecurityAlerts \
   --protocol email \
-  --notification-endpoint ${ALERT_EMAIL}
+  --notification-endpoint $EMAIL_ADDRESS
 
-# Create CloudWatch alarm for unauthorized API calls
+# Create metric filter for unauthorized API calls
+aws logs put-metric-filter \
+  --log-group-name /aws/cloudtrail/logs \
+  --filter-name UnauthorizedAPICalls \
+  --filter-pattern '{ ($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*") }' \
+  --metric-transformations \
+    metricName=UnauthorizedAPICallsCount,metricNamespace=CloudTrailMetrics,metricValue=1
+
+# Create alarm
 aws cloudwatch put-metric-alarm \
-  --alarm-name UnauthorizedAPICalls \
-  --alarm-description "Alert on unauthorized API calls" \
-  --metric-name UnauthorizedAPICalls \
+  --alarm-name UnauthorizedAPICallsAlarm \
+  --alarm-description "Triggers on unauthorized API calls" \
+  --metric-name UnauthorizedAPICallsCount \
   --namespace CloudTrailMetrics \
   --statistic Sum \
   --period 300 \
   --evaluation-periods 1 \
   --threshold 1 \
   --comparison-operator GreaterThanOrEqualToThreshold \
-  --alarm-actions arn:aws:sns:us-east-1:123456789012:Lab-Security-Alerts
+  --alarm-actions arn:aws:sns:us-east-1:$AWS_ACCOUNT_ID:SecurityAlerts
 ```
 
-### CloudWatch Log Insights Queries
+### VPC Flow Logs
 
 ```bash
-# Query CloudTrail logs for failed console logins
-aws logs start-query \
-  --log-group-name /aws/cloudtrail/logs \
-  --start-time $(date -u -d '1 hour ago' +%s) \
-  --end-time $(date -u +%s) \
-  --query-string '
-    fields @timestamp, userIdentity.userName, errorCode, errorMessage
-    | filter eventName = "ConsoleLogin" and errorCode exists
-    | sort @timestamp desc
-    | limit 20
-  '
+# Create log group
+aws logs create-log-group \
+  --log-group-name /aws/vpc/flowlogs
 
-# Query VPC Flow Logs for rejected connections
-aws logs start-query \
+# Create IAM role for Flow Logs
+aws iam create-role \
+  --role-name VPCFlowLogsRole \
+  --assume-role-policy-document file://vpc-flow-logs-trust-policy.json
+
+# Create flow log
+aws ec2 create-flow-logs \
+  --resource-type VPC \
+  --resource-ids vpc-xxxxx \
+  --traffic-type ALL \
+  --log-destination-type cloud-watch-logs \
   --log-group-name /aws/vpc/flowlogs \
-  --start-time $(date -u -d '1 hour ago' +%s) \
-  --end-time $(date -u +%s) \
-  --query-string '
-    fields @timestamp, srcAddr, dstAddr, dstPort, action
-    | filter action = "REJECT"
-    | stats count(*) by srcAddr
-    | sort count desc
-    | limit 20
-  '
+  --deliver-logs-permission-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/VPCFlowLogsRole
 ```
 
-### AWS Config Rules
+### Query CloudTrail Logs
 
 ```bash
-# Enable AWS Config
-aws configservice put-configuration-recorder \
-  --configuration-recorder name=default,roleARN=arn:aws:iam::123456789012:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig \
-  --recording-group allSupported=true,includeGlobalResourceTypes=true
+# List recent events
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=EventName,AttributeValue=CreateUser \
+  --max-results 10
 
-# Create Config rule for S3 bucket encryption
-aws configservice put-config-rule \
-  --config-rule file://s3-encryption-rule.json
-
-# Example rule JSON
-cat > s3-encryption-rule.json <<EOF
-{
-  "ConfigRuleName": "s3-bucket-server-side-encryption-enabled",
-  "Description": "Checks that S3 buckets have encryption enabled",
-  "Source": {
-    "Owner": "AWS",
-    "SourceIdentifier": "S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED"
-  }
-}
-EOF
-```
-
-### GuardDuty Setup
-
-```bash
-# Enable GuardDuty
-aws guardduty create-detector --enable
-
-# Get detector ID
-DETECTOR_ID=$(aws guardduty list-detectors --query 'DetectorIds[0]' --output text)
-
-# List findings
-aws guardduty list-findings \
-  --detector-id $DETECTOR_ID \
-  --finding-criteria '{"Criterion":{"severity":{"Gte":7}}}'
-
-# Get finding details
-aws guardduty get-findings \
-  --detector-id $DETECTOR_ID \
-  --finding-ids <finding-id>
+# Search for specific user activity
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=Username,AttributeValue=lab-user-01 \
+  --start-time 2026-07-27T00:00:00Z \
+  --end-time 2026-07-28T00:00:00Z
 ```
 
 ## Common Patterns
 
-### Lab Documentation Template
+### Least Privilege IAM Policy
 
-```markdown
-# Lab X: [Lab Title]
-
-## Objective
-[Clear statement of what this lab aims to achieve]
-
-## Learning Outcomes
-- Outcome 1
-- Outcome 2
-- Outcome 3
-
-## Environment
-- AWS Region: us-east-1
-- Services: IAM, EC2, S3, etc.
-
-## Step-by-Step Implementation
-
-### Step 1: [Action]
-```bash
-# Command with explanation
-aws service command --parameter value
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSpecificS3Actions",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::my-app-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:x-amz-server-side-encryption": "aws:kms"
+        }
+      }
+    }
+  ]
+}
 ```
 
-**Screenshot**: `lab-x-step-1.png`
-
-**Explanation**: [Why this step is important]
-
-### Step 2: [Next Action]
-[Continue pattern]
-
-## Commands Summary
-```bash
-# All commands used in order
-```
-
-## Challenges Encountered
-- Challenge 1: [Description and solution]
-- Challenge 2: [Description and solution]
-
-## Lessons Learned
-- Key takeaway 1
-- Key takeaway 2
-
-## References
-- [AWS Documentation Link]
-- [Security Best Practices Link]
-```
-
-### Git Workflow
+### Defense in Depth VPC Architecture
 
 ```bash
-# Start new lab
-git checkout -b lab-3-encryption
-mkdir Lab3_Encryption_and_Key_Management
-cd Lab3_Encryption_and_Key_Management
+# Create layered security: NACL + Security Group + WAF
+# Layer 1: NACL (network level)
+aws ec2 create-network-acl-entry \
+  --network-acl-id acl-xxxxx \
+  --ingress \
+  --rule-number 100 \
+  --protocol tcp \
+  --port-range From=443,To=443 \
+  --cidr-block 0.0.0.0/0 \
+  --rule-action allow
 
-# Add lab files
-touch README.md
-mkdir screenshots
+# Layer 2: Security Group (instance level)
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxxxx \
+  --protocol tcp \
+  --port 443 \
+  --source-group sg-alb-xxxxx
 
-# Regular commits
-git add .
-git commit -m "Lab 3: Create KMS key and enable encryption"
-
-# Add more work
-git add .
-git commit -m "Lab 3: Configure S3 bucket encryption"
-
-# Complete lab
-git add .
-git commit -m "Lab 3: Complete encryption lab with documentation"
-
-# Merge to main
-git checkout main
-git merge lab-3-encryption
-git push origin main
+# Layer 3: Application-level logging
 ```
 
-### AWS CLI Configuration Profiles
+### Automated Security Scanning
 
 ```bash
-# Configure multiple profiles
-aws configure --profile lab-admin
-aws configure --profile lab-readonly
+#!/bin/bash
+# Check for public S3 buckets
+aws s3api list-buckets --query "Buckets[].Name" --output text | \
+while read bucket; do
+  acl=$(aws s3api get-bucket-acl --bucket $bucket 2>/dev/null)
+  if echo "$acl" | grep -q "AllUsers"; then
+    echo "WARNING: Bucket $bucket is publicly accessible"
+  fi
+done
 
-# Use specific profile
-aws s3 ls --profile lab-admin
-aws ec2 describe-instances --profile lab-readonly
-
-# Set default profile
-export AWS_PROFILE=lab-admin
+# Check for overly permissive security groups
+aws ec2 describe-security-groups \
+  --filters Name=ip-permission.cidr,Values=0.0.0.0/0 \
+  --query 'SecurityGroups[?IpPermissions[?FromPort==`22`]].[GroupId,GroupName]' \
+  --output table
 ```
 
 ## Troubleshooting
 
-### IAM Permission Issues
+### IAM Permission Denied
 
 ```bash
-# Check current identity
-aws sts get-caller-identity
-
-# Simulate IAM policy
-aws iam simulate-principal-policy \
-  --policy-source-arn arn:aws:iam::123456789012:user/lab-user \
-  --action-names s3:GetObject s3:PutObject \
-  --resource-arns arn:aws:s3:::lab-bucket/*
-
-# Test AssumeRole
-aws sts assume-role \
-  --role-arn arn:aws:iam::123456789012:role/Lab-Role \
-  --role-session-name test-session
+# Decode authorization failure message
+aws sts decode-authorization-message \
+  --encoded-message <encoded-message> \
+  --query DecodedMessage \
+  --output text | jq .
 ```
 
-### Network Connectivity Issues
+### CloudTrail Not Logging
 
 ```bash
-# Test VPC connectivity
-aws ec2 describe-vpc-peering-connections
-aws ec2 describe-route-tables --filters "Name=vpc-id,Values=vpc-xxxxxxxxx"
+# Check trail status
+aws cloudtrail get-trail-status --name lab-security-trail
 
-# Check security group rules
-aws ec2 describe-security-groups --group-ids sg-xxxxxxxxx
+# Verify S3 bucket policy allows CloudTrail
+aws s3api get-bucket-policy --bucket lab-cloudtrail-logs-$AWS_ACCOUNT_ID
 
-# Test instance connectivity
-aws ec2-instance-connect send-ssh-public-key \
-  --instance-id i-xxxxxxxxx \
-  --instance-os-user ec2-user \
-  --ssh-public-key file://~/.ssh/id_rsa.pub
+# Test permissions
+aws cloudtrail start-logging --name lab-security-trail
 ```
 
-### CloudTrail Event History
+### VPC Connectivity Issues
 
 ```bash
-# Find who made a change
-aws cloudtrail lookup-events \
-  --lookup-attributes AttributeKey=ResourceName,AttributeValue=lab-bucket-name \
-  --max-results 50
+# Check route tables
+aws ec2 describe-route-tables --filters Name=vpc-id,Values=vpc-xxxxx
 
-# Find events by user
-aws cloudtrail lookup-events \
-  --lookup-attributes AttributeKey=Username,AttributeValue=lab-user-01
+# Verify security group rules
+aws ec2 describe-security-groups --group-ids sg-xxxxx
 
-# Export events to file
-aws cloudtrail lookup-events \
-  --start-time $(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%S) \
-  --output json > cloudtrail-events.json
+# Check NACL rules
+aws ec2 describe-network-acls --network-acl-ids acl-xxxxx
+
+# Test connectivity using VPC Reachability Analyzer
+aws ec2 create-network-insights-path \
+  --source <eni-id> \
+  --destination <eni-id> \
+  --protocol tcp \
+  --destination-port 443
 ```
 
-### KMS Key Issues
+### KMS Key Access Issues
 
 ```bash
-# Check key state
-aws kms describe-key --key-id alias/lab-key
+# Check key policy
+aws kms get-key-policy --key-id alias/lab-key --policy-name default
 
 # List grants on key
 aws kms list-grants --key-id alias/lab-key
 
-# Enable disabled key
-aws kms enable-key --key-id alias/lab-key
-
-# Rotate key
-aws kms enable-key-rotation --key-id alias/lab-key
-```
-
-### S3 Access Denied
-
-```bash
-# Check bucket policy
-aws s3api get-bucket-policy --bucket lab-bucket-name
-
-# Check bucket ACL
-aws s3api get-bucket-acl --bucket lab-bucket-name
-
-# Check public access block
-aws s3api get-public-access-block --bucket lab-bucket-name
-
-# Verify object ownership
-aws s3api get-object-attributes \
-  --bucket lab-bucket-name \
-  --key object-key \
-  --object-attributes "ObjectParts"
+# Test encryption
+aws kms generate-data-key --key-id alias/lab-key --key-spec AES_256
 ```
 
 ## Best Practices
 
-### Security Checklist
+1. **Always enable MFA** for root and privileged users
+2. **Use IAM roles** instead of access keys for EC2 instances
+3. **Enable CloudTrail** in all regions for audit logging
+4. **Encrypt data at rest** using KMS for S3, EBS, and RDS
+5. **Apply least privilege** principle to all IAM policies
+6. **Use VPC endpoints** to keep traffic within AWS network
+7. **Enable VPC Flow Logs** for network traffic analysis
+8. **Regularly review** security groups and NACLs
+9. **Set up CloudWatch alarms** for security-critical events
+10. **Tag all resources** for better tracking and cost allocation
 
-- [ ] Enable MFA for all IAM users
-- [ ] Use IAM roles instead of access keys when possible
-- [ ] Apply principle of least privilege to all policies
-- [ ] Enable CloudTrail in all regions
-- [ ] Enable VPC Flow Logs
-- [ ] Encrypt all data at rest using KMS
-- [ ] Use VPC endpoints for AWS services
-- [ ] Enable GuardDuty for threat detection
-- [ ] Configure AWS Config for compliance monitoring
-- [ ] Set up CloudWatch alarms for security events
-- [ ] Regularly rotate credentials and keys
-- [ ] Use security groups as firewalls
-- [ ] Enable S3 bucket versioning and logging
-- [ ] Implement backup and disaster recovery
+## Documentation Standards
 
-### Cost Management
+Each lab should document:
+
+- **Objective**: What security concept is being learned
+- **Prerequisites**: Required knowledge and resources
+- **Implementation Steps**: Detailed commands with explanations
+- **Screenshots**: Visual proof of configuration
+- **Testing**: How to verify the security control works
+- **Cleanup**: Commands to remove resources (avoid charges)
+- **Lessons Learned**: Key takeaways and best practices
+
+## Environment Variables
 
 ```bash
-# Tag resources for cost tracking
-aws ec2 create-tags \
-  --resources i-xxxxxxxxx \
-  --tags Key=Project,Value=IKB42603 Key=Lab,Value=Lab1
-
-# Set up billing alerts
-aws cloudwatch put-metric-alarm \
-  --alarm-name Lab-Budget-Alert \
-  --alarm-description "Alert when estimated charges exceed $10" \
-  --metric-name EstimatedCharges \
-  --namespace AWS/Billing \
-  --statistic Maximum \
-  --period 21600 \
-  --evaluation-periods 1 \
-  --threshold 10 \
-  --comparison-operator GreaterThanThreshold
-
-# Clean up resources after lab
-aws ec2 terminate-instances --instance-ids i-xxxxxxxxx
-aws ec2 delete-security-group --group-id sg-xxxxxxxxx
-aws s3 rb s3://lab-bucket-name --force
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_DEFAULT_REGION="us-east-1"
+export AWS_ACCOUNT_ID="123456789012"
+export MY_IP="203.0.113.5"
+export EMAIL_ADDRESS="alerts@example.com"
 ```
+
+## Additional Resources
+
+- [AWS Security Best Practices](https://aws.amazon.com/security/best-practices/)
+- [AWS Well-Architected Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/)
+- [AWS IAM Policy Reference](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies.html)
+- [AWS KMS Developer Guide](https://docs.aws.amazon.com/kms/latest/developerguide/)
+- [AWS CloudTrail User Guide](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/)
