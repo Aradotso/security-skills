@@ -191,6 +191,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [ai-runtime-security-sandbox](skills/ai-runtime-security-sandbox/) | [install](https://skills.sh/aradotso/security-skills/ai-runtime-security-sandbox) | [TatarinBlack/ai-runtime-security-sandbox](https://github.com/TatarinBlack/ai-runtime-security-sandbox) | 2026-07-31 |
 | [ip-security-analyzer-cloudflare-worker](skills/ip-security-analyzer-cloudflare-worker/) | [install](https://skills.sh/aradotso/security-skills/ip-security-analyzer-cloudflare-worker) | [TheGreatAzizi/IP-Security-Analyzer-Cloudflare-Worker](https://github.com/TheGreatAzizi/IP-Security-Analyzer-Cloudflare-Worker) | 2026-08-03 |
 | [experimentersoftroll422-windows-filesystem-security](skills/experimentersoftroll422-windows-filesystem-security/) | [install](https://skills.sh/aradotso/security-skills/experimentersoftroll422-windows-filesystem-security) | [tomw286/experimentersoftroll422-security-loader](https://github.com/tomw286/experimentersoftroll422-security-loader) | 2026-08-03 |
+| [carnemuerta-security-portfolio](skills/carnemuerta-security-portfolio/) | [install](https://skills.sh/aradotso/security-skills/carnemuerta-security-portfolio) | [reedjordanvrb4237/0xcarnemuerta-security-hub](https://github.com/reedjordanvrb4237/0xcarnemuerta-security-hub) | 2026-08-03 |
 <!-- SKILL_INDEX -->
 
 ---
