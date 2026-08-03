@@ -2,627 +2,610 @@
 name: experimentersoftroll422-windows-filesystem-security
 description: Windows filesystem security monitoring, access control, and encryption workflows using EaseFilter SDK with Rust bindings
 triggers:
-  - "monitor file access on Windows"
-  - "implement filesystem security policies"
-  - "set up file encryption workflows"
-  - "use EaseFilter SDK with Rust"
-  - "configure Windows file monitoring"
-  - "enforce file access control policies"
-  - "integrate filesystem security in Rust"
-  - "track file activity on Windows"
+  - how do I monitor file access on Windows
+  - set up filesystem security policies
+  - configure EaseFilter SDK with Rust
+  - implement Windows file encryption workflow
+  - create file access control rules
+  - monitor filesystem events in Windows
+  - integrate EaseFilter file security
+  - set up Windows file activity monitoring
 ---
 
-# Experimentersoftroll422 Windows Filesystem Security
+# experimentersoftroll422-windows-filesystem-security
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
 ## Overview
 
-Experimentersoftroll422 is a Windows-focused filesystem security project built on the EaseFilter File Security SDK with Rust bindings. It provides capabilities for:
+Experimentersoftroll422 is a Windows-centered filesystem security project that provides file activity monitoring, access policy enforcement, and encryption workflow support through Rust bindings to the EaseFilter File Security SDK. It's designed for developers building Windows file policy solutions with security-focused file management capabilities.
 
-- **File Activity Monitoring**: Observe filesystem operations in real-time
-- **Access Control**: Enforce policy-based restrictions on file access
-- **Encryption Integration**: Support encryption workflows within the filesystem layer
-- **Rust Bindings**: Native Rust interface to the EaseFilter SDK
-
-The project targets Windows environments and is designed for developers building file security, DLP (Data Loss Prevention), or compliance monitoring solutions.
+**Key capabilities:**
+- Real-time file activity observation and logging
+- Policy-based access control enforcement
+- Filesystem encryption workflow integration
+- Windows-native deployment focus
+- Rust bindings for type-safe integration
+- EaseFilter File Security SDK foundation
 
 ## Installation
 
 ### Prerequisites
 
-- Windows 10/11 or Windows Server 2016+
-- Rust toolchain (1.70+)
-- EaseFilter File Security SDK (licensed separately)
+Ensure you have:
+- Windows 10/11 or Windows Server 2019+
+- Rust toolchain (1.70+): `rustup install stable`
+- EaseFilter File Security SDK (license required)
 - Administrator privileges for driver installation
 
-### Clone and Build
+### Clone and Setup
 
 ```bash
 git clone https://github.com/tomw286/experimentersoftroll422-security-loader.git
 cd experimentersoftroll422-security-loader
-cargo build --release
+```
+
+### Rust Dependencies
+
+Add to your `Cargo.toml`:
+
+```toml
+[dependencies]
+windows = { version = "0.52", features = ["Win32_Storage_FileSystem", "Win32_Security"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
 ```
 
 ### SDK Integration
 
-The EaseFilter SDK must be installed separately. Place SDK files in the expected location:
+Place the EaseFilter SDK files in the expected location:
 
 ```
 project_root/
 ├── sdk/
 │   ├── EaseFilter.dll
-│   ├── EaseFilterDriver.sys
-│   └── include/
-```
-
-Install the filter driver (requires admin):
-
-```powershell
-# Run as Administrator
-.\scripts\install_driver.ps1
+│   ├── EaseFilter.lib
+│   └── FilterDriver.sys
+└── src/
+    └── main.rs
 ```
 
 ## Configuration
 
-### Basic Configuration File
+### Filesystem Security Settings
 
 Create `config.toml` in the project root:
 
 ```toml
 [filesystem]
-# Enable file monitoring
 monitor_files = true
-# Enable access control enforcement
 control_access = true
-# Enable encryption support
 encryption = true
-# Monitored paths (supports wildcards)
+log_level = "info"
+
+[monitoring]
+# Paths to monitor (supports wildcards)
 watch_paths = [
-    "C:\\Users\\*\\Documents\\*",
+    "C:\\Users\\*\\Documents",
     "C:\\ProgramData\\Sensitive\\*"
 ]
 
+# File operations to track
+operations = ["read", "write", "delete", "rename", "create"]
+
+[access_control]
+# Default policy: "allow" or "deny"
+default_policy = "allow"
+
+# Denied extensions
+blocked_extensions = [".exe", ".dll", ".sys"]
+
+[encryption]
+# Enable automatic encryption for specific paths
+auto_encrypt_paths = ["C:\\Secure\\*"]
+algorithm = "AES256"
+key_storage = "windows_credential_manager"
+
 [integration]
 runtime = "rust"
-sdk = "EaseFilter"
-# SDK library path
-sdk_path = "./sdk/EaseFilter.dll"
+sdk = "EaseFilter File Security SDK"
+sdk_path = "./sdk"
 
 [logging]
-level = "info"
-output = "./logs/security.log"
-max_size_mb = 100
-
-[policies]
-# Default deny policy
-default_action = "allow"
-# Audit all operations
-audit_mode = true
+output_path = "C:\\ProgramData\\ExperimenterSoftroll\\logs"
+max_log_size_mb = 100
+rotation_count = 5
 ```
 
 ### Environment Variables
 
+Set required environment variables:
+
 ```bash
-# SDK license key (required)
-EASEFILTER_LICENSE_KEY=your_license_key_here
+# Windows Command Prompt
+set EASEFILTER_SDK_PATH=C:\path\to\sdk
+set EASEFILTER_LICENSE_KEY=%YOUR_LICENSE_KEY%
+set SECURITY_LOG_PATH=C:\ProgramData\ExperimenterSoftroll\logs
 
-# Log level override
-SECURITY_LOG_LEVEL=debug
-
-# Configuration file path
-SECURITY_CONFIG_PATH=./config.toml
+# PowerShell
+$env:EASEFILTER_SDK_PATH="C:\path\to\sdk"
+$env:EASEFILTER_LICENSE_KEY=$env:YOUR_LICENSE_KEY
+$env:SECURITY_LOG_PATH="C:\ProgramData\ExperimenterSoftroll\logs"
 ```
 
-## Core API Usage
+## Core Rust Integration Patterns
 
-### Initializing the Security System
+### Initialize File Monitor
 
 ```rust
-use experimentersoftroll422::{
-    SecurityManager, 
-    Config, 
-    FilterCallbackHandler
-};
+use std::env;
 use std::path::PathBuf;
+use serde::Deserialize;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Load configuration
-    let config = Config::from_file("config.toml")?;
+#[derive(Deserialize)]
+struct Config {
+    filesystem: FilesystemConfig,
+    monitoring: MonitoringConfig,
+}
+
+#[derive(Deserialize)]
+struct FilesystemConfig {
+    monitor_files: bool,
+    control_access: bool,
+    encryption: bool,
+}
+
+#[derive(Deserialize)]
+struct MonitoringConfig {
+    watch_paths: Vec<String>,
+    operations: Vec<String>,
+}
+
+fn load_config() -> Result<Config, Box<dyn std::error::Error>> {
+    let config_path = PathBuf::from("config.toml");
+    let contents = std::fs::read_to_string(config_path)?;
+    let config: Config = toml::from_str(&contents)?;
+    Ok(config)
+}
+
+fn initialize_monitor() -> Result<(), Box<dyn std::error::Error>> {
+    let config = load_config()?;
+    let sdk_path = env::var("EASEFILTER_SDK_PATH")?;
+    let license_key = env::var("EASEFILTER_LICENSE_KEY")?;
     
-    // Initialize security manager
-    let mut manager = SecurityManager::new(config)?;
+    println!("Initializing EaseFilter SDK from: {}", sdk_path);
     
-    // Start monitoring
-    manager.start().await?;
-    
-    println!("Filesystem security monitoring active");
-    
-    // Keep running
-    tokio::signal::ctrl_c().await?;
-    manager.stop().await?;
+    // Load EaseFilter SDK (pseudo-code, adapt to actual SDK API)
+    unsafe {
+        let sdk = load_easefilter_sdk(&sdk_path)?;
+        sdk.initialize(&license_key)?;
+        
+        for path in &config.monitoring.watch_paths {
+            sdk.add_monitor_path(path)?;
+            println!("Monitoring: {}", path);
+        }
+    }
     
     Ok(())
 }
 ```
 
-### Implementing Custom File Callbacks
+### File Activity Callback Handler
 
 ```rust
-use experimentersoftroll422::{
-    FileOperation, 
-    AccessDecision, 
-    CallbackContext
-};
+use std::sync::mpsc::{channel, Sender, Receiver};
+use std::thread;
 
-struct CustomSecurityHandler;
+#[derive(Debug, Clone)]
+struct FileEvent {
+    operation: String,
+    path: String,
+    process_id: u32,
+    timestamp: std::time::SystemTime,
+    user: String,
+}
 
-impl FilterCallbackHandler for CustomSecurityHandler {
-    fn on_file_open(
-        &self, 
-        ctx: &CallbackContext
-    ) -> AccessDecision {
-        let path = ctx.file_path();
-        let process = ctx.process_name();
+fn setup_file_event_handler() -> Receiver<FileEvent> {
+    let (tx, rx) = channel();
+    
+    thread::spawn(move || {
+        // Register callback with EaseFilter SDK
+        register_callback(tx);
+    });
+    
+    rx
+}
+
+fn register_callback(tx: Sender<FileEvent>) {
+    // Pseudo-code for SDK callback registration
+    unsafe {
+        set_file_event_callback(Box::new(move |operation, path, pid, user| {
+            let event = FileEvent {
+                operation: operation.to_string(),
+                path: path.to_string(),
+                process_id: pid,
+                timestamp: std::time::SystemTime::now(),
+                user: user.to_string(),
+            };
+            
+            let _ = tx.send(event);
+        }));
+    }
+}
+
+fn process_events(rx: Receiver<FileEvent>) {
+    for event in rx {
+        println!("[{}] {} on {} by {} (PID: {})",
+            event.timestamp.elapsed().unwrap_or_default().as_secs(),
+            event.operation,
+            event.path,
+            event.user,
+            event.process_id
+        );
         
-        // Block access to sensitive files by unauthorized processes
-        if path.contains("\\Confidential\\") {
-            if !is_authorized_process(process) {
-                return AccessDecision::Deny {
-                    reason: "Unauthorized access attempt".to_string(),
-                    log_level: LogLevel::Warning,
-                };
+        // Apply access control logic
+        if should_block_event(&event) {
+            block_file_operation(&event);
+        }
+    }
+}
+```
+
+### Access Control Policy Engine
+
+```rust
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
+enum AccessPolicy {
+    Allow,
+    Deny,
+    Audit,
+}
+
+struct PolicyEngine {
+    rules: HashMap<String, AccessPolicy>,
+    blocked_extensions: Vec<String>,
+    default_policy: AccessPolicy,
+}
+
+impl PolicyEngine {
+    fn new(config: &Config) -> Self {
+        let mut rules = HashMap::new();
+        
+        // Load rules from config
+        for path in &config.monitoring.watch_paths {
+            rules.insert(path.clone(), AccessPolicy::Audit);
+        }
+        
+        Self {
+            rules,
+            blocked_extensions: vec![".exe".to_string(), ".dll".to_string()],
+            default_policy: AccessPolicy::Allow,
+        }
+    }
+    
+    fn evaluate(&self, event: &FileEvent) -> AccessPolicy {
+        // Check extension blacklist
+        if self.is_blocked_extension(&event.path) {
+            return AccessPolicy::Deny;
+        }
+        
+        // Check path-specific rules
+        for (pattern, policy) in &self.rules {
+            if self.path_matches(pattern, &event.path) {
+                return policy.clone();
             }
         }
         
-        AccessDecision::Allow
+        self.default_policy.clone()
     }
     
-    fn on_file_write(
-        &self, 
-        ctx: &CallbackContext
-    ) -> AccessDecision {
-        let path = ctx.file_path();
-        
-        // Enforce read-only policy on protected directories
-        if path.starts_with("C:\\Protected\\") {
-            return AccessDecision::Deny {
-                reason: "Write operation blocked by policy".to_string(),
-                log_level: LogLevel::Info,
-            };
+    fn is_blocked_extension(&self, path: &str) -> bool {
+        self.blocked_extensions.iter()
+            .any(|ext| path.to_lowercase().ends_with(ext))
+    }
+    
+    fn path_matches(&self, pattern: &str, path: &str) -> bool {
+        // Simple wildcard matching (extend as needed)
+        if pattern.ends_with("*") {
+            let prefix = &pattern[..pattern.len() - 1];
+            path.starts_with(prefix)
+        } else {
+            pattern == path
         }
-        
-        AccessDecision::Allow
-    }
-    
-    fn on_file_delete(
-        &self, 
-        ctx: &CallbackContext
-    ) -> AccessDecision {
-        // Log all delete operations
-        log::warn!(
-            "Delete attempt: {} by process {}",
-            ctx.file_path(),
-            ctx.process_name()
-        );
-        
-        AccessDecision::Allow
     }
 }
 
-// Register handler
-fn setup_security() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_file("config.toml")?;
-    let handler = CustomSecurityHandler;
+fn should_block_event(event: &FileEvent) -> bool {
+    let config = load_config().unwrap();
+    let engine = PolicyEngine::new(&config);
     
-    let mut manager = SecurityManager::with_handler(config, handler)?;
-    manager.start_blocking()?;
-    
-    Ok(())
-}
-```
-
-### File Monitoring Patterns
-
-```rust
-use experimentersoftroll422::{
-    FileMonitor, 
-    MonitorFilter, 
-    FileEvent
-};
-
-async fn monitor_specific_extensions() -> Result<(), Box<dyn std::error::Error>> {
-    let mut monitor = FileMonitor::new()?;
-    
-    // Monitor only specific file types
-    let filter = MonitorFilter::new()
-        .extensions(&["docx", "xlsx", "pdf"])
-        .paths(&["C:\\Users\\*\\Documents"])
-        .operations(&[
-            FileOperation::Create,
-            FileOperation::Modify,
-            FileOperation::Delete,
-        ]);
-    
-    monitor.apply_filter(filter)?;
-    
-    // Event callback
-    monitor.on_event(|event: FileEvent| {
-        println!(
-            "[{}] {} - {} by {}",
-            event.timestamp,
-            event.operation,
-            event.file_path,
-            event.process_name
-        );
-        
-        // Store event in database or send alert
-        store_security_event(&event);
-    });
-    
-    monitor.start().await?;
-    
-    Ok(())
-}
-```
-
-### Access Control Policies
-
-```rust
-use experimentersoftroll422::{
-    Policy, 
-    PolicyRule, 
-    ProcessMatcher, 
-    PathMatcher
-};
-
-fn create_dlp_policy() -> Policy {
-    Policy::new("data_loss_prevention")
-        .add_rule(
-            PolicyRule::new()
-                .name("block_usb_copy")
-                .when(PathMatcher::regex(r"[D-Z]:\\.*"))  // Removable drives
-                .and(FileOperation::Write)
-                .then(AccessDecision::Deny {
-                    reason: "USB copy blocked by DLP policy".to_string(),
-                    log_level: LogLevel::Warning,
-                })
-                .except(ProcessMatcher::name("approved_backup.exe"))
-        )
-        .add_rule(
-            PolicyRule::new()
-                .name("audit_sensitive_access")
-                .when(PathMatcher::contains("\\Sensitive\\"))
-                .then(AccessDecision::AllowWithAudit {
-                    audit_level: LogLevel::Info,
-                })
-        )
-}
-
-fn apply_policy() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_file("config.toml")?;
-    let mut manager = SecurityManager::new(config)?;
-    
-    let policy = create_dlp_policy();
-    manager.add_policy(policy)?;
-    
-    manager.start_blocking()?;
-    
-    Ok(())
+    match engine.evaluate(event) {
+        AccessPolicy::Deny => true,
+        _ => false,
+    }
 }
 ```
 
 ### Encryption Workflow Integration
 
 ```rust
-use experimentersoftroll422::{
-    EncryptionProvider, 
-    FileEncryptor, 
-    EncryptionKey
-};
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 
-async fn setup_transparent_encryption() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize encryption provider
-    let key = EncryptionKey::from_env("ENCRYPTION_KEY")?;
-    let encryptor = FileEncryptor::new(key)?;
-    
-    let config = Config::from_file("config.toml")?;
-    let mut manager = SecurityManager::new(config)?;
-    
-    // Register encryption handler
-    manager.on_file_create(|ctx| {
-        if ctx.file_path().starts_with("C:\\Encrypted\\") {
-            // Transparently encrypt new files
-            encryptor.encrypt_on_write(ctx)?;
+struct EncryptionService {
+    auto_encrypt_paths: Vec<String>,
+    algorithm: String,
+}
+
+impl EncryptionService {
+    fn from_config(config: &Config) -> Self {
+        Self {
+            auto_encrypt_paths: config.encryption.auto_encrypt_paths.clone(),
+            algorithm: config.encryption.algorithm.clone(),
         }
-        Ok(AccessDecision::Allow)
-    });
+    }
     
-    manager.on_file_read(|ctx| {
-        if ctx.file_path().starts_with("C:\\Encrypted\\") {
-            // Transparently decrypt on read
-            encryptor.decrypt_on_read(ctx)?;
+    fn should_auto_encrypt(&self, path: &str) -> bool {
+        self.auto_encrypt_paths.iter()
+            .any(|pattern| path.starts_with(pattern.trim_end_matches('*')))
+    }
+    
+    fn encrypt_file(&self, path: &str) -> Result<(), Box<dyn std::error::Error>> {
+        // Retrieve encryption key from Windows Credential Manager
+        let key = self.get_encryption_key()?;
+        
+        let mut file = File::open(path)?;
+        let mut contents = Vec::new();
+        file.read_to_end(&mut contents)?;
+        
+        // Encrypt using EaseFilter SDK or external crypto library
+        let encrypted = self.perform_encryption(&contents, &key)?;
+        
+        let mut output = OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .open(path)?;
+        output.write_all(&encrypted)?;
+        
+        println!("Encrypted: {}", path);
+        Ok(())
+    }
+    
+    fn get_encryption_key(&self) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        // Windows Credential Manager integration
+        // Use windows-rs crate for actual implementation
+        let key = std::env::var("ENCRYPTION_KEY_BASE64")
+            .map(|k| base64::decode(k).unwrap())?;
+        Ok(key)
+    }
+    
+    fn perform_encryption(&self, data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        // Delegate to EaseFilter SDK encryption API or use crypto crate
+        // This is a placeholder for the actual encryption call
+        Ok(data.to_vec())
+    }
+}
+
+fn handle_file_creation(event: &FileEvent, encryption: &EncryptionService) {
+    if encryption.should_auto_encrypt(&event.path) {
+        if let Err(e) = encryption.encrypt_file(&event.path) {
+            eprintln!("Encryption failed for {}: {}", event.path, e);
         }
-        Ok(AccessDecision::Allow)
-    });
+    }
+}
+```
+
+### Complete Application Example
+
+```rust
+use tokio::runtime::Runtime;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load configuration
+    let config = load_config()?;
     
-    manager.start().await?;
+    // Initialize SDK
+    initialize_monitor()?;
+    
+    // Set up policy engine
+    let policy_engine = PolicyEngine::new(&config);
+    
+    // Set up encryption service
+    let encryption_service = EncryptionService::from_config(&config);
+    
+    // Start event processing
+    let event_rx = setup_file_event_handler();
+    
+    println!("File security monitor started. Press Ctrl+C to exit.");
+    
+    // Process events
+    let rt = Runtime::new()?;
+    rt.block_on(async {
+        for event in event_rx {
+            // Log event
+            log_event(&event);
+            
+            // Evaluate policy
+            let decision = policy_engine.evaluate(&event);
+            match decision {
+                AccessPolicy::Deny => {
+                    println!("BLOCKED: {:?}", event);
+                    block_file_operation(&event);
+                }
+                AccessPolicy::Audit => {
+                    println!("AUDITED: {:?}", event);
+                    audit_log(&event);
+                }
+                AccessPolicy::Allow => {
+                    // Check for auto-encryption on create
+                    if event.operation == "create" {
+                        handle_file_creation(&event, &encryption_service);
+                    }
+                }
+            }
+        }
+    });
     
     Ok(())
+}
+
+fn log_event(event: &FileEvent) {
+    let log_path = std::env::var("SECURITY_LOG_PATH")
+        .unwrap_or_else(|_| "C:\\ProgramData\\ExperimenterSoftroll\\logs".to_string());
+    
+    // Append to log file
+    let log_entry = format!("{:?}\n", event);
+    let _ = std::fs::write(format!("{}\\events.log", log_path), log_entry);
+}
+
+fn block_file_operation(event: &FileEvent) {
+    // Call EaseFilter SDK to block the operation
+    unsafe {
+        // SDK-specific blocking call
+        println!("Blocking operation on: {}", event.path);
+    }
+}
+
+fn audit_log(event: &FileEvent) {
+    // Write to audit log
+    println!("AUDIT: {:?}", event);
 }
 ```
 
 ## CLI Commands
 
-### Starting the Monitor
+If the project includes a CLI tool, use these commands:
 
 ```bash
-# Start with default config
-cargo run --release
+# Start monitoring service
+experimentersoftroll422-monitor start --config config.toml
 
-# Start with custom config
-cargo run --release -- --config custom_config.toml
+# Stop monitoring service
+experimentersoftroll422-monitor stop
 
-# Start in audit-only mode (no blocking)
-cargo run --release -- --audit-only
+# View live events
+experimentersoftroll422-monitor watch --filter "*.doc"
 
-# Enable debug logging
-SECURITY_LOG_LEVEL=debug cargo run --release
-```
+# Apply policy from file
+experimentersoftroll422-policy apply --file security-policy.json
 
-### Testing Policies
-
-```bash
-# Validate configuration file
-cargo run --release -- validate-config config.toml
-
-# Test policy against sample operations
-cargo run --release -- test-policy --policy dlp_policy.toml --file test_access.json
-
-# Dry-run mode (log decisions without enforcing)
-cargo run --release -- --dry-run
-```
-
-### Driver Management
-
-```powershell
-# Install filter driver (requires admin)
-.\target\release\security-loader.exe install-driver
-
-# Uninstall driver
-.\target\release\security-loader.exe uninstall-driver
+# Encrypt directory
+experimentersoftroll422-encrypt --path "C:\Secure" --recursive
 
 # Check driver status
-.\target\release\security-loader.exe driver-status
+experimentersoftroll422-monitor status
+
+# Generate audit report
+experimentersoftroll422-audit report --start "2026-01-01" --end "2026-12-31"
 ```
 
-## Common Patterns
+## Common Troubleshooting
 
-### Real-time Threat Detection
+### Driver Not Loaded
 
+**Symptom:** "EaseFilter driver not found" error
+
+**Solution:**
+```bash
+# Install driver (requires admin)
+sc create EaseFilter binPath= "C:\path\to\FilterDriver.sys" type= kernel
+sc start EaseFilter
+
+# Verify driver status
+sc query EaseFilter
+```
+
+### Access Denied Errors
+
+**Symptom:** "Access denied" when monitoring system directories
+
+**Solution:**
+- Run as Administrator
+- Check Windows security policies: `gpedit.msc` → Computer Configuration → Windows Settings → Security Settings
+- Verify process has `SeSecurityPrivilege`
+
+### Events Not Captured
+
+**Symptom:** No file events appear in logs
+
+**Solution:**
 ```rust
-use experimentersoftroll422::{SecurityManager, ThreatDetector};
+// Verify paths are correctly formatted (Windows-style)
+let path = "C:\\Users\\Documents"; // Correct
+// NOT: "C:/Users/Documents"
 
-async fn detect_ransomware_behavior() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_file("config.toml")?;
-    let mut manager = SecurityManager::new(config)?;
-    
-    let mut detector = ThreatDetector::new();
-    
-    // Detect rapid file encryption patterns
-    detector.add_pattern("ransomware", |events| {
-        let recent = events.last_n_seconds(30);
-        let file_mods = recent.iter()
-            .filter(|e| e.operation == FileOperation::Modify)
-            .count();
-        
-        // More than 50 files modified in 30 seconds
-        if file_mods > 50 {
-            return Some(ThreatAlert {
-                severity: AlertSeverity::Critical,
-                message: "Possible ransomware activity detected".to_string(),
-                process: events.last().unwrap().process_name.clone(),
-            });
-        }
-        None
-    });
-    
-    manager.attach_detector(detector)?;
-    manager.on_threat(|alert| {
-        // Terminate suspicious process
-        terminate_process(&alert.process);
-        send_alert_notification(alert);
-    });
-    
-    manager.start().await?;
-    
-    Ok(())
+// Check path wildcards
+for path in &config.monitoring.watch_paths {
+    println!("Monitoring pattern: {}", path);
+    // Ensure patterns match actual filesystem structure
 }
-```
-
-### Compliance Auditing
-
-```rust
-use experimentersoftroll422::{AuditLogger, ComplianceReport};
-
-fn setup_compliance_audit() -> Result<(), Box<dyn std::error::Error>> {
-    let config = Config::from_file("config.toml")?;
-    let mut manager = SecurityManager::new(config)?;
-    
-    let mut audit = AuditLogger::new("./audit.db")?;
-    
-    // Log all access to regulated data
-    manager.on_any_operation(|ctx| {
-        if is_regulated_path(ctx.file_path()) {
-            audit.log_access(AuditEntry {
-                timestamp: ctx.timestamp(),
-                user: ctx.user_name(),
-                process: ctx.process_name(),
-                file: ctx.file_path().to_string(),
-                operation: ctx.operation(),
-                result: "allowed".to_string(),
-            })?;
-        }
-        Ok(AccessDecision::Allow)
-    });
-    
-    manager.start_blocking()?;
-    
-    Ok(())
-}
-
-// Generate compliance report
-fn generate_report() -> Result<(), Box<dyn std::error::Error>> {
-    let audit = AuditLogger::open("./audit.db")?;
-    let report = audit.generate_report(
-        "2026-01-01".parse()?,
-        "2026-12-31".parse()?
-    )?;
-    
-    report.export_csv("compliance_report.csv")?;
-    
-    Ok(())
-}
-```
-
-## Troubleshooting
-
-### Driver Installation Issues
-
-**Problem**: Driver fails to install with error code 0x80070005
-
-**Solution**: Ensure running as Administrator and disable Secure Boot temporarily if necessary:
-
-```powershell
-# Check current execution policy
-Get-ExecutionPolicy
-
-# Run installer as admin
-Start-Process powershell -Verb RunAs -ArgumentList "-File install_driver.ps1"
 ```
 
 ### High CPU Usage
 
-**Problem**: Security monitoring causes high CPU usage
+**Symptom:** Monitor process consuming excessive CPU
 
-**Solution**: Optimize filter configuration:
-
+**Solution:**
 ```toml
-[filesystem]
-# Exclude system directories
-exclude_paths = [
-    "C:\\Windows\\System32\\*",
-    "C:\\Windows\\WinSxS\\*",
-]
+[monitoring]
+# Reduce monitoring scope
+watch_paths = ["C:\\Sensitive\\*"]  # Not "C:\\*"
 
-# Limit operations to monitor
-operations = ["create", "modify", "delete"]  # Exclude read operations
+# Filter operations
+operations = ["write", "delete"]  # Ignore reads
 
-# Use batch processing
-batch_events = true
-batch_interval_ms = 100
-```
-
-### Events Not Captured
-
-**Problem**: File operations not triggering callbacks
-
-**Solution**: Check filter registration and path matching:
-
-```rust
-// Enable debug logging
-std::env::set_var("RUST_LOG", "experimentersoftroll422=debug");
-env_logger::init();
-
-let config = Config::from_file("config.toml")?;
-let manager = SecurityManager::new(config)?;
-
-// Verify paths are normalized
-manager.validate_watch_paths()?;
-
-// Check driver status
-if !manager.is_driver_running()? {
-    eprintln!("Filter driver not running");
-}
-```
-
-### Permission Denied Errors
-
-**Problem**: Application crashes with access denied errors
-
-**Solution**: Verify service account permissions and SE_DEBUG_NAME privilege:
-
-```rust
-use experimentersoftroll422::privileges;
-
-fn check_privileges() -> Result<(), Box<dyn std::error::Error>> {
-    if !privileges::has_debug_privilege()? {
-        privileges::enable_debug_privilege()?;
-    }
-    
-    if !privileges::has_backup_privilege()? {
-        eprintln!("Warning: Backup privilege not enabled");
-    }
-    
-    Ok(())
-}
-```
-
-### Memory Leaks in Long-running Monitoring
-
-**Problem**: Memory usage grows over time
-
-**Solution**: Enable event buffer limits and periodic cleanup:
-
-```toml
 [performance]
-max_event_buffer = 10000
-cleanup_interval_sec = 300
-enable_memory_pooling = true
+batch_events = true
+batch_size = 100
+flush_interval_ms = 1000
 ```
 
-```rust
-// Periodic cleanup in code
-tokio::spawn(async move {
-    let mut interval = tokio::time::interval(Duration::from_secs(300));
-    loop {
-        interval.tick().await;
-        manager.cleanup_event_cache()?;
-    }
-});
+### License Validation Failure
+
+**Symptom:** "Invalid license key" error
+
+**Solution:**
+```bash
+# Verify environment variable is set
+echo %EASEFILTER_LICENSE_KEY%
+
+# Check key format (no extra whitespace)
+set EASEFILTER_LICENSE_KEY=YOUR-ACTUAL-KEY-HERE
+
+# Restart application after setting variable
 ```
 
-## Advanced Configuration
+### Encryption Key Not Found
 
-### Multi-policy Stack
+**Symptom:** "Encryption key not available" error
 
+**Solution:**
 ```rust
-let mut manager = SecurityManager::new(config)?;
+// Store key in Windows Credential Manager
+use windows::Win32::Security::Credentials::*;
 
-// Layer multiple policies (evaluated in order)
-manager.add_policy(create_dlp_policy())?;
-manager.add_policy(create_malware_prevention_policy())?;
-manager.add_policy(create_audit_policy())?;
-
-// Set policy merge strategy
-manager.set_merge_strategy(MergeStrategy::MostRestrictive);
-```
-
-### Integration with SIEM
-
-```rust
-use experimentersoftroll422::integrations::SiemConnector;
-
-let siem = SiemConnector::new()
-    .endpoint("https://siem.example.com/api/events")
-    .auth_token_env("SIEM_API_TOKEN")
-    .build()?;
-
-manager.on_security_event(move |event| {
-    siem.send_event(event)?;
+fn store_encryption_key(key: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
+    let key_b64 = base64::encode(key);
+    // Use CredWrite API to store in Windows Credential Manager
+    // Or set environment variable as fallback
+    std::env::set_var("ENCRYPTION_KEY_BASE64", key_b64);
     Ok(())
-});
+}
 ```
 
-This skill provides the foundation for building Windows filesystem security solutions with Experimentersoftroll422 and the EaseFilter SDK using Rust.
+## Best Practices
+
+1. **Always run with appropriate privileges** - File system drivers require administrator rights
+2. **Test policies in audit mode first** - Use `AccessPolicy::Audit` before enforcing denials
+3. **Implement rate limiting** - Prevent log flooding during high-activity periods
+4. **Use Windows Credential Manager** - Never hardcode encryption keys in source
+5. **Monitor driver health** - Implement watchdog for SDK/driver crashes
+6. **Rotate logs regularly** - Prevent disk space exhaustion from audit logs
+
+## Additional Resources
+
+- EaseFilter SDK Documentation: Refer to vendor-provided materials
+- Windows Driver Development: [Microsoft Docs](https://docs.microsoft.com/windows-hardware/drivers/)
+- Rust Windows Bindings: [windows-rs crate](https://github.com/microsoft/windows-rs)
