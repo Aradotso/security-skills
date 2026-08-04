@@ -196,6 +196,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [avira-internet-security-loader-analysis](skills/avira-internet-security-loader-analysis/) | [install](https://skills.sh/aradotso/security-skills/avira-internet-security-loader-analysis) | [clarar71/avira-internet-security-loader](https://github.com/clarar71/avira-internet-security-loader) | 2026-08-03 |
 | [acidrain-xss-security-testing](skills/acidrain-xss-security-testing/) | [install](https://skills.sh/aradotso/security-skills/acidrain-xss-security-testing) | [henry-lewiskpp1107/acidrain-security-script-hub](https://github.com/henry-lewiskpp1107/acidrain-security-script-hub) | 2026-08-04 |
 | [acidrain-security-testing-scripts](skills/acidrain-security-testing-scripts/) | [install](https://skills.sh/aradotso/security-skills/acidrain-security-testing-scripts) | [henry-lewiskpp1107/acidrain-security-script-hub](https://github.com/henry-lewiskpp1107/acidrain-security-script-hub) | 2026-08-04 |
+| [acidrain-security-testing-toolkit](skills/acidrain-security-testing-toolkit/) | [install](https://skills.sh/aradotso/security-skills/acidrain-security-testing-toolkit) | [henry-lewiskpp1107/acidrain-security-script-hub](https://github.com/henry-lewiskpp1107/acidrain-security-script-hub) | 2026-08-04 |
 <!-- SKILL_INDEX -->
 
 ---
