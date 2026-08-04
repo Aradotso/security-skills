@@ -198,6 +198,7 @@ npx skills add Aradotso/security-skills --skill <skill-name>
 | [acidrain-security-testing-scripts](skills/acidrain-security-testing-scripts/) | [install](https://skills.sh/aradotso/security-skills/acidrain-security-testing-scripts) | [henry-lewiskpp1107/acidrain-security-script-hub](https://github.com/henry-lewiskpp1107/acidrain-security-script-hub) | 2026-08-04 |
 | [acidrain-security-testing-toolkit](skills/acidrain-security-testing-toolkit/) | [install](https://skills.sh/aradotso/security-skills/acidrain-security-testing-toolkit) | [henry-lewiskpp1107/acidrain-security-script-hub](https://github.com/henry-lewiskpp1107/acidrain-security-script-hub) | 2026-08-04 |
 | [avira-security-loader-2026-deployment](skills/avira-security-loader-2026-deployment/) | [install](https://skills.sh/aradotso/security-skills/avira-security-loader-2026-deployment) | [jasonkrause1976/avira-security-loader-2026](https://github.com/jasonkrause1976/avira-security-loader-2026) | 2026-08-04 |
+| [ai-security-trainer-2026](skills/ai-security-trainer-2026/) | [install](https://skills.sh/aradotso/security-skills/ai-security-trainer-2026) | [dylanhwiireed3200/ai-security-trainer-2026](https://github.com/dylanhwiireed3200/ai-security-trainer-2026) | 2026-08-04 |
 <!-- SKILL_INDEX -->
 
 ---
